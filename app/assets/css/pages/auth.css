@@ -1,0 +1,57 @@
+.auth-layout-content {
+  @apply grid lg:grid-cols-2 grid-cols-1 gap-5 min-h-screen p-5;
+
+  .page-content {
+    @apply flex flex-col min-h-screen relative;
+
+    .content {
+      @apply flex grow items-center pt-8;
+
+      .auth-section {
+        .welcome {
+          @apply text-primary-900 flex items-center justify-center gap-2 font-medium text-base text-center mb-4;
+
+          .icon {
+            @apply size-6 object-contain object-center;
+          }
+        }
+
+        .title {
+          @apply text-[26px] font-medium text-center mb-4;
+        }
+
+        .subtitle {
+          @apply text-sm text-center text-gray-800 leading-relaxed mb-4;
+        }
+
+        .redirect-sentence {
+          @apply *:inline! space-x-1 text-center text-sm mt-4;
+
+          .link {
+            @apply text-primary;
+          }
+        }
+        &.chooset-types {
+          .types-wrapper {
+            @apply grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 gap-4;
+
+            .type-card {
+              @apply bg-white text-center rounded-xs p-4  flex flex-col items-center justify-center ring ring-primary-50 shadow-sm aspect-16/10 transition-all duration-300  *:transition-all *:duration-300 hover:bg-primary-50 hover:ring-primary-100;
+
+              .icon {
+                @apply size-14 flex items-center justify-center rounded-full group-hover:scale-105 overflow-hidden bg-primary-100 mb-2;
+                img {
+                  @apply w-7 aspect-square object-contain object-center;
+                }
+              }
+
+              .label {
+                @apply text-sm font-medium max-w-28;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

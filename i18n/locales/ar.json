@@ -1,0 +1,27 @@
+{
+  "site": {
+    "title": "جمعية وطنى للاستزراع المائي",
+    "language": "العربية",
+    "home": "الرئيسية",
+    "welcome_back": "مرحبا في ريتا"
+  },
+  "Auth": {
+    "email": "البريد الإلكتروني",
+    "email_placeholder": "أدخل بريدك الإلكتروني",
+    "password": "كلمة المرور",
+    "password_placeholder": "أدخل كلمة المرور",
+    "name": "الاسم",
+    "name_placeholder": "أدخل اسمك",
+    "login": "تسجيل الدخول"
+  },
+  "validation": {
+    "required_with_label": "{field} مطلوب",
+    "email": "يجب أن يكون {field} بريد إلكتروني صحيح",
+    "min": "يجب أن يكون {field} على الأقل {min} أحرف",
+    "max": "يجب أن يكون {field} على الأكثر {max} حرف",
+    "fullName": "الاسم الكامل"
+  },
+  "common": {
+    "choose_language": "اختر لغة الموقع"
+  }
+}

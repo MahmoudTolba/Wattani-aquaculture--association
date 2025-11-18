@@ -1,0 +1,3 @@
+.p-button {
+  @apply bg-(image:--main-gradient) hover:bg-transparent! hover:bg-(image:--main-gradient-hover)! transition-all duration-300 text-white rounded-full border-none! text-sm;
+}

@@ -1,0 +1,149 @@
+{
+  "site": {
+    "title": "Rita",
+    "language": "English",
+    "home": "Home"
+  },
+  "auth": {
+    "welcome_to_rita": "Welcome to Rita",
+    "email": "Email",
+    "email_placeholder": "Enter your email",
+    "password": "Password",
+    "password_placeholder": "Enter your password",
+    "name": "Name",
+    "name_placeholder": "Enter your name",
+    "dont_have_account": "Don't Have An Account?",
+    "new_account": "New Account",
+    "login": {
+      "title": "Login",
+      "welcome_back": "Welcome Back to Rita",
+      "subtitle": "Everything You Need To Support Your Clients <br> And Grow Your Impact — Right At Your <br> Fingertips.",
+      "slogan": {
+        "title": "Your Gateway to Professional <br> Care",
+        "subtitle": "Deliver expert support, manage your sessions, </br> and guide clients on their wellness journey </br> — all in one place."
+      },
+      "redirect_sentence": {
+        "text": "Don't have an account?",
+        "link": "New Account"
+      }
+    },
+    "register": {
+      "title": "Register",
+      "welcome_to_rita": "Welcome to Rita",
+      "subtitle": "Everything You Need To Support Your Clients <br> And Grow Your Impact — Right At Your <br> Fingertips.",
+      "slogan": {
+        "title": "Your Gateway to Professional <br> Care",
+        "subtitle": "Deliver expert support, manage your sessions, </br> and guide clients on their wellness journey </br> — all in one place."
+      },
+      "redirect_sentence": {
+        "text": "Already have an account?",
+        "link": "Login"
+      },
+      "choose_type": {
+        "title": "Choose Your Account Type",
+        "subtitle": "Let us know how you’ll be using Rita — as an independent expert or as a registered Medical <br> Center.",
+        "type": {
+          "hospital-medical-center": "Hospital / Medical Center",
+          "individual-expert": "Individual Expert",
+          "distributors-sector": "Distributors Sector"
+        }
+      }
+    },
+    "forget_password": {
+      "title": "Forget Password?"
+    }
+  },
+  "inputs": {
+    "profile_picture": {
+      "label": "Profile Picture",
+      "placeholder": "Upload your profile picture",
+      "required": "Profile picture is required"
+    },
+    "email": {
+      "label": "Email Address",
+      "placeholder": "Enter your email",
+      "required": "Email Address is required",
+      "invalid": "Email Address is invalid. Example: "
+    },
+    "firstname": {
+      "label": "First Name",
+      "placeholder": "Enter your first name"
+    },
+    "lastname": {
+      "label": "Last Name",
+      "placeholder": "Enter your last name"
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "Enter your password"
+    },
+    "details": {
+      "label": "Details",
+      "placeholder": "Enter your details"
+    },
+    "provider_type": {
+      "label": "Provider Type",
+      "placeholder": "Select provider type",
+      "required": "Provider type is required"
+    },
+    "hospital_name": {
+      "label": "Hospital / Medical Center Name",
+      "placeholder": "Enter hospital or medical center name"
+    },
+    "license_number": {
+      "label": "License Number",
+      "placeholder": "Enter license number"
+    },
+    "address": {
+      "label": "Address",
+      "placeholder": "Enter address"
+    },
+    "specialization": {
+      "label": "Specialization",
+      "placeholder": "Enter your specialization"
+    },
+    "certification_number": {
+      "label": "Certification Number",
+      "placeholder": "Enter certification number"
+    },
+    "years_of_experience": {
+      "label": "Years of Experience",
+      "placeholder": "Enter years of experience"
+    },
+    "company_name": {
+      "label": "Company Name",
+      "placeholder": "Enter company name"
+    },
+    "tax_id": {
+      "label": "Tax ID",
+      "placeholder": "Enter tax ID"
+    },
+    "commercial_registration": {
+      "label": "Commercial Registration",
+      "placeholder": "Enter commercial registration number"
+    }
+  },
+  "provider_types": {
+    "hospital": {
+      "label": "Hospital / Medical Center"
+    },
+    "individual_expert": {
+      "label": "Individual Expert"
+    },
+    "distributors_sector": {
+      "label": "Distributors Sector"
+    }
+  },
+  "validation": {
+    "required_with_label": "{field} is required",
+    "email": "The {field} field must be a valid email address",
+    "password": "The {field} field must be at least 8 characters",
+    "min": "{field} must be at least {min} characters",
+    "max": "{field} must be at most {max} characters",
+    "fullName": "Full Name",
+    "firstname": "First Name"
+  },
+  "common": {
+    "choose_language": "Choose Site Language"
+  }
+}

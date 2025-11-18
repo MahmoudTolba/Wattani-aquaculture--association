@@ -1,0 +1,123 @@
+@import "tailwindcss" theme(static);
+@import "tailwindcss-primeui";
+
+/* ==================================================================== imports */
+
+/* components */
+@import "./components/button.css";
+@import "./components/form.css";
+
+/* pages */
+@import "./pages/auth.css";
+
+/* ==================================================================== Theme */
+@theme static {
+  /* ===================================== Amber Color Scheme ===================================== */
+  --color-amber-50: #faf9ec;
+  --color-amber-100: #f3efce;
+  --color-amber-200: #e9df9f;
+  --color-amber-300: #dcc868;
+  --color-amber-400: #d1b23e;
+  --color-amber-500: #c09b30;
+  --color-amber-600: #a77b27;
+  --color-amber-700: #855c23;
+  --color-amber-800: #704b23;
+  --color-amber-900: #603f23;
+  --color-amber-950: #372011;
+  /* ===================================== Gray Color Scheme ===================================== */
+  --color-gray-50: #f7f7f7;
+  --color-gray-100: #ededed;
+  --color-gray-200: #dfdfdf;
+  --color-gray-300: #d3d3d3;
+  --color-gray-400: #adadad;
+  --color-gray-500: #999999;
+  --color-gray-600: #888888;
+  --color-gray-700: #7b7b7b;
+  --color-gray-800: #545454;
+  --color-gray-900: #3b3b3b;
+  --color-gray-950: #1c1c1c;
+
+  /* ===================================== Font Scheme ===================================== */
+  --font-readax: "Readex Pro", sans-serif;
+  --font-serif: "Readex Pro", sans-serif;
+  --main-gradient: linear-gradient(
+    to top,
+    theme("colors.primary.900") 0%,
+    theme("colors.primary.500") 100%
+  );
+  --main-gradient-hover: linear-gradient(
+    to top,
+    theme("colors.primary.900") 0%,
+    theme("colors.primary.500") 90%
+  );
+}
+
+/* :root {
+  --ui-text: #1e1e1e;
+  --ui-text-muted: #59575f;
+  --ui-text-highlighted: #1e1e1e;
+  --ui-text-dimmed: #c1c1cd;
+  --ui-text-secondary: #5e5873;
+  --ui-border: #c1c1cd;
+  --ui-border-muted: #f8f8f8;
+  --ui-border-dimmed: #babfc7;
+  --ui-text-table: #202224;
+} */
+
+:root {
+  --ui-shadow-sm: 0 0 8px 0 rgba(0, 0, 0, 0.06);
+}
+
+@utility filter-white {
+  filter: brightness(0) invert(1);
+}
+
+/* ====================================== Dashboard Wrap ====================================== */
+/* width */
+::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  @apply bg-primary-50;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  @apply bg-primary-500 rounded-full;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: theme("colors.primary.500") theme("colors.primary.50");
+}
+
+/* ====================================== Body ====================================== */
+body {
+  @apply font-readax;
+}
+
+/* ====================================== Section ====================================== */
+section {
+  @apply grow;
+}
+
+/* ====================================== Page Wrapper ====================================== */
+.page-wrapper {
+  @apply min-h-full flex flex-col space-y-2.5;
+}
+
+/* ===================================== general ====================================== */
+.icon {
+  @apply size-6 object-contain object-center;
+}
+
+.rtl-revert {
+  @apply rtl:-scale-x-100;
+}
+
+.ltr-revert {
+  @apply ltr:-scale-x-100;
+}

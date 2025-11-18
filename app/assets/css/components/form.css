@@ -1,0 +1,34 @@
+.p-form {
+  @apply w-full;
+
+  .p-formfield {
+    @apply flex flex-col space-y-1;
+  }
+
+  .required {
+    .form-label {
+      @apply before:content-['*'] before:text-red-500 before:me-1;
+    }
+  }
+
+  .form-label {
+    @apply text-xs font-normal w-fit;
+  }
+
+  .p-inputtext {
+    @apply text-xs font-normal rounded-xs shadow-none border-gray-200 placeholder:text-gray-400;
+    &.p-invalid {
+      @apply border-red-500;
+    }
+  }
+
+  .p-message-text {
+    @apply text-xs font-light;
+  }
+
+  .p-password {
+    .p-icon {
+      @apply text-primary cursor-pointer;
+    }
+  }
+}
