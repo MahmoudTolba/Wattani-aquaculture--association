@@ -19,7 +19,7 @@
           <div class="text-center space-y-3">
             <div class="inline-flex items-center justify-center gap-2"></div>
             <h1 class="text-3xl sm:text-4xl font-semibold text-[#0b9a78]">
-              تسجيل الدخول
+              اعادة تعيين كلمة مرور
             </h1>
           </div>
 
@@ -54,63 +54,14 @@
               </div>
             </div>
 
-            <!-- Password -->
-            <div class="space-y-3">
-              <div class="flex items-center justify-end">
-                <label class="text-base font-medium text-dark" for="password">
-                  <span class="text-red-500">*</span>
-                  كلمة المرور
-                </label>
-              </div>
-
-              <div
-                class="flex items-center rounded-2xl border border-gray-100 bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d]"
-              >
-                <button type="button" class="px-4 text-gray-400">
-                  <img src="/icons/openeye-icon.svg" />
-                </button>
-                <input
-                  id="password"
-                  type="password"
-                  placeholder="كلمة المرور"
-                  required
-                  class="flex-1 bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
-                />
-              </div>
-            </div>
-            <button
-              type="button"
-              class="text-sm text-red-500 cursor-pointer"
-              @click="navigateTo('/forgot-password')"
-            >
-              هل نسيت كلمة المرور
-            </button>
-
             <!-- CTA -->
             <button
               type="submit"
               class="w-full rounded-2xl bg-linear-to-l from-[#15C472] from-[0.05%] to-[#0A717E] to-[99.95%] py-4 text-white text-lg font-semibold shadow-[0_15px_30px_rgba(21,196,114,0.3)] transition-all duration-300 hover:translate-y-0.5"
             >
-              تسجيل
+              اعادة تعيين كلمة مرور
             </button>
           </form>
-
-          <!-- Secondary actions -->
-          <div class="text-center space-y-4">
-            <button
-              type="button"
-              @click="navigateTo('/')"
-              class="text-md text-[#00000] cursor-pointer font-light"
-            >
-              الاستمرار كزائر
-            </button>
-            <p class="text-md text-[#00000]">
-              ليس لديك حساب؟
-              <NuxtLink to="/signup" class="text-[#0a9687]">
-                إنشاء حساب
-              </NuxtLink>
-            </p>
-          </div>
         </div>
       </div>
 
@@ -120,8 +71,8 @@
       >
         <div class="absolute inset-6 rounded-[28px] border border-white/30" />
         <img
-          src="/images/login-img.png"
-          alt="fishing"
+          src="/images/pass-otpimage.jpg"
+          alt="pass-otpimage"
           class="relative z-1 w-full h-full object-cover"
         />
       </div>

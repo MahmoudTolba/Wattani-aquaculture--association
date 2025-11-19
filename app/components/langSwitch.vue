@@ -2,7 +2,7 @@
   <div>
     <button
       @click="toggleLang"
-      class="flex items-center gap-3 rounded-xl border border-[#15c472] px-5 py-2 text-sm text-dark/70"
+      class="flex items-center gap-3 rounded-xl border border-[#15c472] px-5 py-2 text-sm text-dark/70 cursor-pointer"
     >
       {{ locale === "ar" ? "EN" : "عربي" }}
       <img src="/icons/translate-icon.svg" class="w-5 h-5" alt="translate" />
