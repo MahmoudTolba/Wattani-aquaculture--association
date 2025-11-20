@@ -19,41 +19,12 @@
           <div class="text-center space-y-3">
             <div class="inline-flex items-center justify-center gap-2"></div>
             <h1 class="text-3xl sm:text-4xl font-semibold text-[#0b9a78]">
-              تسجيل الدخول
+              اعادة تعيين كلمة مرور
             </h1>
           </div>
 
           <!-- Form -->
           <form class="space-y-6" @submit.prevent="handleSubmit">
-            <!-- Phone number -->
-            <div class="space-y-3">
-              <label
-                class="text-base font-medium text-dark flex justify-end items-center gap-1"
-                for="phone"
-                placeholder=""
-              >
-                <span class="text-red-500">*</span>
-                رقم الجوال
-              </label>
-              <div
-                class="flex flex-col sm:flex-row rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] overflow-hidden"
-              >
-                <div
-                  class="flex items-center justify-between sm:justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-4 py-3 bg-gray-50 text-sm text-dark/70"
-                >
-                  +966
-                  <img src="/images/Country Flags.png" alt="Country Flag" />
-                </div>
-                <input
-                  id="phone"
-                  type="tel"
-                  placeholder="رقم الجوال"
-                  required
-                  class="flex-1 w-full bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
-                />
-              </div>
-            </div>
-
             <!-- Password -->
             <div class="space-y-3">
               <div class="flex items-center justify-end">
@@ -86,39 +57,47 @@
                 />
               </div>
             </div>
-            <button
-              type="button"
-              class="text-sm text-red-500 cursor-pointer"
-              @click="navigateTo('/forgot-password')"
-            >
-              هل نسيت كلمة المرور
-            </button>
+            <!-- Password -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-end">
+                <label class="text-base font-medium text-dark" for="password">
+                  <span class="text-red-500">*</span>
+                  كلمة المرور
+                </label>
+              </div>
+
+              <div
+                class="flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl border border-gray-100 bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] overflow-hidden"
+              >
+                <button
+                  type="button"
+                  class="px-4 py-3 text-gray-400 text-right sm:text-left border-b border-gray-100 sm:border-b-0 sm:border-r"
+                  @click="togglePasswordVisibility"
+                  :aria-pressed="showPassword"
+                  :aria-label="
+                    showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'
+                  "
+                >
+                  <img src="/icons/openeye-icon.svg" />
+                </button>
+                <input
+                  id="password"
+                  :type="showPassword ? 'text' : 'password'"
+                  placeholder="كلمة المرور"
+                  required
+                  class="flex-1 w-full bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
+                />
+              </div>
+            </div>
 
             <!-- CTA -->
             <button
               type="submit"
               class="w-full rounded-2xl bg-linear-to-l from-[#15C472] from-[0.05%] to-[#0A717E] to-[99.95%] py-4 text-white text-lg font-semibold shadow-[0_15px_30px_rgba(21,196,114,0.3)] transition-all duration-300 hover:translate-y-0.5"
             >
-              تسجيل
+              اعادة تعيين كلمة مرور
             </button>
           </form>
-
-          <!-- Secondary actions -->
-          <div class="text-center space-y-4">
-            <button
-              type="button"
-              @click="navigateTo('/')"
-              class="text-md text-[#00000] cursor-pointer font-light"
-            >
-              الاستمرار كزائر
-            </button>
-            <p class="text-md text-[#00000]">
-              ليس لديك حساب؟
-              <NuxtLink to="/signup" class="text-[#0a9687]">
-                إنشاء حساب
-              </NuxtLink>
-            </p>
-          </div>
         </div>
       </div>
 
@@ -145,12 +124,12 @@ const togglePasswordVisibility = () => {
 };
 
 const handleSubmit = (event: Event) => {
-  // const form = event.target as HTMLFormElement;
-  // if (!form.checkValidity()) {
-  //   form.reportValidity();
-  //   return;
-  // }
-  navigateTo("/");
+  const form = event.target as HTMLFormElement | null;
+  if (!form?.checkValidity()) {
+    form?.reportValidity();
+    return;
+  }
+  navigateTo("/login");
 };
 </script>
 

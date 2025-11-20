@@ -1,9 +1,9 @@
 <template>
   <div
-    class="min-h-screen bg-[#f3f7fb] flex items-stretch justify-center overflow-hidden font-ge text-2xl text-dark"
+    class="relative min-h-screen bg-[#f3f7fb] flex items-stretch justify-center overflow-hidden font-ge text-2xl text-dark"
   >
     <div
-      class="flex flex-col lg:flex-row w-full min-h-screen rounded-4xl border border-white/70 bg-white/90 backdrop-blur-xl shadow-[0_35px_120px_rgba(10,113,126,0.15)] overflow-hidden"
+      class="relative z-10 flex flex-col lg:flex-row w-full min-h-screen rounded-4xl border border-white/70 bg-white/90 backdrop-blur-xl shadow-[0_35px_120px_rgba(10,113,126,0.15)] overflow-hidden"
     >
       <!-- Form column -->
       <div
@@ -19,7 +19,7 @@
           <div class="text-center space-y-3">
             <div class="inline-flex items-center justify-center gap-2"></div>
             <h1 class="text-3xl sm:text-4xl font-semibold text-[#0b9a78]">
-              تسجيل الدخول
+              انشاء حساب
             </h1>
           </div>
 
@@ -36,10 +36,10 @@
                 رقم الجوال
               </label>
               <div
-                class="flex flex-col sm:flex-row rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] overflow-hidden"
+                class="flex rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d]"
               >
                 <div
-                  class="flex items-center justify-between sm:justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-4 py-3 bg-gray-50 text-sm text-dark/70"
+                  class="flex items-center gap-2 border-l border-gray-100 px-4 py-3 bg-gray-50 text-sm text-dark/70"
                 >
                   +966
                   <img src="/images/Country Flags.png" alt="Country Flag" />
@@ -49,7 +49,7 @@
                   type="tel"
                   placeholder="رقم الجوال"
                   required
-                  class="flex-1 w-full bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
+                  class="flex-1 bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
                 />
               </div>
             </div>
@@ -64,25 +64,17 @@
               </div>
 
               <div
-                class="flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl border border-gray-100 bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] overflow-hidden"
+                class="flex items-center rounded-2xl border border-gray-100 bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d]"
               >
-                <button
-                  type="button"
-                  class="px-4 py-3 text-gray-400 text-right sm:text-left border-b border-gray-100 sm:border-b-0 sm:border-r"
-                  @click="togglePasswordVisibility"
-                  :aria-pressed="showPassword"
-                  :aria-label="
-                    showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'
-                  "
-                >
+                <button type="button" class="px-4 text-gray-400">
                   <img src="/icons/openeye-icon.svg" />
                 </button>
                 <input
                   id="password"
-                  :type="showPassword ? 'text' : 'password'"
+                  type="password"
                   placeholder="كلمة المرور"
                   required
-                  class="flex-1 w-full bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
+                  class="flex-1 bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
                 />
               </div>
             </div>
@@ -123,11 +115,14 @@
       </div>
 
       <!-- Image column -->
-      <div class="w-full lg:w-1/2 hidden md:hidden lg:block xl:block 2xl:block">
+      <div
+        class="w-full lg:w-1/2 relative bg-gradient-to-br from-[#0b9a78]/5 via-transparent to-[#0ab07d]/5 hidden md:hidden lg:block"
+      >
+        <div class="absolute inset-6 rounded-[28px] border border-white/30" />
         <img
           src="/images/login-img.png"
           alt="fishing"
-          class="w-full h-full object-cover"
+          class="relative z-1 w-full h-full object-cover"
         />
       </div>
     </div>
@@ -135,14 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
-
-const showPassword = ref(false);
-
-const togglePasswordVisibility = () => {
-  showPassword.value = !showPassword.value;
-};
 
 const handleSubmit = (event: Event) => {
   // const form = event.target as HTMLFormElement;

@@ -62,6 +62,7 @@
               type="submit"
               :disabled="!isOtpComplete"
               class="w-full rounded-2xl bg-linear-to-l from-[#15C472] from-[0.05%] to-[#0A717E] to-[99.95%] py-4 text-white text-lg font-semibold shadow-[0_15px_30px_rgba(21,196,114,0.3)] transition-all duration-300 hover:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              @click="navigateTo('new-password')"
             >
               تعيين
             </button>

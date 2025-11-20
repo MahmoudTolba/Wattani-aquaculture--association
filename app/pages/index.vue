@@ -1,7 +1,11 @@
 <template>
-  <div></div>
+  <div>
+    <navHeader />
+  </div>
 </template>
 
-<script setup></script>
+<script setup>
+import navHeader from "~/components/navHeader.vue";
+</script>
 
 <style lang="scss" scoped></style>

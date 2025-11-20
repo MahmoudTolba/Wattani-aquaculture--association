@@ -20,7 +20,8 @@ export default defineNuxtConfig({
       mode: "out-in",
     },
     head: {
-      title: "Rita",
+      htmlAttrs: { dir: "rtl", lang: "ar" },
+      title: "جمعية وطن للاستزراع المائي",
       meta: [
         {
           name: "viewport",
@@ -28,7 +29,7 @@ export default defineNuxtConfig({
         },
         {
           name: "description",
-          content: "Rita",
+          content: "وطن",
         },
         {
           charset: "utf-8",
@@ -73,8 +74,8 @@ export default defineNuxtConfig({
       alwaysRedirect: false,
     },
     compilation: { strictMessage: false },
-    defaultLocale: "en",
-    defaultDirection: "ltr",
+    defaultLocale: "ar",
+    defaultDirection: "rtl",
     langDir: "locales",
     strategy: "no_prefix",
     locales: [

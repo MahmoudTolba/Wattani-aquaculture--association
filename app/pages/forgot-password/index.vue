@@ -66,9 +66,7 @@
       </div>
 
       <!-- Image column -->
-      <div
-        class="w-full lg:w-1/2 relative bg-gradient-to-br from-[#0b9a78]/5 via-transparent to-[#0ab07d]/5"
-      >
+      <div class="w-full lg:w-1/2 relative">
         <div class="absolute inset-6 rounded-[28px] border border-white/30" />
         <img
           src="/images/login-img.png"
