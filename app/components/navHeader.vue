@@ -27,16 +27,10 @@
         <!-- brand -->
         <NuxtLink to="/" class="flex items-center gap-3 shrink-0">
           <img
-            src="/images/Logo.png"
+            src="/icons/LOGO.svg"
             alt="Wattani Aquaculture Association"
-            class="h-12 w-auto"
+            class="h-auto w-auto"
           />
-          <div class="hidden sm:flex flex-col leading-tight">
-            <span class="text-sm font-semibold text-[#00a859]">{{
-              brandText.primary
-            }}</span>
-            <span class="text-xs text-gray-500">{{ brandText.secondary }}</span>
-          </div>
         </NuxtLink>
         <!-- search -->
         <div class="w-full md:flex-1">
@@ -49,7 +43,6 @@
               type="search"
               :placeholder="searchPlaceholder"
               class="w-full rounded-full border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:border-[#15c472] focus:ring-2 focus:ring-[#15c472]/20 transition"
-              :class="isRTL ? 'pr-5 pl-12 text-right' : 'pl-5 pr-12 text-left'"
             />
             <span
               class="absolute inset-y-0 flex items-center text-gray-400"
@@ -73,25 +66,20 @@
           </div>
         </div>
         <!-- actions -->
-        <div
-          class="flex flex-wrap items-center gap-2 md:w-auto"
-          :class="
-            isRTL ? 'md:flex-row-reverse md:justify-start' : 'md:justify-end'
-          "
-        >
-          <LangSwitch />
-          <NuxtLink
-            to="/register"
-            class="inline-flex items-center justify-center rounded-full border border-gray-200 px-5 py-2 text-sm font-medium text-gray-700 transition hover:border-[#15c472]"
-          >
-            {{ createAccountText }}
-          </NuxtLink>
+        <div class="flex flex-wrap items-center gap-2 md:w-auto">
           <NuxtLink
             to="/login"
             class="inline-flex items-center justify-center rounded-full bg-linear-to-r from-[#00a859] to-[#15c472] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow"
           >
             {{ loginText }}
           </NuxtLink>
+          <NuxtLink
+            to="/register"
+            class="inline-flex items-center justify-center rounded-full border border-gray-200 px-5 py-2 text-sm font-medium text-gray-700 transition hover:border-[#15c472]"
+          >
+            {{ createAccountText }}
+          </NuxtLink>
+          <LangSwitch />
         </div>
       </div>
       <!-- divider -->
@@ -99,11 +87,9 @@
       <!-- bottom row -->
       <div
         class="flex flex-col gap-3 py-3 md:flex-row md:items-center md:justify-between"
-        :class="isRTL ? 'md:flex-row-reverse' : ''"
       >
         <nav
           class="flex flex-wrap items-center gap-4 text-sm font-semibold text-gray-600"
-          :class="isRTL ? 'md:flex-row-reverse' : ''"
         >
           <NuxtLink
             v-for="item in navItems"
@@ -158,17 +144,6 @@ const createAccountText = computed(() =>
 );
 const addListingText = computed(() =>
   isRTL.value ? "إضافة إعلان" : "Add advertisement"
-);
-const brandText = computed(() =>
-  isRTL.value
-    ? {
-        primary: "جمعية وطني للاستزراع المائي",
-        secondary: "Wattani Aquaculture Association",
-      }
-    : {
-        primary: "Wattani Aquaculture Association",
-        secondary: "جمعية وطني للاستزراع المائي",
-      }
 );
 </script>
 <style scoped>
