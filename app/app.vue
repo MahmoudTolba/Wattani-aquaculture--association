@@ -13,7 +13,7 @@
       </template>
     </Head>
 
-    <Body class="bg-[#F2F2F2]">
+    <Body class="bg-[#ffffff]">
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>

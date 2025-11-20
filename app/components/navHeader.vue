@@ -19,7 +19,7 @@
 
 <template>
   <header
-    class="bg-white shadow-[0_4px_30px_rgba(0,0,0,0.03)] border border-gray-100/80 rounded-2xl"
+    class="bg-[#FCFCFC] shadow-[0_4px_30px_rgba(0,0,0,0.03)] border border-gray-100/80 rounded-2xl"
   >
     <div class="mx-auto w-full px-25">
       <!-- top row -->
@@ -89,7 +89,7 @@
         class="flex flex-col gap-3 py-3 md:flex-row md:items-center md:justify-between"
       >
         <nav
-          class="flex flex-wrap items-center gap-4 text-sm font-semibold text-gray-600"
+          class="flex flex-wrap items-center gap-4 text-sm font-semibold text-[#161616]"
         >
           <NuxtLink
             v-for="item in navItems"
