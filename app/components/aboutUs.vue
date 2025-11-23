@@ -20,7 +20,7 @@
         </p>
       </div>
       <!-- Image -->
-      <div class="relative w-full h-[80%]">
+      <div class="relative w-full h-[80%] hidden 2xl:block xl:block lg:block">
         <div
           class="absolute -top-4 -left-4 w-full h-[80%] bg-[linear-gradient(270deg,#15C472_0.05%,#0A717E_99.95%)] rounded-xl -z-10"
         ></div>

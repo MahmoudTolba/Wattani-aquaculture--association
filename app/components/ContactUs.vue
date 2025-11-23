@@ -13,7 +13,7 @@ const submitForm = () => {
 </script>
 
 <template>
-  <div class="w-full mx-auto p-8">
+  <div class="w-full max-w-8xl mx-auto p-20">
     <!-- Header -->
     <h1 class="text-2xl md:text-3xl font-bold text-right mb-8">تواصل معنا</h1>
 
@@ -25,7 +25,7 @@ const submitForm = () => {
       المملكة ٢٠٣٠ نحو تحقيق الأمن الغذائي والاستدامة البيئية.
     </p>
 
-    <form @submit.prevent="submitForm" class="space-y-8" dir="rtl">
+    <form @submit.prevent="submitForm" class="space-y-8">
       <!-- Name & Phone Row -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- First Name / Client Name -->

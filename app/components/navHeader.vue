@@ -19,7 +19,7 @@
   <header
     class="bg-[#FCFCFC] shadow-[0_4px_30px_rgba(0,0,0,0.03)] border border-gray-100/80 rounded-2xl"
   >
-    <div class="mx-auto w-full px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto w-full px-12 sm:px-6 lg:px-12">
       <!-- top row -->
       <div class="flex flex-col gap-4 py-4 md:flex-row md:items-center">
         <!-- brand and mobile menu button -->
@@ -28,7 +28,7 @@
             <img
               src="/icons/LOGO.svg"
               alt="Wattani Aquaculture Association"
-              class="h-10 w-auto"
+              class="h-16 w-auto"
             />
           </NuxtLink>
           <!-- Mobile menu button -->
@@ -73,7 +73,7 @@
               id="main-search"
               type="search"
               :placeholder="searchPlaceholder"
-              class="w-full rounded-full border border-gray-200 bg-white text-sm text-gray-700 focus:border-gray-300 focus:ring-0 pr-10 pl-4 py-2"
+              class="w-full rounded-full border border-gray-200 bg-white text-sm text-gray-700 focus:border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none resize-none text-right transition pr-10 pl-4 py-2"
               :class="{ 'text-right': isRTL }"
               dir="auto"
             />
