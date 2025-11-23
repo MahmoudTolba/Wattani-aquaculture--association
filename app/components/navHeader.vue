@@ -42,11 +42,13 @@
               id="main-search"
               type="search"
               :placeholder="searchPlaceholder"
-              class="w-full rounded-full border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:border-[#15c472] focus:ring-2 focus:ring-[#15c472]/20 transition"
+              class="w-full rounded-full border border-gray-200 bg-white text-sm text-gray-700 focus:border-gray-300 focus:ring-0 pr-10 pl-4 py-2"
+              :class="{ 'text-right': isRTL }"
+              dir="auto"
             />
             <span
               class="absolute inset-y-0 flex items-center text-gray-400"
-              :class="isRTL ? 'left-4' : 'right-4'"
+              :class="isRTL ? 'right-3' : 'left-3'"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -89,7 +91,7 @@
         class="flex flex-col gap-3 py-3 md:flex-row md:items-center md:justify-between"
       >
         <nav
-          class="flex flex-wrap items-center gap-4 text-sm font-semibold text-[#161616]"
+          class="flex flex-wrap items-center gap-4 text-lg font-semibold text-[#161616]"
         >
           <NuxtLink
             v-for="item in navItems"

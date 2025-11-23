@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     "@nuxtjs/i18n",
     "@nuxtjs/google-fonts",
     "@pinia/nuxt",
+    "nuxt-swiper",
   ],
 
   app: {
