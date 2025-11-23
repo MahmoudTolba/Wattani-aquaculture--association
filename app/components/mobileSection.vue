@@ -8,18 +8,20 @@
         <img src="/images/mobile-imgs.png" alt="App Mockup" class="w-full" />
       </div>
       <!-- Text Section -->
-      <div class="text-white text-right">
+      <div class="text-white text-right" dir="rtl">
         <h1 class="text-3xl font-bold leading-[52px] mb-6">
           جمعية وطني للاستزراع المائي
         </h1>
 
-        <p class="leading-[32px] mb-4">
+        <p class="leading-[40px] mb-4 text-3xl">
           جمعية وطني للاستزراع المائي هي جمعية تعاونية سعودية تعمل على تطوير
           وتنمية قطاع الاستزراع المائي في المملكة العربية السعودية، بما يواكب
-          أهداف رؤية المملكة ٢٠٣٠، نحو تحقيق الأمن الغذائي والاستدامة البيئية.
+          أهداف رؤية المملكة 2030 نحو تحقيق الأمن الغذائي والاستدامة البيئية.
         </p>
 
-        <div class="flex gap-4 justify-center md:justify-start mt-10">
+        <div
+          class="flex gap-6 justify-center items-center md:justify-center mt-10"
+        >
           <button class="cursor-pointer">
             <img
               src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
