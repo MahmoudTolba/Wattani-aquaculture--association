@@ -2,7 +2,8 @@
   <div>
     <navHeader />
     <SwiperSection class="mt-10" />
-    <AboutUs />
+    <AboutUs class="mb-8" />
+    <MobileSection />
   </div>
 </template>
 
@@ -10,6 +11,7 @@
 import navHeader from "~/components/navHeader.vue";
 import SwiperSection from "~/components/swiperSection.vue";
 import AboutUs from "~/components/aboutUs.vue";
+import MobileSection from "~/components/mobileSection.vue";
 </script>
 
 <style lang="scss" scoped></style>
