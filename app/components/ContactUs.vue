@@ -17,9 +17,7 @@ const submitForm = () => {
     <!-- Header -->
     <h1 class="text-2xl md:text-3xl font-bold text-right mb-8">تواصل معنا</h1>
 
-    <p
-      class="text-right text-gray-600 text-sm md:text-base leading-relaxed mb-10"
-    >
+    <p class="text-right text-[#4E4C4C] text-xl leading-relaxed mb-10">
       جمعية وطني للاستنزاع المائي هي جمعية تعاونية سعودية تعمل على تطوير وتنمية
       قطاع الاستنزاع المائي في المملكة العربية السعودية، بما يواكب أهداف رؤية
       المملكة ٢٠٣٠ نحو تحقيق الأمن الغذائي والاستدامة البيئية.

@@ -214,7 +214,7 @@ const navItems = [
     to: "/services",
     labels: { ar: "الخدمات", en: "Services" },
   },
-  { id: "about", to: "/about", labels: { ar: "من نحن", en: "About us" } },
+  { id: "about", to: "/aboutUs", labels: { ar: "من نحن", en: "About us" } },
   {
     id: "contact",
     to: "/contact",
