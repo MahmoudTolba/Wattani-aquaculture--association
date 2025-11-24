@@ -69,10 +69,10 @@ const linksGroups = [
     { name: "تواصل معنا", path: "/ContactUs" },
   ],
   [
-    { name: "سياسة الخصوصية", path: "/privacy" },
     { name: "الشروط والأحكام", path: "/terms" },
-    { name: "الأسئلة الشائعة", path: "/faq" },
-    { name: "الدعم", path: "/support" },
+    { name: "الاسئلة المتكررة", path: "/faq" },
+    { name: " سياسة الاستخدام", path: "/privacy" },
+    { name: "عن المنصة ", path: "/support" },
   ],
 ];
 </script>

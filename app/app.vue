@@ -49,4 +49,27 @@ const title = computed(() => {
 body {
   font-family: "GE SS Two", sans-serif;
 }
+/* Gradient Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(270deg, #15c472 0.05%, #0a717e 99.95%);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(270deg, #12ad65 0.05%, #085e68 99.95%);
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #15c472 #f1f1f1;
+}
 </style>
