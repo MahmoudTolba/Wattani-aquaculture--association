@@ -21,7 +21,7 @@ export default defineNuxtConfig({
       mode: "out-in",
     },
     head: {
-      title: "Rita",
+      title: "Wattani Aquaculture Association",
       meta: [
         {
           name: "viewport",
@@ -29,7 +29,7 @@ export default defineNuxtConfig({
         },
         {
           name: "description",
-          content: "Rita",
+          content: "Wattani Aquaculture Association",
         },
         {
           charset: "utf-8",

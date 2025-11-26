@@ -3,7 +3,7 @@
     <div class="content">
       <div class="text">
         <p class="welcome" v-if="!route.meta.noSlogWelcome">
-          {{ t("auth.welcome_to_rita") }}
+          {{ t("auth.welcome_to_wattani") }}
         </p>
 
         <h2

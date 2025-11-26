@@ -136,8 +136,26 @@
           >
             {{ resolveLabel(item.labels) }}
           </NuxtLink>
+          <div
+            class="flex items-center justify-between gap-2 border-y border-gray-100 py-3"
+          >
+            <NuxtLink
+              v-for="action in actionButtons"
+              :key="'mobile-action-' + action.id"
+              :to="action.to"
+              class="flex h-12 w-12 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:bg-[#15c472]/10"
+              :aria-label="resolveLabel(action.aria)"
+              @click="isMobileMenuOpen = false"
+            >
+              <img
+                :src="action.icon"
+                :alt="resolveLabel(action.aria)"
+                class="h-5 w-5"
+              />
+            </NuxtLink>
+          </div>
           <NuxtLink
-            to="/ads/create"
+            to="/CreateAds"
             class="flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-[#15c472] hover:bg-[#15c472]/10 transition mt-2"
             @click="isMobileMenuOpen = false"
           >
@@ -170,16 +188,31 @@
             {{ resolveLabel(item.labels) }}
           </NuxtLink>
         </nav>
-        <NuxtLink
-          to="/ads/create"
-          class="hidden md:inline-flex items-center gap-2 self-start rounded-full border border-[#15c472] px-5 py-2 text-sm font-semibold text-[#15c472] transition hover:bg-[#15c472]/5 md:self-auto"
-        >
-          <span
-            class="flex h-6 w-6 items-center justify-center rounded-full bg-[#15c472]/10 text-base"
-            >+</span
+        <div class="hidden md:flex items-center gap-4">
+          <NuxtLink
+            v-for="action in actionButtons"
+            :key="'desktop-action-' + action.id"
+            :to="action.to"
+            class="flex h-10 w-10 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:border-[#15c472]/40"
+            :aria-label="resolveLabel(action.aria)"
           >
-          {{ addListingText }}
-        </NuxtLink>
+            <img
+              :src="action.icon"
+              :alt="resolveLabel(action.aria)"
+              class="h-5 w-5"
+            />
+          </NuxtLink>
+          <NuxtLink
+            to="/CreateAds"
+            class="inline-flex items-center gap-2 rounded-full border border-[#15c472] px-5 py-2 text-sm font-semibold text-[#15c472] transition hover:bg-[#15c472]/5"
+          >
+            <span
+              class="flex h-6 w-6 items-center justify-center rounded-full bg-[#15c472]/10 text-base"
+              >+</span
+            >
+            {{ addListingText }}
+          </NuxtLink>
+        </div>
       </div>
     </div>
   </header>
@@ -219,6 +252,26 @@ const navItems = [
     id: "contact",
     to: "/ContactUs",
     labels: { ar: "تواصل معنا", en: "Contact us" },
+  },
+];
+const actionButtons = [
+  {
+    id: "favorites",
+    to: "/favorites",
+    icon: "/icons/heart-icon.svg",
+    aria: { ar: "المفضلة", en: "Favorites" },
+  },
+  {
+    id: "chat",
+    to: "/chat",
+    icon: "/icons/chat-icon.svg",
+    aria: { ar: "الدردشة", en: "Chat" },
+  },
+  {
+    id: "notifications",
+    to: "/notifications",
+    icon: "/icons/ring-icon.svg",
+    aria: { ar: "الإشعارات", en: "Notifications" },
   },
 ];
 const isRTL = computed(() => locale.value === "ar");

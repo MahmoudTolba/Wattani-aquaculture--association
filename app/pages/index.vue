@@ -4,6 +4,7 @@
     <SwiperSection class="mt-10" />
     <AboutUs class="mb-8" />
     <MobileSection class="mb-15" />
+    <Favorits />
     <ContactUs class="mb-15" />
     <footerSection />
   </div>
