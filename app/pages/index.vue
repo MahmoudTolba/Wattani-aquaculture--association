@@ -18,4 +18,4 @@ import ContactUs from "~/components/ContactUs.vue";
 import footerSection from "~/components/footerSection.vue";
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

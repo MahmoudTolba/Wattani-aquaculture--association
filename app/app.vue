@@ -14,6 +14,7 @@
     </Head>
 
     <Body class="bg-[#ffffff]">
+      <PageLoader />
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>
@@ -22,6 +23,10 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
+
 const { t } = useI18n();
 const route = useRoute();
 
@@ -39,6 +44,15 @@ const title = computed(() => {
 </script>
 
 <style lang="scss" scoped>
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.3s;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+
 .layout-content {
   @apply flex flex-col min-h-screen;
 
@@ -46,6 +60,7 @@ const title = computed(() => {
     @apply flex-1;
   }
 }
+
 body {
   font-family: "GE SS Two", sans-serif;
 }

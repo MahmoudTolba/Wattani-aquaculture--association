@@ -1,6 +1,8 @@
 @import "tailwindcss" theme(static);
 @import "tailwindcss-primeui";
 
+@import url("https://fonts.cdnfonts.com/css/ge-ss-two");
+
 /* ==================================================================== imports */
 
 /* components */
@@ -38,8 +40,8 @@
   --color-gray-950: #1c1c1c;
 
   /* ===================================== Font Scheme ===================================== */
-  --font-readax: "Readex Pro", sans-serif;
-  --font-serif: "Readex Pro", sans-serif;
+  --font-readax: "GE SS Two", "Readex Pro", sans-serif;
+  --font-serif: "GE SS Two", "Readex Pro", sans-serif;
   --main-gradient: linear-gradient(
     to top,
     theme("colors.primary.900") 0%,

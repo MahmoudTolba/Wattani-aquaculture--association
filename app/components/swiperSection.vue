@@ -1,6 +1,7 @@
 <template>
   <div class="relative w-full h-screen p-8">
     <Swiper
+      :key="currentDir"
       :modules="[SwiperPagination, SwiperAutoplay]"
       :slides-per-view="1"
       :loop="true"
@@ -75,6 +76,8 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import {
   Autoplay as SwiperAutoplay,
@@ -82,6 +85,15 @@ import {
 } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
+
+const { locale, locales } = useI18n();
+
+const currentDir = computed(() => {
+  const activeLocale = locales.value?.find(
+    (item) => item.code === locale.value
+  );
+  return activeLocale?.dir ?? "ltr";
+});
 </script>
 
 <style scoped>
