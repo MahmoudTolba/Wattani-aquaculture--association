@@ -1,20 +1,3 @@
-<!-- <template> -->
-<!-- <div> -->
-<!-- Nav Container -->
-<!-- <div class="nav-container"> -->
-<!-- First Section -->
-
-<!-- <div class="flex gap-6"></div> -->
-<!-- End Of First Section -->
-<!-- Second Section  -->
-<!-- <div class=""></div> -->
-<!-- End Of Second Section -->
-<!-- </div> -->
-<!-- </div> -->
-<!-- </template> -->
-
-<!-- <script setup></script> -->
-
 <template>
   <header
     class="bg-[#FCFCFC] shadow-[0_4px_30px_rgba(0,0,0,0.03)] border border-gray-100/80 rounded-2xl"
@@ -154,17 +137,17 @@
               />
             </NuxtLink>
           </div>
-          <NuxtLink
-            to="/CreateAds"
-            class="flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-[#15c472] hover:bg-[#15c472]/10 transition mt-2"
-            @click="isMobileMenuOpen = false"
+          <button
+            type="button"
+            class="flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-[#15c472] hover:bg-[#15c472]/10 transition mt-2 w-full text-right"
+            @click="openCommitmentModal"
           >
             <span
               class="flex h-6 w-6 items-center justify-center rounded-full bg-[#15c472]/10 text-base"
               >+</span
             >
             {{ addListingText }}
-          </NuxtLink>
+          </button>
         </nav>
       </div>
 
@@ -202,26 +185,38 @@
               class="h-5 w-5"
             />
           </NuxtLink>
-          <NuxtLink
-            to="/CreateAds"
+          <button
+            type="button"
             class="inline-flex items-center gap-2 rounded-full border border-[#15c472] px-5 py-2 text-sm font-semibold text-[#15c472] transition hover:bg-[#15c472]/5"
+            @click="openCommitmentModal"
           >
             <span
               class="flex h-6 w-6 items-center justify-center rounded-full bg-[#15c472]/10 text-base"
               >+</span
             >
             {{ addListingText }}
-          </NuxtLink>
+          </button>
         </div>
       </div>
     </div>
+
+    <!-- Commitment Modal -->
+    <CommitmentModal
+      :is-open="isCommitmentModalOpen"
+      @close="closeCommitmentModal"
+      @agree="handleAgree"
+    />
   </header>
 </template>
 <script setup>
 import { computed, ref, onMounted, onBeforeUnmount } from "vue";
+import { useRouter } from "#imports";
+import CommitmentModal from "~/components/CommitmentModal.vue";
 
+const router = useRouter();
 const isMobileMenuOpen = ref(false);
 const windowWidth = ref(0);
+const isCommitmentModalOpen = ref(false);
 
 const updateWindowWidth = () => {
   windowWidth.value = window.innerWidth;
@@ -287,6 +282,20 @@ const createAccountText = computed(() =>
 const addListingText = computed(() =>
   isRTL.value ? "إضافة إعلان" : "Add advertisement"
 );
+
+const openCommitmentModal = () => {
+  isMobileMenuOpen.value = false;
+  isCommitmentModalOpen.value = true;
+};
+
+const closeCommitmentModal = () => {
+  isCommitmentModalOpen.value = false;
+};
+
+const handleAgree = () => {
+  isCommitmentModalOpen.value = false;
+  router.push("/CreateAds");
+};
 </script>
 <style scoped>
 .sr-only {
