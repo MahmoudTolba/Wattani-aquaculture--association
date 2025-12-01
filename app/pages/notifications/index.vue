@@ -61,23 +61,23 @@
         :showHeader="false"
         class="delete-confirm-dialog"
       >
-        <div class="flex flex-col items-center text-center gap-4">
-          <img src="/icons/delete-modal.svg" alt="delete" class="w-20 h-20" />
-          <div>
-            <p class="text-lg font-semibold text-gray-900 mb-1">
+        <div class="flex flex-col items-center text-center gap-6">
+          <img src="/icons/delete-modal.svg" alt="delete" class="w-24 h-24" />
+          <div class="space-y-2">
+            <p class="text-xl font-semibold text-gray-900">
               حذف الاشعارات
             </p>
             <p class="text-gray-500 text-base">هل انت متأكد من حذف الاشعارات</p>
           </div>
-          <div class="flex flex-col sm:flex-row-reverse gap-3 w-full mt-4">
+          <div class="flex flex-col sm:flex-row-reverse gap-4 w-full mt-6">
             <button
-              class="flex-1 bg-[#D92D20] text-white py-3 rounded-lg shadow-sm hover:bg-[#b22319] transition"
+              class=" bg-[#D92D20] text-white py-4 px-8 rounded-lg shadow-sm hover:bg-[#b22319] transition font-medium"
               @click="confirmDeleteAll"
             >
               تأكيد حذف الاشعارات
             </button>
             <button
-              class="flex-1 bg-linear-to-r from-[#00a859] to-[#15c472] text-white py-3 rounded-lg shadow-sm hover:opacity-90 transition"
+              class="bg-gradient-to-r from-[#00a859] to-[#15c472] text-white py-4 px-8 rounded-lg shadow-sm hover:opacity-90 transition font-medium"
               @click="showDeleteConfirm = false"
             >
               الرجوع الي صفحتي
@@ -156,17 +156,22 @@ watch(
 
 <style scoped>
 :global(.delete-confirm-dialog .p-dialog) {
-  width: min(680px, 100vw);
+  width: min(1000px, 90vw);
+  max-width: 1000px;
   border-radius: 18px;
 }
 
 :global(.delete-confirm-dialog .p-dialog-content) {
-  padding: 3.25rem 3.5rem;
+  padding: 5rem 5rem;
 }
 
 @media (max-width: 640px) {
+  :global(.delete-confirm-dialog .p-dialog) {
+    width: 95vw;
+  }
+  
   :global(.delete-confirm-dialog .p-dialog-content) {
-    padding: 2rem 1.5rem;
+    padding: 2.5rem 1.5rem;
   }
 }
 </style>
