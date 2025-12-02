@@ -383,8 +383,10 @@
 <script setup>
 import { computed, ref, nextTick } from "vue";
 import { useRoute } from "#imports";
+import { useToast } from "primevue/usetoast";
 
 const route = useRoute();
+const toast = useToast();
 const { id } = route.params;
 const from = route.query.from;
 
@@ -454,11 +456,21 @@ const setRating = (value) => {
 const submitReview = () => {
   // Basic Validation
   if (currentRating.value === 0) {
-    alert("الرجاء اختيار التقييم (عدد النجوم) أولاً");
+    toast.add({
+      severity: "warn",
+      summary: "تنبيه",
+      detail: "الرجاء اختيار التقييم (عدد النجوم) أولاً",
+      life: 3000,
+    });
     return;
   }
   if (reviewText.value.trim() === "") {
-    alert("الرجاء كتابة تعليق");
+    toast.add({
+      severity: "warn",
+      summary: "تنبيه",
+      detail: "الرجاء كتابة تعليق",
+      life: 3000,
+    });
     return;
   }
 

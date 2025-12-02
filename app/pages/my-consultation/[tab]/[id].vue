@@ -394,7 +394,8 @@
                   class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6"
                 >
                   <h2 class="text-lg font-bold text-black mb-4">تقييم الخدمة</h2>
-                  <div class="flex items-center gap-2 mb-4">
+                  <div class="flex items-center gap-6 mb-4">
+                    <span class="text-gray-600 text-sm mr-2">اسم المستخدم</span>
                     <div class="flex items-center gap-1">
                       <span
                         v-for="star in 5"
@@ -408,6 +409,7 @@
                       >
                         ★
                       </span>
+                      
                     </div>
                     <span class="text-gray-600 text-sm">{{ userRating.stars }}.0</span>
                   </div>
@@ -422,93 +424,114 @@
           <!-- Content for Canceled Tab (ملغية) -->
           <template v-else-if="tabParam === 'canceled'">
             <div
-              class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6"
+              class=" gap-4 sm:gap-6 mb-4 sm:mb-6"
             >
-              <!-- Order Information Card -->
-              <div
-                class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6"
-              >
-                <h2 class="text-lg font-bold text-black mb-4">معلومات الطلب</h2>
-                <div class="space-y-3">
-                  <div class="flex items-center gap-2">
-                    <img
-                      src="/icons/clock.svg"
-                      alt="time-icon"
-                      class="w-4 h-4 sm:w-5 sm:h-5 shrink-0"
-                    />
-                    <span class="text-gray-700 text-sm sm:text-base"
-                      >تاريخ الطلب: {{ orderData.date }}</span
+              
+            <div class="mb-6 rounded-xl p-4 sm:p-6">
+                <div class="relative w-full rounded-lg overflow-hidden">
+                  <section
+                    class="bg-white rounded-2xl mt-4 sm:mt-8 mb-4 sm:mb-6 overflow-hidden"
+                  >
+                    <div
+                      class="relative w-full h-[200px] sm:h-[250px] md:h-[30vw] min-h-[200px] rounded-lg"
                     >
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <img
-                      src="/icons/located.svg"
-                      alt="location-icon"
-                      class="w-4 h-4 sm:w-5 sm:h-5 shrink-0"
-                    />
-                    <span class="text-gray-700 text-sm sm:text-base"
-                      >المكان: {{ orderData.location }}</span
-                    >
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <img
-                      src="/icons/clock.svg"
-                      alt="canceled-icon"
-                      class="w-4 h-4 sm:w-5 sm:h-5 shrink-0"
-                    />
-                    <span class="text-gray-700 text-sm sm:text-base"
-                      >تاريخ الإلغاء: {{ orderData.date }}</span
-                    >
-                  </div>
+                      <img
+                        src="/images/product-banner.png"
+                        alt="product-banner"
+                        class="w-full h-full object-cover rounded-lg"
+                      />
+                    </div>
+                  </section>
                 </div>
               </div>
 
-              <!-- Department Information Card -->
+              <!-- Order Details Section -->
               <div
-                class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6"
+                class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-4 sm:mb-6"
               >
-                <h2 class="text-lg font-bold text-black mb-4">معلومات القسم</h2>
-                <div class="space-y-3">
-                  <div>
-                    <p class="text-gray-700 text-sm sm:text-base">
-                      {{ orderData.department }}
-                    </p>
+                <div class="flex items-center justify-between">
+                  <!-- Right Column - Labels -->
+                  <div class="space-y-4">
+                    <div class="flex flex-col gap-1">
+                      <span class="text-black-600 text-md font-medium"
+                        >رقم الطلب</span
+                      >
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <span class="text-black-600 text-md font-medium"
+                        >الحالة</span
+                      >
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <span class="text-black-600 text-md font-medium"
+                        >القسم</span
+                      >
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <span class="text-black-600 text-md font-medium"
+                        >اسم الدورة</span
+                      >
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <span class="text-black-600 text-md font-medium"
+                        >موقع الانعقاد</span
+                      >
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <span class="text-black-600 text-md font-medium"
+                        >سعر الدورة</span
+                      >
+                    </div>
                   </div>
-                  <div class="flex items-center gap-2">
-                    <img
-                      src="/icons/phone-icon.svg"
-                      alt="phone-icon"
-                      class="w-4 h-4 sm:w-5 sm:h-5 shrink-0"
-                    />
-                    <span class="text-gray-700 text-sm sm:text-base"
-                      >للتواصل: {{ orderData.contactNumber }}</span
-                    >
+
+                  <!-- Left Column - Values -->
+                  <div class="space-y-4">
+                    <div class="flex flex-col gap-1">
+                      <span class="text-black text-sm font-semibold"
+                        >#{{ orderData.orderNumber }}</span
+                      >
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <span
+                        class="inline-block px-3 py-1 rounded-full text-sm font-semibold w-fit"
+                        :class="getStatusClass(orderData.status)"
+                      >
+                        {{ orderData.status }}
+                      </span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <span class="text-black text-sm font-semibold">{{
+                        orderData.department
+                      }}</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <span class="text-black text-sm font-semibold">{{
+                        orderData.courseName || "دورة الاستزراع المائي"
+                      }}</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <span class="text-black text-sm font-semibold">{{
+                        orderData.location
+                      }}</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <span
+                        class="text-black text-sm font-semibold flex items-center gap-1"
+                      >
+                        {{ orderData.price }}
+                        <img
+                          src="/icons/green-currency.svg"
+                          alt="currency"
+                          class="w-4 h-4"
+                        />
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Canceled Status Message -->
-            <div
-              class="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6"
-            >
-              <div class="flex items-start gap-3">
-                <img
-                  src="/icons/clock.svg"
-                  alt="canceled"
-                  class="w-5 h-5 text-red-600 mt-1"
-                />
-                <div>
-                  <h3 class="text-lg font-bold text-red-900 mb-2">
-                    تم إلغاء الطلب
-                  </h3>
-                  <p class="text-red-800 text-sm sm:text-base">
-                    تم إلغاء هذا الطلب. إذا كان لديك أي استفسارات، يرجى التواصل
-                    مع فريق الدعم.
-                  </p>
-                </div>
-              </div>
-            </div>
+      
 
             <!-- Order Description -->
             <div
@@ -668,8 +691,8 @@
                   ★
                 </button>
                 <!-- <span class="text-gray-600 text-sm mr-2"
-                  >{{ selectedStars }}.0</span -->
-                <!-- > -->
+                  >{{ selectedStars }}.0</span 
+                 > -->
               </div>
             </div>
 
@@ -712,8 +735,10 @@
 <script setup>
 import { computed, ref, watch, onBeforeUnmount, onMounted } from "vue";
 import { useRoute } from "#imports";
+import { useToast } from "primevue/usetoast";
 
 const route = useRoute();
+const toast = useToast();
 const orderId = route.params.id;
 const tabParam = route.params.tab || "new";
 
@@ -808,7 +833,12 @@ const closeRatingModal = () => {
 const submitRating = () => {
   if (selectedStars.value === 0 || !ratingComment.value.trim()) {
     // You can add validation feedback here
-    alert("يرجى اختيار التقييم وكتابة التعليق");
+    toast.add({
+      severity: "warn",
+      summary: "تنبيه",
+      detail: "يرجى اختيار التقييم وكتابة التعليق",
+      life: 3000,
+    });
     return;
   }
   
