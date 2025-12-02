@@ -1,7 +1,7 @@
 <template>
   <div class="layout-content">
     <!-- header -->
-    <!-- <LayoutAppHeader /> -->
+    <LayoutAppHeader />
 
     <!-- <LayoutSidebar  /> -->
     <main class="">
@@ -9,6 +9,6 @@
     </main>
 
     <!-- footer -->
-    <!-- <LayoutAppFooter /> -->
+    <LayoutAppFooter />
   </div>
 </template>

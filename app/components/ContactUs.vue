@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast();
+
 // Optional: Add form logic here later (e.g., Pinia, API call)
 const form = reactive({
   firstName: "",
@@ -8,7 +12,12 @@ const form = reactive({
 
 const submitForm = () => {
   console.log("Form submitted:", form);
-  alert("تم إرسال الرسالة بنجاح!");
+  toast.add({
+    severity: "success",
+    summary: "نجح",
+    detail: "تم إرسال الرسالة بنجاح!",
+    life: 3000,
+  });
 };
 </script>
 

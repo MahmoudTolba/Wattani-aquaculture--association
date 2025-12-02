@@ -18,6 +18,7 @@
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>
+      <Toast />
     </Body>
   </Html>
 </template>

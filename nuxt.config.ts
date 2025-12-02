@@ -10,6 +10,9 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "nuxt-swiper",
   ],
+  components: [
+    { path: '~/components', global: true }
+  ],
 
   app: {
     pageTransition: {

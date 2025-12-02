@@ -590,7 +590,7 @@ const backLink = computed(() => {
     case "home":
       return "/";
     case "benefits":
-      return "/benefits";
+      return "/products";
     case "experts":
       return "/experts";
     case "courses":

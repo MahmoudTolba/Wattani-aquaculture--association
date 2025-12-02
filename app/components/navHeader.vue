@@ -237,6 +237,7 @@ onBeforeUnmount(() => {
 const { locale } = useI18n();
 const navItems = [
   { id: "home", to: "/", labels: { ar: "الرئيسية", en: "Home" } },
+  { id: "consultation", to: "/my-consultation", labels: { ar: "استشاراتي", en: "My consultation" } },
   {
     id: "services",
     to: "/services",
