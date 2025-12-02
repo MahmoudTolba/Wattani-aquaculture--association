@@ -26,8 +26,8 @@
           <article
             v-for="order in paginatedOrders"
             :key="order.id"
-            class="bg-[#F8F9FA] rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
-            dir="rtl"
+            class="bg-[#F8F9FA] rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+            @click="goToOrderDetail(order)"
           >
             <div class="p-4 flex gap-4">
               <!-- Left side: Order Info -->
@@ -108,7 +108,10 @@
 
 <script setup>
 import { computed, ref } from "vue";
+import { useRouter } from "#imports";
 import Paginator from "primevue/paginator";
+
+const router = useRouter();
 
 // Navigation Tabs
 const tabs = [
@@ -132,23 +135,16 @@ const setActiveTab = (key) => {
 const rows = ref(9); // Items per page
 const first = ref(0); // First item index
 
-// Orders Data
-const createOrders = (status, count = 20) => {
-  return Array.from({ length: count }).map((_, index) => ({
-    id: `${status}-${index + 1}`,
-    orderNumber: "٨٥٤٢",
-    status: status,
-    department: "القسم دورات وطني",
-    price: "50",
-    image: "/images/card-img.jpg",
-  }));
-};
+// Orders Data - using composable
+// TODO: When API is ready, make this async and use await
+// Example: const ordersByTab = await createOrdersData("معلق", "new", 15)
+const { createOrders: createOrdersData } = useOrders();
 
 const ordersByTab = {
-  new: createOrders("معلق", 15),
-  current: createOrders("تم القبول", 12),
-  finished: createOrders("منتهي", 8),
-  canceled: createOrders("ملغي", 5),
+  new: createOrdersData("معلق", "new", 15),
+  current: createOrdersData("تم القبول", "current", 12),
+  finished: createOrdersData("منتهي", "finished", 8),
+  canceled: createOrdersData("ملغي", "canceled", 5),
 };
 
 const currentOrders = computed(() => {
@@ -171,6 +167,13 @@ const paginatedOrders = computed(() => {
 const onPageChange = (event) => {
   first.value = event.first;
   rows.value = event.rows;
+};
+
+// Navigate to order detail page
+const goToOrderDetail = (order) => {
+  router.push({
+    path: `/my-consultation/${activeTab.value}/${order.id}`,
+  });
 };
 </script>
 
