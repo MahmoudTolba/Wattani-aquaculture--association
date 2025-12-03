@@ -16,8 +16,10 @@
           </NuxtLink>
           <!-- Mobile menu button -->
           <button
+            ref="mobileMenuButtonRef"
             @click="isMobileMenuOpen = !isMobileMenuOpen"
             class="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
+            aria-label="Toggle mobile menu"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -46,7 +48,7 @@
         <!-- search -->
         <div
           class="w-full md:flex-1 px-2 md:px-0"
-          :class="{ 'hidden md:block': !isMobileMenuOpen && windowWidth < 768 }"
+          :class="{ 'hidden md:block': !isMobileMenuOpen }"
         >
           <label class="sr-only" for="main-search">{{
             searchPlaceholder
@@ -81,11 +83,16 @@
             </span>
           </div>
         </div>
-        <!-- actions -->
-        <div
-          class="flex flex-wrap items-center gap-2 md:w-auto"
-          :class="{ 'hidden md:flex': !isMobileMenuOpen && windowWidth < 768 }"
+        <!-- user profile - hidden on mobile, shown in menu -->
+        <NuxtLink
+          to="/profile"
+          class="hidden md:flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
         >
+          <img src="/images/profile-avatar.png" alt="user-icon" class="w-10 h-10 rounded-full object-cover" />
+          <span class="text-gray-700 text-sm"> {{ userName }} </span>
+        </NuxtLink>
+        <!-- actions - hidden on mobile, shown in menu -->
+        <div class="hidden md:flex flex-wrap items-center gap-2 md:w-auto">
           <NuxtLink
             to="/login"
             class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#00a859] to-[#15c472] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow w-full md:w-auto text-center"
@@ -104,52 +111,130 @@
         </div>
       </div>
       <!-- Mobile menu, show/hide based on menu state -->
-      <div
-        v-if="isMobileMenuOpen && windowWidth < 768"
-        class="md:hidden bg-white rounded-lg shadow-lg p-4 mt-2"
-      >
-        <nav class="flex flex-col space-y-3">
-          <NuxtLink
-            v-for="item in navItems"
-            :key="'mobile-' + item.id"
-            :to="item.to"
-            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-[#15c472] transition"
-            active-class="text-[#15c472] bg-gray-50"
-            @click="isMobileMenuOpen = false"
-          >
-            {{ resolveLabel(item.labels) }}
-          </NuxtLink>
-          <div
-            class="flex items-center justify-between gap-2 border-y border-gray-100 py-3"
-          >
+      <Transition name="mobile-menu">
+        <div
+          v-if="isMobileMenuOpen"
+          ref="mobileMenuRef"
+          class="md:hidden bg-white rounded-lg shadow-lg p-4 mt-2"
+        >
+          <nav class="flex flex-col space-y-3">
+            <!-- User Profile in Mobile Menu -->
             <NuxtLink
-              v-for="action in actionButtons"
-              :key="'mobile-action-' + action.id"
-              :to="action.to"
-              class="flex h-12 w-12 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:bg-[#15c472]/10"
-              :aria-label="resolveLabel(action.aria)"
+              to="/profile"
+              class="flex items-center gap-3 px-3 py-3 rounded-md bg-gray-50 hover:bg-gray-100 transition border border-gray-200"
               @click="isMobileMenuOpen = false"
             >
-              <img
-                :src="action.icon"
-                :alt="resolveLabel(action.aria)"
-                class="h-5 w-5"
-              />
+              <img src="/images/profile-avatar.png" alt="user-icon" class="w-10 h-10 rounded-full object-cover" />
+              <div class="flex flex-col">
+                <span class="text-gray-700 text-sm font-medium">{{ userName }}</span>
+                <span class="text-gray-500 text-xs">عرض الملف الشخصي</span>
+              </div>
             </NuxtLink>
-          </div>
-          <button
-            type="button"
-            class="flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-[#15c472] hover:bg-[#15c472]/10 transition mt-2 w-full text-right"
-            @click="openCommitmentModal"
-          >
-            <span
-              class="flex h-6 w-6 items-center justify-center rounded-full bg-[#15c472]/10 text-base"
-              >+</span
+
+            <!-- Search in Mobile Menu -->
+            <div class="px-3">
+              <label class="sr-only" for="mobile-search">{{
+                searchPlaceholder
+              }}</label>
+              <div class="relative">
+                <input
+                  id="mobile-search"
+                  type="search"
+                  :placeholder="searchPlaceholder"
+                  class="w-full rounded-full border border-gray-200 bg-white text-sm text-gray-700 focus:border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none resize-none text-right transition pr-10 pl-4 py-2"
+                  :class="{ 'text-right': isRTL }"
+                  dir="auto"
+                />
+                <span
+                  class="absolute inset-y-0 flex items-center text-gray-400"
+                  :class="isRTL ? 'right-3' : 'left-3'"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    class="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m21 21-4.35-4.35m1.1-5.4a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <!-- Navigation Items -->
+            <NuxtLink
+              v-for="item in navItems"
+              :key="'mobile-' + item.id"
+              :to="item.to"
+              class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-[#15c472] transition"
+              active-class="text-[#15c472] bg-gray-50"
+              @click="isMobileMenuOpen = false"
             >
-            {{ addListingText }}
-          </button>
-        </nav>
-      </div>
+              {{ resolveLabel(item.labels) }}
+            </NuxtLink>
+
+            <!-- Action Buttons (Favorites, Chat, Notifications) -->
+            <div
+              class="flex items-center justify-between gap-2 border-y border-gray-100 py-3"
+            >
+              <NuxtLink
+                v-for="action in actionButtons"
+                :key="'mobile-action-' + action.id"
+                :to="action.to"
+                class="flex h-12 w-12 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:bg-[#15c472]/10"
+                :aria-label="resolveLabel(action.aria)"
+                @click="isMobileMenuOpen = false"
+              >
+                <img
+                  :src="action.icon"
+                  :alt="resolveLabel(action.aria)"
+                  class="h-5 w-5"
+                />
+              </NuxtLink>
+            </div>
+
+            <!-- Login and Register Buttons -->
+            <div class="flex flex-col gap-2 border-t border-gray-100 pt-3">
+              <NuxtLink
+                to="/login"
+                class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#00a859] to-[#15c472] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow text-center"
+                @click="isMobileMenuOpen = false"
+              >
+                {{ loginText }}
+              </NuxtLink>
+              <NuxtLink
+                to="/register"
+                class="inline-flex items-center justify-center rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-[#15c472] text-center"
+                @click="isMobileMenuOpen = false"
+              >
+                {{ createAccountText }}
+              </NuxtLink>
+              <div class="flex justify-center pt-2">
+                <LangSwitch />
+              </div>
+            </div>
+
+            <!-- Add Listing Button -->
+            <button
+              type="button"
+              class="flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-[#15c472] hover:bg-[#15c472]/10 transition mt-2 w-full text-right border-t border-gray-100 pt-3"
+              @click="openCommitmentModal"
+            >
+              <span
+                class="flex h-6 w-6 items-center justify-center rounded-full bg-[#15c472]/10 text-base"
+                >+</span
+              >
+              {{ addListingText }}
+            </button>
+          </nav>
+        </div>
+      </Transition>
 
       <!-- divider -->
       <div class="border-t border-solid border-gray-200"></div>
@@ -209,14 +294,17 @@
   </header>
 </template>
 <script setup>
-import { computed, ref, onMounted, onBeforeUnmount } from "vue";
-import { useRouter } from "#imports";
+import { computed, ref, onMounted, onBeforeUnmount, watch } from "vue";
+import { useRouter, useRoute } from "#imports";
 import CommitmentModal from "~/components/CommitmentModal.vue";
 
 const router = useRouter();
+const route = useRoute();
 const isMobileMenuOpen = ref(false);
 const windowWidth = ref(0);
 const isCommitmentModalOpen = ref(false);
+const mobileMenuRef = ref(null);
+const mobileMenuButtonRef = ref(null);
 
 const updateWindowWidth = () => {
   windowWidth.value = window.innerWidth;
@@ -226,13 +314,39 @@ const updateWindowWidth = () => {
   }
 };
 
+// Close mobile menu when clicking outside
+const handleClickOutside = (event) => {
+  if (
+    isMobileMenuOpen.value &&
+    windowWidth.value < 768 &&
+    mobileMenuRef.value &&
+    !mobileMenuRef.value.contains(event.target) &&
+    mobileMenuButtonRef.value &&
+    !mobileMenuButtonRef.value.contains(event.target)
+  ) {
+    isMobileMenuOpen.value = false;
+  }
+};
+
+// Watch for route changes to close mobile menu
+watch(
+  () => route.path,
+  () => {
+    if (windowWidth.value < 768) {
+      isMobileMenuOpen.value = false;
+    }
+  }
+);
+
 onMounted(() => {
   windowWidth.value = window.innerWidth;
   window.addEventListener("resize", updateWindowWidth);
+  document.addEventListener("click", handleClickOutside);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", updateWindowWidth);
+  document.removeEventListener("click", handleClickOutside);
 });
 const { locale } = useI18n();
 const navItems = [
@@ -270,6 +384,9 @@ const actionButtons = [
     aria: { ar: "الإشعارات", en: "Notifications" },
   },
 ];
+const userName = computed(() => {
+  return " محمد عبدالعزيز ";
+});
 const isRTL = computed(() => locale.value === "ar");
 const resolveLabel = (labels) =>
   labels[locale.value] ?? labels.en ?? Object.values(labels)[0] ?? "";
@@ -312,11 +429,16 @@ const handleAgree = () => {
 }
 
 /* Smooth transition for mobile menu */
-.mobile-menu-enter-active,
-.mobile-menu-leave-active {
-  transition: all 0.3s ease;
+.mobile-menu-enter-active {
+  transition: all 0.3s ease-out;
 }
-.mobile-menu-enter-from,
+.mobile-menu-leave-active {
+  transition: all 0.2s ease-in;
+}
+.mobile-menu-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
 .mobile-menu-leave-to {
   opacity: 0;
   transform: translateY(-10px);

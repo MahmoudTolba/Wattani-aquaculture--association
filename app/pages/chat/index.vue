@@ -1,6 +1,6 @@
 <template>
   <navHeader />
-  <div class="min-h-screen bg-white flex justify-center  p-4 md:p-10">
+  <div class="min-h-screen bg-white flex justify-center p-4 md:p-10">
     <div class="w-full max-w-[95%] xl:max-w-[1600px] h-full flex gap-8">
       <!-- Sidebar - Contacts List -->
       <div class="w-1/3 hidden md:flex flex-col">
@@ -14,7 +14,7 @@
               'rounded-xl p-4 flex items-center cursor-pointer transition-all duration-200',
               contact.id === activeContactId
                 ? 'bg-[#148E84] text-white shadow-md transform scale-[1.02]'
-                : 'bg-white hover:bg-gray-50 text-gray-800 border border-transparent hover:border-gray-200'
+                : 'bg-white hover:bg-gray-50 text-gray-800 border border-transparent hover:border-gray-200',
             ]"
           >
             <div class="relative">
@@ -22,7 +22,9 @@
                 :src="contact.avatar"
                 :class="[
                   'w-12 h-12 rounded-full border-2 object-cover',
-                  contact.id === activeContactId ? 'border-white' : 'border-gray-200'
+                  contact.id === activeContactId
+                    ? 'border-white'
+                    : 'border-gray-200',
                 ]"
                 :alt="contact.name"
               />
@@ -33,7 +35,9 @@
                 <span
                   :class="[
                     'text-[10px]',
-                    contact.id === activeContactId ? 'text-gray-200' : 'text-gray-400'
+                    contact.id === activeContactId
+                      ? 'text-gray-200'
+                      : 'text-gray-400',
                   ]"
                 >
                   {{ contact.time }}
@@ -42,7 +46,9 @@
               <p
                 :class="[
                   'text-xs truncate w-full opacity-90',
-                  contact.id === activeContactId ? 'text-gray-100' : 'text-gray-500'
+                  contact.id === activeContactId
+                    ? 'text-gray-100'
+                    : 'text-gray-500',
                 ]"
               >
                 {{ contact.lastMessage }}
@@ -63,7 +69,9 @@
         class="flex-1 bg-white border border-gray-100 rounded-[2.5rem] shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden relative"
       >
         <!-- Header -->
-        <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-white z-10">
+        <div
+          class="p-6 border-b border-gray-50 flex justify-between items-center bg-white z-10"
+        >
           <div class="flex items-center">
             <img
               :src="activeContact?.avatar"
@@ -72,15 +80,19 @@
             />
             <div class="mr-3">
               <h2 class="font-bold text-gray-800 text-lg leading-none">
-                {{ activeContact?.name || '...' }}
+                {{ activeContact?.name || "..." }}
               </h2>
               <span class="text-xs text-green-500 flex items-center gap-1 mt-1">
-                <span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
+                <span
+                  class="w-2 h-2 bg-green-500 rounded-full inline-block"
+                ></span>
                 متصل الآن
               </span>
             </div>
           </div>
-          <div class="h-12 w-1.5 bg-gray-200 rounded-full opacity-50 absolute left-4 top-20 hidden md:block"></div>
+          <div
+            class="h-12 w-1.5 bg-gray-200 rounded-full opacity-50 absolute left-4 top-20 hidden md:block"
+          ></div>
         </div>
 
         <!-- Messages Container -->
@@ -93,7 +105,7 @@
             :key="index"
             :class="[
               'flex items-start',
-              msg.type === 'outgoing' ? 'justify-end' : ''
+              msg.type === 'outgoing' ? 'justify-end' : '',
             ]"
           >
             <!-- Incoming Message -->
@@ -132,7 +144,9 @@
 
         <!-- Input Area -->
         <div class="p-6 bg-white">
-          <div class="relative border-t border-gray-100 pt-4 flex items-center gap-4">
+          <div
+            class="relative border-t border-gray-100 pt-4 flex items-center gap-4"
+          >
             <input
               v-model="messageInput"
               type="text"
