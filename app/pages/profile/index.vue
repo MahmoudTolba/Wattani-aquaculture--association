@@ -571,13 +571,57 @@
                     >
                       كلمة المرور الحالية
                     </label>
-                    <input
-                      id="currentPassword"
-                      v-model="changePasswordForm.currentPassword"
-                      type="password"
-                      placeholder="أدخل كلمة المرور الحالية"
-                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
-                    />
+                    <div class="relative">
+                      <input
+                        id="currentPassword"
+                        v-model="changePasswordForm.currentPassword"
+                        :type="showCurrentPassword ? 'text' : 'password'"
+                        placeholder="أدخل كلمة المرور الحالية"
+                        class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 pr-10 sm:pr-12 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                      />
+                      <button
+                        type="button"
+                        @click="showCurrentPassword = !showCurrentPassword"
+                        class="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                        aria-label="Toggle password visibility"
+                      >
+                        <svg
+                          v-if="showCurrentPassword"
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-5 h-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.29 3.29m0 0A9.97 9.97 0 015.12 5.12m0 0a10.05 10.05 0 013.755 3.755M3 3l18 18"
+                          />
+                        </svg>
+                        <svg
+                          v-else
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-5 h-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
 
                   <!-- New Password -->
@@ -588,13 +632,57 @@
                     >
                       كلمة المرور الجديدة
                     </label>
-                    <input
-                      id="newPassword"
-                      v-model="changePasswordForm.newPassword"
-                      type="password"
-                      placeholder="أدخل كلمة المرور الجديدة"
-                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
-                    />
+                    <div class="relative">
+                      <input
+                        id="newPassword"
+                        v-model="changePasswordForm.newPassword"
+                        :type="showNewPassword ? 'text' : 'password'"
+                        placeholder="أدخل كلمة المرور الجديدة"
+                        class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 pr-10 sm:pr-12 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                      />
+                      <button
+                        type="button"
+                        @click="showNewPassword = !showNewPassword"
+                        class="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                        aria-label="Toggle password visibility"
+                      >
+                        <svg
+                          v-if="showNewPassword"
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-5 h-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.29 3.29m0 0A9.97 9.97 0 015.12 5.12m0 0a10.05 10.05 0 013.755 3.755M3 3l18 18"
+                          />
+                        </svg>
+                        <svg
+                          v-else
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-5 h-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
 
                   <!-- Confirm New Password -->
@@ -605,13 +693,57 @@
                     >
                       تأكيد كلمة المرور الجديدة
                     </label>
-                    <input
-                      id="confirmPassword"
-                      v-model="changePasswordForm.confirmPassword"
-                      type="password"
-                      placeholder="أعد إدخال كلمة المرور الجديدة"
-                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
-                    />
+                    <div class="relative">
+                      <input
+                        id="confirmPassword"
+                        v-model="changePasswordForm.confirmPassword"
+                        :type="showConfirmPassword ? 'text' : 'password'"
+                        placeholder="أعد إدخال كلمة المرور الجديدة"
+                        class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 pr-10 sm:pr-12 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                      />
+                      <button
+                        type="button"
+                        @click="showConfirmPassword = !showConfirmPassword"
+                        class="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                        aria-label="Toggle password visibility"
+                      >
+                        <svg
+                          v-if="showConfirmPassword"
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-5 h-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.29 3.29m0 0A9.97 9.97 0 015.12 5.12m0 0a10.05 10.05 0 013.755 3.755M3 3l18 18"
+                          />
+                        </svg>
+                        <svg
+                          v-else
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-5 h-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
 
                   <!-- Save Button -->
@@ -866,12 +998,128 @@
 
             <!-- Packages Tab Content -->
             <div v-if="activeTab === 'packages'" class="space-y-6">
-              <p class="text-gray-600">صفحة الباقات - قيد التطوير</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Golden Package Card -->
+                <div
+                  v-for="(packageItem, index) in packages"
+                  :key="index"
+                  class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <!-- Header Section -->
+                  <div class="flex items-start justify-between mb-6">
+                    <!-- Price -->
+                    <div class="flex items-center gap-1">
+                      <span class="text-3xl sm:text-4xl font-bold text-[#15c472]">
+                        {{ packageItem.price }}
+                      </span>
+                      <img
+                        src="/icons/green-currency.svg"
+                        alt="currency"
+                        class="w-6 h-6 sm:w-8 sm:h-8"
+                      />
+                    </div>
+                    <!-- Title with Icon -->
+                    <div class="flex items-center gap-2">
+                      <span>🥇 </span>
+                      <span class="text-lg sm:text-xl font-bold text-[#FE9B0E]">
+                        {{ packageItem.title }}
+                      </span>
+                     
+                    </div>
+                  </div>
+
+                  <!-- Features List -->
+                  <ul class="space-y-3 mb-6 text-right list-disc">
+                    <li
+                      v-for="(feature, featureIndex) in packageItem.features"
+                      :key="featureIndex"
+                      class="text-gray-700 text-sm sm:text-base"
+                    >
+                      {{ feature }}
+                    </li>
+                  </ul>
+
+                  <!-- Subscribe Button -->
+                  <button
+                    @click="handlePackageSubscribe(packageItem)"
+                    class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
+                  >
+                    اشتراك
+                  </button>
+                </div>
+              </div>
             </div>
 
             <!-- Subscription Tab Content -->
             <div v-if="activeTab === 'subscription'" class="space-y-6">
-              <p class="text-gray-600">صفحة اشتراكي - قيد التطوير</p>
+              <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-3 2xl:grid-cols-3 gap-6">
+                <!-- Subscription Cards -->
+                <div
+                  v-for="(subscription, index) in subscriptions"
+                  :key="index"
+                  class="bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <!-- Header Section -->
+                  <div class="flex items-start justify-between mb-6">
+                    <!-- Price -->
+                    <div class="flex items-center gap-1">
+                      <span class="text-3xl sm:text-4xl font-bold text-[#15c472]">
+                        {{ subscription.price }}
+                      </span>
+                      <img
+                        src="/icons/green-currency.svg"
+                        alt="currency"
+                        class="w-6 h-6 sm:w-8 sm:h-8"
+                      />
+                    </div>
+                    <!-- Title with Medal Icon -->
+                    <div class="flex items-center gap-2">
+                      <span class="text-xl sm:text-2xl font-bold text-orange-500">
+                        {{ subscription.title }}
+                      </span>
+                      <div class="relative">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-6 h-6 sm:w-7 sm:h-7 text-orange-500"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 2.18l8 4v8.82c0 4.54-3.07 8.83-8 9.81-4.93-.98-8-5.27-8-9.81V8.18l8-4z"
+                          />
+                          <path
+                            d="M5 16L3 5l5.5 3L12 4l3.5 4L21 5l-2 11H5zm2.7-1h8.6l1.1-7.4-3.5 4.5L12 8l-1.9 4.1-3.5-4.5L7.7 15z"
+                          />
+                        </svg>
+                        <span
+                          class="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center text-[10px] sm:text-xs font-bold text-orange-500"
+                        >
+                          {{ subscription.medalNumber }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Features List -->
+                  <ul class="space-y-3 mb-6 text-right list-disc pr-6">
+                    <li
+                      v-for="(feature, featureIndex) in subscription.features"
+                      :key="featureIndex"
+                      class="text-gray-700 text-sm sm:text-base"
+                    >
+                      {{ feature }}
+                    </li>
+                  </ul>
+
+                  <!-- Renew Button -->
+                  <button
+                    @click="handleRenewSubscription(subscription)"
+                    class="w-full bg-gradient-to-r from-[#0A717E] to-[#15C472] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
+                  >
+                    تجديد
+                  </button>
+                </div>
+              </div>
             </div>
 
             <!-- Favorites Tab Content -->
@@ -1843,6 +2091,146 @@
       </div>
     </Teleport>
 
+    <!-- Success Modal -->
+    <Teleport to="body">
+      <div
+        v-if="isSuccessModalOpen"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="success-modal-title"
+        @click.self="closeSuccessModal"
+        style="z-index: 9999 !important;"
+      >
+        <div
+          class="w-full max-w-xl rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
+          @click.stop
+        >
+          <!-- Content -->
+          <div class="p-8 sm:p-12 text-center">
+            <!-- Success Message -->
+            <h2
+              id="success-modal-title"
+              class="text-xl sm:text-2xl font-bold text-gray-900 mb-6"
+            >
+              تم الاشتراك بنجاح
+            </h2>
+
+            <!-- Loading Spinner -->
+            <div class="flex justify-center mb-6">
+              <img src="/icons/success-icon.gif" alt="success-icon" class="w-20 h-20 sm:w-24 sm:h-24">
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Package Payment Modal -->
+    <Teleport to="body">
+      <div
+        v-if="isPackagePaymentModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="payment-modal-title"
+        @click.self="closePackagePaymentModal"
+      >
+        <div
+          class="w-full max-w-3xl rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
+          @click.stop
+        >
+          <!-- Header -->
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2
+              id="payment-modal-title"
+              class="text-xl font-bold text-black text-right"
+            >
+              تحديد طريقة الدفع
+            </h2>
+          </div>
+
+          <!-- Content -->
+          <div class="p-6">
+            <!-- Payment Method Options -->
+            <div class="space-y-4">
+              <!-- Wallet Option -->
+              <div
+                @click="selectedPackagePaymentMethod = 'wallet'"
+                class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all"
+                :class="
+                  selectedPackagePaymentMethod === 'wallet'
+                    ? 'bg-gray-50 border-2 border-[#15C472]'
+                    : 'bg-gray-50 border-2 border-gray-200'
+                "
+              >
+                <label
+                  for="package-wallet"
+                  class="flex-1 flex items-center gap-2 justify-start cursor-pointer"
+                >
+                  <img
+                    src="/icons/wallet-icon.svg"
+                    alt="wallet"
+                    class="w-8 h-8"
+                  />
+                  <span class="text-black font-medium text-right">المحفظة</span>
+                </label>
+                <input
+                  type="radio"
+                  id="package-wallet"
+                  v-model="selectedPackagePaymentMethod"
+                  value="wallet"
+                  class="w-5 h-5 cursor-pointer accent-[#15C472]"
+                />
+              </div>
+
+              <!-- Electronic Payment Option -->
+              <div
+                @click="selectedPackagePaymentMethod = 'electronic'"
+                class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all"
+                :class="
+                  selectedPackagePaymentMethod === 'electronic'
+                    ? 'bg-gray-50 border-2 border-[#15C472]'
+                    : 'bg-gray-50 border-2 border-gray-200'
+                "
+              >
+                <label
+                  for="package-electronic"
+                  class="flex-1 flex items-center justify-start gap-2 cursor-pointer"
+                >
+                  <img
+                    src="/icons/epay-icon.svg"
+                    alt="electronic payment"
+                    class="w-8 h-8"
+                  />
+                  <span class="text-black font-medium text-right"
+                    >دفع الكتروني</span
+                  >
+                </label>
+                <input
+                  type="radio"
+                  id="package-electronic"
+                  v-model="selectedPackagePaymentMethod"
+                  value="electronic"
+                  class="w-5 h-5 cursor-pointer accent-[#15C472]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer with confirm button -->
+          <div class="px-6 pb-6">
+            <button
+              type="button"
+              class="w-full bg-gradient-to-r from-[#0A717E] to-[#15C472] text-white font-semibold py-3 rounded-lg shadow-sm hover:opacity-90 transition-all duration-200"
+              @click="handlePackagePayment"
+            >
+              تأكيد
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
     <!-- Logout Confirmation Modal -->
     <Teleport to="body">
       <div
@@ -1914,6 +2302,7 @@ import {
   watch,
   onBeforeUnmount,
   onMounted,
+  nextTick,
 } from "vue";
 import navHeader from "~/components/navHeader.vue";
 import footerSection from "~/components/footerSection.vue";
@@ -1935,9 +2324,22 @@ const commissionAmount = ref("");
 // Settings Sub-tab State
 const settingsSubTab = ref("personal-info");
 
+// Password Visibility State
+const showCurrentPassword = ref(false);
+const showNewPassword = ref(false);
+const showConfirmPassword = ref(false);
+
 // Commission Payment Modal State
 const isCommissionPaymentModalOpen = ref(false);
 const selectedCommissionPaymentMethod = ref("wallet");
+
+// Success Modal State
+const isSuccessModalOpen = ref(false);
+
+// Package Payment Modal State
+const isPackagePaymentModalOpen = ref(false);
+const selectedPackagePaymentMethod = ref("wallet");
+const selectedPackage = ref(null);
 
 // Logout Modal State
 const isLogoutModalOpen = ref(false);
@@ -2243,6 +2645,89 @@ const handleUnfollow = (userId) => {
   }
 };
 
+// Packages Data
+const packages = ref([
+  {
+    id: 1,
+    price: "70",
+    title: "الباقة الذهبية",
+    features: [
+      "إعلانك في أعلى النتائج دائما",
+      "يظهر في خانة الإعلانات المميزة",
+      'شعار "مميز" ظاهر للمستخدمين',
+      "تثبيت الإعلان لمدة 7 أيام",
+      "5 أضعاف فرص البيع",
+    ],
+  },
+  {
+    id: 2,
+    price: "70",
+    title: "الباقة الذهبية",
+    features: [
+      "إعلانك في أعلى النتائج دائما",
+      "يظهر في خانة الإعلانات المميزة",
+      'شعار "مميز" ظاهر للمستخدمين',
+      "تثبيت الإعلان لمدة 7 أيام",
+      "5 أضعاف فرص البيع",
+    ],
+  },
+  {
+    id: 3,
+    price: "70",
+    title: "الباقة الذهبية",
+    features: [
+      "إعلانك في أعلى النتائج دائما",
+      "يظهر في خانة الإعلانات المميزة",
+      'شعار "مميز" ظاهر للمستخدمين',
+      "تثبيت الإعلان لمدة 7 أيام",
+      "5 أضعاف فرص البيع",
+    ],
+  },
+]);
+
+// Subscription Data
+const subscriptions = ref([
+  {
+    id: 1,
+    price: "70",
+    title: "الباقة الذهبية",
+    medalNumber: "1",
+    features: [
+      "إعلانك في أعلى النتائج دائما",
+      "يظهر في خانة الإعلانات المميزة",
+      'شعار "مميز" ظاهر للمستخدمين',
+      "تثبيت الإعلان لمدة 7 أيام",
+      "٥ أضعاف فرص البيع",
+    ],
+  },
+  {
+    id: 2,
+    price: "70",
+    title: "الباقة الذهبية",
+    medalNumber: "1",
+    features: [
+      "إعلانك في أعلى النتائج دائما",
+      "يظهر في خانة الإعلانات المميزة",
+      'شعار "مميز" ظاهر للمستخدمين',
+      "تثبيت الإعلان لمدة 7 أيام",
+      "٥ أضعاف فرص البيع",
+    ],
+  },
+  {
+    id: 3,
+    price: "70",
+    title: "الباقة الذهبية",
+    medalNumber: "1",
+    features: [
+      "إعلانك في أعلى النتائج دائما",
+      "يظهر في خانة الإعلانات المميزة",
+      'شعار "مميز" ظاهر للمستخدمين',
+      "تثبيت الإعلان لمدة 7 أيام",
+      "٥ أضعاف فرص البيع",
+    ],
+  },
+]);
+
 // Complaints Data
 const complaints = ref([
   {
@@ -2546,6 +3031,65 @@ const handleChangePasswordSubmit = () => {
   changePasswordForm.currentPassword = "";
   changePasswordForm.newPassword = "";
   changePasswordForm.confirmPassword = "";
+  // Reset password visibility
+  showCurrentPassword.value = false;
+  showNewPassword.value = false;
+  showConfirmPassword.value = false;
+};
+
+const handlePackageSubscribe = (packageItem) => {
+  selectedPackage.value = packageItem;
+  openPackagePaymentModal();
+};
+
+const openPackagePaymentModal = () => {
+  isPackagePaymentModalOpen.value = true;
+};
+
+const closePackagePaymentModal = () => {
+  isPackagePaymentModalOpen.value = false;
+  // Reset payment method selection when closing
+  selectedPackagePaymentMethod.value = "wallet";
+  selectedPackage.value = null;
+};
+
+const handlePackagePayment = () => {
+  if (!selectedPackage.value) {
+    return;
+  }
+  console.log("Processing package payment:", selectedPackage.value);
+  console.log(
+    "Selected payment method:",
+    selectedPackagePaymentMethod.value
+  );
+  // Add your payment processing logic here
+  
+  // Open success modal first (it has higher z-index z-[100])
+  console.log("Opening success modal now...");
+  isSuccessModalOpen.value = true;
+  console.log("Success modal state set to:", isSuccessModalOpen.value);
+  
+  // Close package payment modal after a delay
+  setTimeout(() => {
+    closePackagePaymentModal();
+  }, 200);
+  
+  // Auto-close success modal after 3 seconds
+  setTimeout(() => {
+    closeSuccessModal();
+  }, 3000);
+};
+
+const handleRenewSubscription = (subscription) => {
+  console.log("Renewing subscription:", subscription);
+  // Open the package payment modal with the subscription data
+  selectedPackage.value = {
+    id: subscription.id,
+    price: subscription.price,
+    title: subscription.title,
+    features: subscription.features,
+  };
+  openPackagePaymentModal();
 };
 
 const handleContactUsSubmit = () => {
@@ -2689,9 +3233,35 @@ const handleCommissionPayment = () => {
     selectedCommissionPaymentMethod.value
   );
   // Add your payment processing logic here
-  // After successful payment, close the modal
-  closeCommissionPaymentModal();
-  // You might want to show a success message or navigate to a success page
+  
+  // Open success modal first (it has higher z-index z-[60])
+  console.log("Opening success modal now...");
+  isSuccessModalOpen.value = true;
+  console.log("Success modal state set to:", isSuccessModalOpen.value);
+  
+  // Close commission modal after a delay
+  setTimeout(() => {
+    closeCommissionPaymentModal();
+  }, 200);
+  
+  // Auto-close success modal after 3 seconds
+  setTimeout(() => {
+    closeSuccessModal();
+  }, 3000);
+};
+
+const openSuccessModal = () => {
+  console.log("Opening success modal");
+  isSuccessModalOpen.value = true;
+  console.log("Success modal state:", isSuccessModalOpen.value);
+  // Auto-close after 3 seconds
+  setTimeout(() => {
+    closeSuccessModal();
+  }, 3000);
+};
+
+const closeSuccessModal = () => {
+  isSuccessModalOpen.value = false;
 };
 
 // Prevent body scroll when modal is open (client-side only)
@@ -2734,12 +3304,66 @@ watch(
   { immediate: true }
 );
 
+// Package Payment Modal - Prevent body scroll when modal is open
+const updatePackagePaymentModalBodyOverflow = (isOpen) => {
+  if (process.client && typeof document !== "undefined") {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+  }
+};
+
+watch(
+  () => isPackagePaymentModalOpen.value,
+  (isOpen) => {
+    updatePackagePaymentModalBodyOverflow(isOpen);
+  },
+  { immediate: true }
+);
+
+// Success Modal - Prevent body scroll when modal is open
+const updateSuccessModalBodyOverflow = (isOpen) => {
+  if (process.client && typeof document !== "undefined") {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+  }
+};
+
+watch(
+  () => isSuccessModalOpen.value,
+  (isOpen) => {
+    updateSuccessModalBodyOverflow(isOpen);
+  },
+  { immediate: true }
+);
+
 // Logout Modal - Prevent body scroll when modal is open
 watch(
   () => isLogoutModalOpen.value,
   (isOpen) => {
     if (process.client && typeof document !== "undefined") {
       document.body.style.overflow = isOpen ? "hidden" : "";
+    }
+  },
+  { immediate: true }
+);
+
+// Reset password visibility when switching away from change-password sub-tab
+watch(
+  () => settingsSubTab.value,
+  (newTab) => {
+    if (newTab !== "change-password") {
+      showCurrentPassword.value = false;
+      showNewPassword.value = false;
+      showConfirmPassword.value = false;
+    }
+  }
+);
+
+// Debug watcher for success modal
+watch(
+  () => isSuccessModalOpen.value,
+  (isOpen) => {
+    console.log("Success modal state changed to:", isOpen);
+    if (isOpen) {
+      console.log("Success modal should be visible now!");
     }
   },
   { immediate: true }
@@ -2764,5 +3388,17 @@ select {
 
 .custom-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+/* RTL List dots positioning */
+ul.list-disc {
+  list-style-position: outside;
+  direction: rtl;
+  padding-right: 1.5rem;
+}
+
+ul.list-disc li {
+  direction: rtl;
+  text-align: right;
 }
 </style>
