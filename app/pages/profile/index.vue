@@ -120,7 +120,7 @@
                       <img
                         src="/images/Country Flags.png"
                         alt="Saudi Arabia Flag"
-                        class="w-4 h-4 sm:w-5 sm:h-5"
+                        class="w-7 h-7 sm:w-6 sm:h-6"
                       />
                     </div>
                     <input
@@ -235,7 +235,7 @@
                 </div>
 
                 <!-- Delete Account Button -->
-                <div class="pt-4 sm:pt-6 mt-4 sm:mt-6">
+                <div class="pt-4 sm:pt-6 mt-4 sm:mt-6 max-w-lg mx-auto">
                   <button
                     type="button"
                     class="w-full px-4 py-2.5 sm:px-6 sm:py-3 bg-red-500 text-white text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl hover:bg-red-600 transition-colors"
@@ -249,7 +249,382 @@
 
             <!-- Settings Tab Content -->
             <div v-if="activeTab === 'settings'" class="space-y-6">
-              <p class="text-gray-600">صفحة الإعدادات - قيد التطوير</p>
+              <!-- Settings Sub-tabs Navigation -->
+              <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-6">
+                <button
+                  @click="settingsSubTab = 'personal-info'"
+                  :class="[
+                    'px-4 py-2 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-all',
+                    settingsSubTab === 'personal-info'
+                      ? 'bg-gradient-to-r from-[#15c472] to-[#12a866] text-white shadow-md'
+                      : 'bg-white border-2 border-[#15c472] text-[#15c472] hover:bg-gray-50',
+                  ]"
+                >
+                  البيانات الشخصية
+                </button>
+                <button
+                  @click="settingsSubTab = 'change-mobile'"
+                  :class="[
+                    'px-4 py-2 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-all',
+                    settingsSubTab === 'change-mobile'
+                      ? 'bg-gradient-to-r from-[#15c472] to-[#12a866] text-white shadow-md'
+                      : 'bg-white border-2 border-[#15c472] text-[#15c472] hover:bg-gray-50',
+                  ]"
+                >
+                  تغيير رقم الجوال
+                </button>
+                <button
+                  @click="settingsSubTab = 'change-password'"
+                  :class="[
+                    'px-4 py-2 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-all',
+                    settingsSubTab === 'change-password'
+                      ? 'bg-gradient-to-r from-[#15c472] to-[#12a866] text-white shadow-md'
+                      : 'bg-white border-2 border-[#15c472] text-[#15c472] hover:bg-gray-50',
+                  ]"
+                >
+                  تغيير كلمة المرور
+                </button>
+              </div>
+
+              <!-- Personal Information Sub-tab -->
+              <div v-if="settingsSubTab === 'personal-info'" class="space-y-6">
+                <!-- Profile Picture Section -->
+                <div class="flex flex-col items-center mb-6 sm:mb-8">
+                  <div class="relative">
+                    <img
+                      src="/images/profile-avatar.png"
+                      alt="Profile Picture"
+                      class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full object-cover border-2 sm:border-4 border-gray-100"
+                    />
+                    <button
+                      type="button"
+                      class="absolute bottom-0 right-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-[#15c472] rounded-full flex items-center justify-center shadow-lg hover:bg-[#12a866] transition-colors"
+                      aria-label="Edit Profile Picture"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Form Fields -->
+                <form
+                  class="space-y-4 sm:space-y-6"
+                  @submit.prevent="handleSettingsSubmit"
+                >
+                  <!-- Client Name -->
+                  <div class="space-y-2">
+                    <label
+                      for="settingsClientName"
+                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
+                    >
+                      اسم العميل
+                    </label>
+                    <input
+                      id="settingsClientName"
+                      v-model="settingsForm.clientName"
+                      type="text"
+                      placeholder="العميل"
+                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                    />
+                  </div>
+
+                  <!-- Email -->
+                  <div class="space-y-2">
+                    <label
+                      for="settingsEmail"
+                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
+                    >
+                      البريد الإلكتروني
+                    </label>
+                    <input
+                      id="settingsEmail"
+                      v-model="settingsForm.email"
+                      type="email"
+                      placeholder="البريد الإلكتروني"
+                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                    />
+                  </div>
+
+                  <!-- City -->
+                  <div class="space-y-2">
+                    <label
+                      for="settingsCity"
+                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
+                    >
+                      المدينة
+                    </label>
+                    <div class="relative">
+                      <select
+                        id="settingsCity"
+                        v-model="settingsForm.city"
+                        class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 pr-8 sm:pr-10 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 appearance-none text-right"
+                      >
+                        <option value="">اختر المدينة</option>
+                        <option value="riyadh">الرياض</option>
+                        <option value="jeddah">جدة</option>
+                        <option value="dammam">الدمام</option>
+                        <option value="makkah">مكة المكرمة</option>
+                        <option value="medina">المدينة المنورة</option>
+                      </select>
+                      <div
+                        class="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Location -->
+                  <div class="space-y-2">
+                    <label
+                      for="settingsLocation"
+                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
+                    >
+                      تحديد الموقع
+                    </label>
+                    <div class="relative">
+                      <input
+                        id="settingsLocation"
+                        v-model="settingsForm.location"
+                        type="text"
+                        placeholder="تحديد الموقع"
+                        class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 pr-10 sm:pr-12 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                      />
+                      <div
+                        class="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-4 h-4 sm:w-5 sm:h-5 text-[#15c472]"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Save Button -->
+                  <div class="pt-4 sm:pt-6">
+                    <button
+                      type="submit"
+                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
+                    >
+                      حفظ
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Change Mobile Number Sub-tab -->
+              <div v-if="settingsSubTab === 'change-mobile'" class="space-y-6">
+                <form
+                  class="space-y-4 sm:space-y-6"
+                  @submit.prevent="handleChangeMobileSubmit"
+                >
+                  <!-- Current Mobile Number -->
+                  <div class="space-y-2">
+                    <label
+                      for="currentMobile"
+                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
+                    >
+                      رقم الجوال الحالي
+                    </label>
+                    <div
+                      class="flex flex-col sm:flex-row rounded-lg sm:rounded-xl border border-gray-200 bg-white shadow-sm focus-within:border-[#15c472] focus-within:ring-2 focus-within:ring-[#15c472]/20 overflow-hidden"
+                    >
+                      <div
+                        class="flex items-center justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-3 py-2.5 sm:px-4 sm:py-3 bg-gray-50 text-xs sm:text-sm text-gray-700 min-w-[90px] sm:min-w-[100px]"
+                      >
+                        <span>+966</span>
+                        <img
+                          src="/images/Country Flags.png"
+                          alt="Saudi Arabia Flag"
+                          class="w-7 h-7 sm:w-6 sm:h-6"
+                        />
+                      </div>
+                      <input
+                        id="currentMobile"
+                        v-model="changeMobileForm.currentMobile"
+                        type="tel"
+                        placeholder="رقم الجوال الحالي"
+                        class="flex-1 w-full bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 text-right"
+                        disabled
+                      />
+                    </div>
+                  </div>
+
+                  <!-- New Mobile Number -->
+                  <div class="space-y-2">
+                    <label
+                      for="newMobile"
+                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
+                    >
+                      رقم الجوال الجديد
+                    </label>
+                    <div
+                      class="flex flex-col sm:flex-row rounded-lg sm:rounded-xl border border-gray-200 bg-white shadow-sm focus-within:border-[#15c472] focus-within:ring-2 focus-within:ring-[#15c472]/20 overflow-hidden"
+                    >
+                      <div
+                        class="flex items-center justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-3 py-2.5 sm:px-4 sm:py-3 bg-gray-50 text-xs sm:text-sm text-gray-700 min-w-[90px] sm:min-w-[100px]"
+                      >
+                        <span>+966</span>
+                        <img
+                          src="/images/Country Flags.png"
+                          alt="Saudi Arabia Flag"
+                          class="w-7 h-7 sm:w-6 sm:h-6"
+                        />
+                      </div>
+                      <input
+                        id="newMobile"
+                        v-model="changeMobileForm.newMobile"
+                        type="tel"
+                        placeholder="رقم الجوال الجديد"
+                        class="flex-1 w-full bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 text-right"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Verification Code -->
+                  <div class="space-y-2">
+                    <label
+                      for="verificationCode"
+                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
+                    >
+                      رمز التحقق
+                    </label>
+                    <input
+                      id="verificationCode"
+                      v-model="changeMobileForm.verificationCode"
+                      type="text"
+                      placeholder="أدخل رمز التحقق"
+                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                    />
+                  </div>
+
+                  <!-- Save Button -->
+                  <div class="pt-4 sm:pt-6">
+                    <button
+                      type="submit"
+                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
+                    >
+                      حفظ
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Change Password Sub-tab -->
+              <div v-if="settingsSubTab === 'change-password'" class="space-y-6">
+                <form
+                  class="space-y-4 sm:space-y-6"
+                  @submit.prevent="handleChangePasswordSubmit"
+                >
+                  <!-- Current Password -->
+                  <div class="space-y-2">
+                    <label
+                      for="currentPassword"
+                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
+                    >
+                      كلمة المرور الحالية
+                    </label>
+                    <input
+                      id="currentPassword"
+                      v-model="changePasswordForm.currentPassword"
+                      type="password"
+                      placeholder="أدخل كلمة المرور الحالية"
+                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                    />
+                  </div>
+
+                  <!-- New Password -->
+                  <div class="space-y-2">
+                    <label
+                      for="newPassword"
+                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
+                    >
+                      كلمة المرور الجديدة
+                    </label>
+                    <input
+                      id="newPassword"
+                      v-model="changePasswordForm.newPassword"
+                      type="password"
+                      placeholder="أدخل كلمة المرور الجديدة"
+                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                    />
+                  </div>
+
+                  <!-- Confirm New Password -->
+                  <div class="space-y-2">
+                    <label
+                      for="confirmPassword"
+                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
+                    >
+                      تأكيد كلمة المرور الجديدة
+                    </label>
+                    <input
+                      id="confirmPassword"
+                      v-model="changePasswordForm.confirmPassword"
+                      type="password"
+                      placeholder="أعد إدخال كلمة المرور الجديدة"
+                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                    />
+                  </div>
+
+                  <!-- Save Button -->
+                  <div class="pt-4 sm:pt-6">
+                    <button
+                      type="submit"
+                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
+                    >
+                      حفظ
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
 
             <!-- Wallet Tab Content -->
@@ -279,14 +654,14 @@
                     رصيدك الحالي هو
                   </p>
                   <div class="flex items-center justify-center gap-2">
+                    <span class="text-green-600 text-3xl sm:text-4xl font-bold"
+                      >60</span
+                    >
                     <img
                       src="/icons/green-currency.svg"
                       alt="rial-icon"
                       class="w-8 h-8 sm:w-10 sm:h-10"
                     />
-                    <span class="text-green-600 text-3xl sm:text-4xl font-bold"
-                      >60</span
-                    >
                   </div>
                 </div>
 
@@ -403,7 +778,11 @@
                     class="p-2 hover:bg-red-50 rounded-lg transition-colors"
                     aria-label="إلغاء المتابعة"
                   >
-                   <img src="/icons/cancelled-follow.svg" alt="cancelled-follow-icon" class="w-6 h-6 sm:w-5 sm:h-5">
+                    <img
+                      src="/icons/cancelled-follow.svg"
+                      alt="cancelled-follow-icon"
+                      class="w-8 h-8 sm:w-7 sm:h-7"
+                    />
                   </button>
                 </div>
               </div>
@@ -444,7 +823,9 @@
                 <div class="w-full max-w-md space-y-6">
                   <!-- Total Amount Heading -->
                   <div class="text-right">
-                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
+                    <h2
+                      class="text-xl sm:text-2xl font-bold text-gray-800 mb-4"
+                    >
                       المبلغ الاجمالي
                     </h2>
                   </div>
@@ -461,14 +842,14 @@
 
                   <!-- Display Amount -->
                   <div class="flex items-center justify-center gap-2">
+                    <span class="text-green-600 text-3xl sm:text-4xl font-bold">
+                      {{ commissionAmount || "60" }}
+                    </span>
                     <img
                       src="/icons/green-currency.svg"
                       alt="rial-icon"
                       class="w-8 h-8 sm:w-10 sm:h-10"
                     />
-                    <span class="text-green-600 text-3xl sm:text-4xl font-bold">
-                      {{ commissionAmount || "60" }}
-                    </span>
                   </div>
 
                   <!-- Pay Button -->
@@ -521,19 +902,391 @@
               </div>
             </div>
 
+            <!-- Privacy Tab Content -->
+            <div v-if="activeTab === 'privacy'" class="space-y-6">
+              <p class="text-gray-600 text-xl leading-relaxed">
+                هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد
+                هذا النص من مولد النص العربى، حيث يمكنك أن تولد مثل هذا النص أو
+                العديد من النصوص الأخرى إضافة إلى زيادة عدد الحروف التى يولدها
+                التطبيق.إذا كنت تحتاج إلى عدد أكبر من الفقرات يتيح لك مولد النص
+                العربى زيادة عدد الفقرات كما تريد، النص لن يبدو مقسما ولا يحوي
+                أخطاء لغوية، مولد النص العربى مفيد لمصممي المواقع على وجه
+                الخصوص، حيث يحتاج العميل فى كثير من الأحيان أن يطلع على صورة
+                حقيقية لتصميم الموقع.ومن هنا وجب على المصمم أن يضع نصوصا مؤقتة
+                على التصميم ليظهر للعميل الشكل كاملاً،دور مولد النص العربى أن
+                يوفر على المصمم عناء البحث عن نص بديل لا علاقة له بالموضوع الذى
+                يتحدث عنه التصميم فيظهر بشكل لا يليق.هذا النص يمكن أن يتم تركيبه
+                على أي تصميم دون مشكلة فلن يقتاً ومن هنا وجب على المصمم أن يضع
+                نصوصا مؤقتة على التصميم
+              </p>
+            </div>
+
             <!-- Terms Tab Content -->
             <div v-if="activeTab === 'terms'" class="space-y-6">
-              <p class="text-gray-600">صفحة الشروط والاحكام - قيد التطوير</p>
+              <p class="text-gray-600 text-xl leading-relaxed">
+                هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد
+                هذا النص من مولد النص العربى، حيث يمكنك أن تولد مثل هذا النص أو
+                العديد من النصوص الأخرى إضافة إلى زيادة عدد الحروف التى يولدها
+                التطبيق.إذا كنت تحتاج إلى عدد أكبر من الفقرات يتيح لك مولد النص
+                العربى زيادة عدد الفقرات كما تريد، النص لن يبدو مقسما ولا يحوي
+                أخطاء لغوية، مولد النص العربى مفيد لمصممي المواقع على وجه
+                الخصوص، حيث يحتاج العميل فى كثير من الأحيان أن يطلع على صورة
+                حقيقية لتصميم الموقع.ومن هنا وجب على المصمم أن يضع نصوصا مؤقتة
+                على التصميم ليظهر للعميل الشكل كاملاً،دور مولد النص العربى أن
+                يوفر على المصمم عناء البحث عن نص بديل لا علاقة له بالموضوع الذى
+                يتحدث عنه التصميم فيظهر بشكل لا يليق.هذا النص يمكن أن يتم تركيبه
+                على أي تصميم دون مشكلة فلن يقتاً ومن هنا وجب على المصمم أن يضع
+                نصوصا مؤقتة على التصميم
+              </p>
+            </div>
+
+            <!-- About Us Tab Content -->
+            <div v-if="activeTab === 'about-us'" class="space-y-6">
+              <div class="space-y-6">
+                <!-- Introduction Section -->
+                <div
+                  class=" rounded-xl p-4 sm:p-6"
+                >
+                  <p
+                    class="text-gray-700 text-base sm:text-lg leading-relaxed text-start mb-4"
+                  >
+                    هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم
+                    توليد هذا النص من مولد النص العربى، حيث يمكنك أن تولد مثل
+                    هذا النص أو العديد من النصوص الأخرى إضافة إلى زيادة عدد
+                    الحروف التى يولدها التطبيق.إذا كنت تحتاج إلى عدد أكبر من
+                    الفقرات يتيح لك مولد النص العربى زيادة عدد الفقرات كما تريد،
+                    النص لن يبدو مقسما ولا يحوي أخطاء لغوية، مولد النص العربى
+                    مفيد لمصممي المواقع على وجه الخصوص، حيث يحتاج العميل فى كثير
+                    من الأحيان أن يطلع على صورة حقيقية لتصميم الموقع.ومن هنا وجب
+                    على المصمم أن يضع نصوصا مؤقتة على التصميم ليظهر للعميل الشكل
+                    كاملاً،دور مولد النص العربى أن يوفر على المصمم عناء البحث عن
+                    نص بديل لا علاقة له بالموضوع الذى يتحدث عنه التصميم فيظهر
+                    بشكل لا يليق.هذا النص يمكن أن يتم تركيبه على أي تصميم دون
+                    مشكلة فلن يقتاً ومن هنا وجب على المصمم أن يضع نصوصا مؤقتة
+                    على التصميم
+                  </p>
+                </div>
+              </div>
             </div>
 
             <!-- Complaints Tab Content -->
             <div v-if="activeTab === 'complaints'" class="space-y-6">
-              <p class="text-gray-600">صفحة الشكاوي المقدمة - قيد التطوير</p>
+              <!-- Complaint Detail View -->
+              <div v-if="selectedComplaint" class="space-y-6">
+                <!-- Back Button -->
+                <button
+                  @click="selectedComplaint = null"
+                  class="flex items-center gap-2 text-gray-700 hover:text-[#15c472] transition-colors text-sm sm:text-base"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                  <span>العودة</span>
+                </button>
+
+                <!-- Header Section -->
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                  <h1 class="text-xl sm:text-2xl font-bold text-gray-900">
+                    شكوى رقم {{ selectedComplaint.number }}
+                  </h1>
+                  <span
+                    :class="[
+                      'px-3 py-1 rounded-lg text-sm sm:text-base font-semibold',
+                      getStatusClass(selectedComplaint.status),
+                    ]"
+                  >
+                    {{ selectedComplaint.status }}
+                  </span>
+                </div>
+
+                <!-- Complaint Details Card -->
+                <div
+                  class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6"
+                >
+                  <h2
+                    class="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-start border-b border-gray-200 pb-4"
+                  >
+                    تفاصيل الشكوى
+                  </h2>
+                  <div class="space-y-3">
+                    <!-- Complaint Date -->
+                    <div
+                      class="flex items-center justify-between py-3 border-b border-gray-200"
+                    >
+                      <span class="text-gray-600 text-sm sm:text-base"
+                        >تاريخ الشكوي</span
+                      >
+                      <span
+                        class="text-gray-800 font-semibold text-sm sm:text-base"
+                        >{{ selectedComplaint.date }}</span
+                      >
+                    </div>
+
+                    <!-- Complaint Address -->
+                    <div
+                      class="flex items-center justify-between py-3 border-b border-gray-200"
+                    >
+                      <span class="text-gray-600 text-sm sm:text-base"
+                        >عنوان الشكوي</span
+                      >
+                      <span
+                        class="text-gray-800 font-semibold text-sm sm:text-base"
+                        >{{ selectedComplaint.address }}</span
+                      >
+                    </div>
+
+                    <!-- Complaint Status -->
+                    <div
+                      class="flex items-center justify-between py-3 border-b border-gray-200"
+                    >
+                      <span class="text-gray-600 text-sm sm:text-base"
+                        >حالة الشكوى</span
+                      >
+                      <span
+                        class="text-gray-800 font-semibold text-sm sm:text-base"
+                        >{{ selectedComplaint.status }}</span
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Complaint Description Card -->
+                <div
+                  class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6"
+                >
+                  <h2
+                    class="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-start border-b border-gray-200 pb-4"
+                  >
+                    تفاصيل الشكوى
+                  </h2>
+                  <p
+                    class="text-gray-700 text-sm sm:text-base leading-relaxed text-right"
+                  >
+                    {{
+                      selectedComplaint.description ||
+                      "هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر. هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر."
+                    }}
+                  </p>
+                </div>
+                <!-- Complaint Description Card -->
+                <div
+                  class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6"
+                >
+                  <h2
+                    class="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-start border-b border-gray-200 pb-4"
+                  >
+                    رد الادارة
+                  </h2>
+                  <p
+                    class="text-gray-700 text-sm sm:text-base leading-relaxed text-right"
+                  >
+                    {{
+                      selectedComplaint.description ||
+                      "هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر. هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر."
+                    }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Complaints List View -->
+              <div v-else class="space-y-6">
+                <!-- Complaints Grid -->
+                <div
+                  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 md:grid-cols-1 gap-4 sm:gap-6"
+                >
+                  <div
+                    v-for="complaint in paginatedComplaints"
+                    :key="complaint.id"
+                    @click="viewComplaintDetails(complaint.id)"
+                    class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                  >
+                    <!-- Title -->
+                    <h3
+                      class="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-right border-b border-gray-200 pb-4"
+                    >
+                      تفاصيل الشكوى
+                    </h3>
+
+                    <!-- Complaint Details -->
+                    <div class="space-y-3 text-right">
+                      <!-- Complaint Number -->
+                      <div class="flex items-center justify-between">
+                        <span class="text-gray-600 text-sm sm:text-base"
+                          >رقم الشكوى</span
+                        >
+                        <span
+                          class="text-gray-800 font-semibold text-sm sm:text-base"
+                          >{{ complaint.number }}</span
+                        >
+                      </div>
+
+                      <!-- Complaint Date -->
+                      <div class="flex items-center justify-between">
+                        <span class="text-gray-600 text-sm sm:text-base"
+                          >تاريخ الشكوى</span
+                        >
+                        <span
+                          class="text-gray-800 font-semibold text-sm sm:text-base"
+                          >{{ complaint.date }}</span
+                        >
+                      </div>
+
+                      <!-- Complaint Address -->
+                      <div class="flex items-center justify-between">
+                        <span class="text-gray-600 text-sm sm:text-base"
+                          >عنوان الشكوى</span
+                        >
+                        <span
+                          class="text-gray-800 font-semibold text-sm sm:text-base"
+                          >{{ complaint.address }}</span
+                        >
+                      </div>
+
+                      <!-- Complaint Status -->
+                      <div class="flex items-center justify-between">
+                        <span class="text-gray-600 text-sm sm:text-base"
+                          >حالة الشكوى</span
+                        >
+                        <span
+                          :class="[
+                            'px-3 py-1 rounded-lg text-sm sm:text-base font-semibold',
+                            getStatusClass(complaint.status),
+                          ]"
+                        >
+                          {{ complaint.status }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-center pt-4">
+                  <Paginator
+                    :rows="complaintsPerPage"
+                    :total-records="totalComplaints"
+                    :first="complaintsFirst"
+                    @page="onComplaintsPageChange"
+                    template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+                    class="p-paginator"
+                  />
+                </div>
+              </div>
             </div>
 
             <!-- Join Consultant Tab Content -->
             <div v-if="activeTab === 'join-consultant'" class="space-y-6">
-              <p class="text-gray-600">صفحة الانظمام كمستشار - قيد التطوير</p>
+              <form
+                @submit.prevent="handleJoinConsultantSubmit"
+                class="space-y-6"
+              >
+                <!-- CV PDF Upload -->
+                <div class="space-y-2">
+                  <label
+                    for="cvFile"
+                    class="block text-sm sm:text-base font-bold text-gray-800 text-right"
+                  >
+                    ارفاق ملف السير الذاتية PDF
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <label
+                    for="cvFile"
+                    class="block max-w-xs border border-gray-300 rounded-xl p-3 sm:p-4 cursor-pointer hover:border-[#15c472] transition-colors bg-white"
+                  >
+                    <input
+                      id="cvFile"
+                      type="file"
+                      accept=".pdf"
+                      @change="handleCvFileChange"
+                      class="hidden"
+                    />
+                    <div
+                      class="flex flex-col items-center justify-center gap-2"
+                    >
+                      <img
+                        src="/icons/pdf-uploader.svg"
+                        alt="pdf-uploader"
+                        class="w-4 h-4"
+                      />
+                      <span class="text-gray-600 text-xs sm:text-sm">
+                        {{ cvFileName || "إرفاق ملف" }}
+                      </span>
+                    </div>
+                  </label>
+                </div>
+
+                <!-- Consultant Proof PDF Upload -->
+                <div class="space-y-2">
+                  <label
+                    for="proofFile"
+                    class="block text-sm sm:text-base font-bold text-gray-800 text-right"
+                  >
+                    ارفاق ما يثبت انه استشاري PDF
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <label
+                    for="proofFile"
+                    class="block max-w-xs border border-gray-300 rounded-xl p-3 sm:p-4 cursor-pointer hover:border-[#15c472] transition-colors bg-white"
+                  >
+                    <input
+                      id="proofFile"
+                      type="file"
+                      accept=".pdf"
+                      @change="handleProofFileChange"
+                      class="hidden"
+                    />
+                    <div
+                      class="flex flex-col items-center justify-center gap-2"
+                    >
+                      <img
+                        src="/icons/pdf-uploader.svg"
+                        alt="pdf-uploader"
+                        class="w-4 h-4"
+                      />
+                      <span class="text-gray-600 text-xs sm:text-sm">
+                        {{ proofFileName || "إرفاق ملف" }}
+                      </span>
+                    </div>
+                  </label>
+                </div>
+
+                <!-- Consultation Cost -->
+                <div class="space-y-2">
+                  <label
+                    for="consultationCost"
+                    class="block text-sm sm:text-base font-bold text-gray-800 text-right"
+                  >
+                    تكلفة الاستشارة
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="consultationCost"
+                    v-model="joinConsultantForm.consultationCost"
+                    type="text"
+                    placeholder="١٠٠ ريال"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl text-right text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-[#15c472] focus:border-transparent placeholder:text-gray-400"
+                  />
+                </div>
+
+                <!-- Submit Button -->
+                <button
+                  type="submit"
+                  class="w-full bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300"
+                >
+                  ارسال طلب
+                </button>
+              </form>
             </div>
 
             <!-- Contact Us Tab Content -->
@@ -610,7 +1363,7 @@
                   <img
                     src="/icons/profile-tab.svg"
                     alt="profile-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>الملف الشخصي</span>
                 </button>
@@ -628,7 +1381,7 @@
                   <img
                     src="/icons/settings-tab.svg"
                     alt="settings-tab"
-                    class="w-4 h-4 sm:w-5 sm:h-5"
+                    class="w-7 h-7 sm:w-6 sm:h-6"
                   />
                   <span>الاعدادات</span>
                 </button>
@@ -646,7 +1399,7 @@
                   <img
                     src="/icons/heart-icon.svg"
                     alt="favorites-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>المفضلة</span>
                 </button>
@@ -664,7 +1417,7 @@
                   <img
                     src="/icons/wallet-tab.svg"
                     alt="wallet-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>المحفظة</span>
                 </button>
@@ -682,7 +1435,7 @@
                   <img
                     src="/icons/ads-tab.svg"
                     alt="ads-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>اعلاناتي</span>
                 </button>
@@ -700,7 +1453,7 @@
                   <img
                     src="/icons/rating-tab.svg"
                     alt="ratings-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>تقييماتي</span>
                 </button>
@@ -718,7 +1471,7 @@
                   <img
                     src="/icons/follow-tab.svg"
                     alt="follow-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>المتابعة</span>
                 </button>
@@ -736,7 +1489,7 @@
                   <img
                     src="/icons/cost-tab.svg"
                     alt="cost-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>حساب عمولة التطبيق</span>
                 </button>
@@ -754,7 +1507,7 @@
                   <img
                     src="/icons/Packages-tabs.svg"
                     alt="Packages-tabs"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>باقاتي</span>
                 </button>
@@ -772,7 +1525,7 @@
                   <img
                     src="/icons/subscription-tab.svg"
                     alt="subscription-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>اشتراكي</span>
                 </button>
@@ -790,23 +1543,28 @@
                   <img
                     src="/icons/contactus-tab.svg"
                     alt="contact-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>تواصل معنا</span>
                 </button>
 
                 <!-- 12. عن المنصة -->
-                <NuxtLink
-                  to="/aboutUs"
-                  class="flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base text-gray-700 hover:bg-gray-50 hover:text-[#15c472] font-medium transition-colors"
+                <button
+                  @click="setActiveTab('about-us')"
+                  :class="[
+                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
+                    activeTab === 'about-us'
+                      ? 'bg-[#15c472] text-white'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                  ]"
                 >
                   <img
                     src="/icons/aboutus-tab.svg"
                     alt="aboutus-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>عن المنصة</span>
-                </NuxtLink>
+                </button>
 
                 <!-- 13. الاسئلة المتكررة -->
                 <button
@@ -821,7 +1579,7 @@
                   <img
                     src="/icons/faq-tab.svg"
                     alt="faq-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>الاسئلة المتكررة</span>
                 </button>
@@ -839,7 +1597,7 @@
                   <img
                     src="/icons/privacy-tab.svg"
                     alt="privacy-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>سياسة الاستخدام</span>
                 </button>
@@ -857,7 +1615,7 @@
                   <img
                     src="/icons/terms-tab.svg"
                     alt="terms-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>الشروط والاحكام</span>
                 </button>
@@ -875,7 +1633,7 @@
                   <img
                     src="/icons/reports-tab.svg"
                     alt="complaints-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>الشكاوي المقدمة</span>
                 </button>
@@ -893,7 +1651,7 @@
                   <img
                     src="/icons/join-tab.svg"
                     alt="consultant-tab"
-                    class="w-6 h-6 sm:w-5 sm:h-5 bg-green-200 p-1 rounded-full"
+                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>الانظمام كمستشار</span>
                 </button>
@@ -901,7 +1659,7 @@
                 <!-- 18. تسجيل الخروج (في الأسفل باللون الأحمر) -->
                 <div class="pt-2 mt-2 border-t border-gray-200">
                   <button
-                    @click="handleLogout"
+                    @click="openLogoutModal"
                     class="flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base text-red-500 hover:bg-red-50 font-medium transition-colors w-full text-right"
                   >
                     <svg
@@ -1084,6 +1842,67 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- Logout Confirmation Modal -->
+    <Teleport to="body">
+      <div
+        v-if="isLogoutModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3 sm:px-4 py-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="logout-modal-title"
+        @click.self="closeLogoutModal"
+      >
+        <div
+          class="w-full max-w-sm sm:max-w-md md:max-w-xl rounded-xl sm:rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
+          @click.stop
+        >
+          <!-- Content -->
+          <div class="p-4 sm:p-6 md:p-8 text-center">
+            <!-- Question -->
+            <h2
+              id="logout-modal-title"
+              class="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mb-4 sm:mb-6"
+            >
+              هل انت متاكد من تسجيل الخروج
+            </h2>
+
+            <!-- Icon -->
+            <div class="flex justify-center mb-4 sm:mb-6">
+              <div
+                class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center"
+              >
+                <img
+                  src="/icons/logout-modal.svg"
+                  alt="logout-icon"
+                  class="w-full h-full object-contain"
+                />
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-2 sm:gap-3 md:gap-4">
+              <!-- Yes Button (Right) -->
+              <button
+                type="button"
+                @click="confirmLogout"
+                class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-red-700 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-red-800 transition-colors"
+              >
+                نعم
+              </button>
+              <!-- No Button (Left) -->
+              <button
+                type="button"
+                @click="closeLogoutModal"
+                class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-white border-2 border-[#15c472] text-gray-800 text-sm sm:text-base font-semibold rounded-lg hover:bg-gray-50 transition-colors order-1"
+              >
+                لا
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -1113,14 +1932,25 @@ const isChargeModalOpen = ref(false);
 const chargeAmount = ref("");
 const commissionAmount = ref("");
 
+// Settings Sub-tab State
+const settingsSubTab = ref("personal-info");
+
 // Commission Payment Modal State
 const isCommissionPaymentModalOpen = ref(false);
 const selectedCommissionPaymentMethod = ref("wallet");
+
+// Logout Modal State
+const isLogoutModalOpen = ref(false);
 
 // FAQ State
 const openFaqIndex = ref(null);
 const faqPerPage = ref(4); // Items per page
 const faqFirst = ref(0); // First item index
+
+// Complaints Pagination State
+const complaintsPerPage = ref(4); // Items per page
+const complaintsFirst = ref(0); // First item index
+const selectedComplaint = ref(null);
 
 // FAQ Data
 const faqs = ref([
@@ -1413,10 +2243,152 @@ const handleUnfollow = (userId) => {
   }
 };
 
+// Complaints Data
+const complaints = ref([
+  {
+    id: 1,
+    number: "٨٤٥١",
+    date: "٢٠٢٥ / ١٠ / ١٠",
+    address: "الرياض",
+    status: "جديدة",
+    description:
+      "هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر. هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر.",
+  },
+  {
+    id: 2,
+    number: "٥٤٨٧٦",
+    date: "٢٠٢٥ / ١٠ / ٠٩",
+    address: "الرياض",
+    status: "جاري المعالجة",
+    description:
+      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
+  },
+  {
+    id: 3,
+    number: "٥٤٨٧٧",
+    date: "٢٠٢٥ / ١٠ / ٠٨",
+    address: "الرياض",
+    status: "منتهية",
+    description:
+      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
+  },
+  {
+    id: 4,
+    number: "٥٤٨٧٨",
+    date: "٢٠٢٥ / ١٠ / ٠٧",
+    address: "الرياض",
+    status: "منتهية",
+    description:
+      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
+  },
+  {
+    id: 5,
+    number: "٥٤٨٧٩",
+    date: "٢٠٢٥ / ١٠ / ٠٦",
+    address: "جدة",
+    status: "جديدة",
+    description:
+      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
+  },
+  {
+    id: 6,
+    number: "٥٤٨٨٠",
+    date: "٢٠٢٥ / ١٠ / ٠٥",
+    address: "الدمام",
+    status: "جاري المعالجة",
+    description:
+      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
+  },
+  {
+    id: 7,
+    number: "٥٤٨٨١",
+    date: "٢٠٢٥ / ١٠ / ٠٤",
+    address: "الرياض",
+    status: "منتهية",
+    description:
+      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
+  },
+  {
+    id: 8,
+    number: "٥٤٨٨٢",
+    date: "٢٠٢٥ / ١٠ / ٠٣",
+    address: "مكة المكرمة",
+    status: "جديدة",
+    description:
+      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
+  },
+  {
+    id: 9,
+    number: "٥٤٨٨٣",
+    date: "٢٠٢٥ / ١٠ / ٠٢",
+    address: "الرياض",
+    status: "جاري المعالجة",
+    description:
+      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
+  },
+  {
+    id: 10,
+    number: "٥٤٨٨٤",
+    date: "٢٠٢٥ / ١٠ / ٠١",
+    address: "المدينة المنورة",
+    status: "منتهية",
+    description:
+      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
+  },
+]);
+
+// Total complaints count
+const totalComplaints = computed(() => complaints.value.length);
+
+// Paginated complaints
+const paginatedComplaints = computed(() => {
+  const start = complaintsFirst.value;
+  const end = start + complaintsPerPage.value;
+  return complaints.value.slice(start, end);
+});
+
+// Pagination handler
+const onComplaintsPageChange = (event) => {
+  complaintsFirst.value = event.first;
+  complaintsPerPage.value = event.rows;
+  // Scroll to top when page changes
+  if (process.client) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+};
+
+// View complaint details
+const viewComplaintDetails = (complaintId) => {
+  const complaint = complaints.value.find((c) => c.id === complaintId);
+  if (complaint) {
+    selectedComplaint.value = complaint;
+    // Scroll to top when viewing details
+    if (process.client) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+};
+
+// Get status class for styling
+const getStatusClass = (status) => {
+  const statusClasses = {
+    جديدة: "bg-orange-100 text-orange-800",
+    "جاري المعالجة": "bg-yellow-100 text-yellow-800",
+    منتهية: "bg-green-100 text-green-800",
+  };
+  return statusClasses[status] || "bg-gray-100 text-gray-800";
+};
+
 const setActiveTab = (tab) => {
   activeTab.value = tab;
+  // Reset selected complaint when switching tabs
+  selectedComplaint.value = null;
+  // Reset settings sub-tab when switching away from settings
+  if (tab !== "settings") {
+    settingsSubTab.value = "personal-info";
+  }
   // Close mobile menu on small screens after selecting a tab
-  if (window.innerWidth < 1024) {
+  if (process.client && window.innerWidth < 1024) {
     isMobileMenuOpen.value = false;
   }
 };
@@ -1429,10 +2401,36 @@ const form = reactive({
   location: "",
 });
 
+const settingsForm = reactive({
+  clientName: "",
+  email: "",
+  city: "",
+  location: "",
+});
+
+const changeMobileForm = reactive({
+  currentMobile: "",
+  newMobile: "",
+  verificationCode: "",
+});
+
+const changePasswordForm = reactive({
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+});
+
 const contactForm = reactive({
   messageTitle: "",
   messageText: "",
 });
+
+const joinConsultantForm = reactive({
+  consultationCost: "",
+});
+
+const cvFileName = ref("");
+const proofFileName = ref("");
 
 const tabTitles = {
   profile: "الملف الشخصي",
@@ -1451,6 +2449,7 @@ const tabTitles = {
   complaints: "الشكاوي المقدمة",
   "join-consultant": "الانظمام كمستشار",
   "contact-us": "تواصل معنا",
+  "about-us": "عن المنصة",
 };
 
 const getTabTitle = () => {
@@ -1460,6 +2459,93 @@ const getTabTitle = () => {
 const handleSubmit = () => {
   console.log("Form submitted:", form);
   // Add your form submission logic here
+};
+
+const handleSettingsSubmit = () => {
+  if (
+    !settingsForm.clientName.trim() ||
+    !settingsForm.email.trim() ||
+    !settingsForm.city.trim()
+  ) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى ملء جميع الحقول المطلوبة",
+      life: 3000,
+    });
+    return;
+  }
+  console.log("Settings form submitted:", settingsForm);
+  // Add your form submission logic here
+  toast.add({
+    severity: "success",
+    summary: "نجح",
+    detail: "تم حفظ البيانات الشخصية بنجاح",
+    life: 3000,
+  });
+};
+
+const handleChangeMobileSubmit = () => {
+  if (
+    !changeMobileForm.newMobile.trim() ||
+    !changeMobileForm.verificationCode.trim()
+  ) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى ملء جميع الحقول المطلوبة",
+      life: 3000,
+    });
+    return;
+  }
+  console.log("Change mobile form submitted:", changeMobileForm);
+  // Add your form submission logic here
+  toast.add({
+    severity: "success",
+    summary: "نجح",
+    detail: "تم تغيير رقم الجوال بنجاح",
+    life: 3000,
+  });
+  // Reset form
+  changeMobileForm.newMobile = "";
+  changeMobileForm.verificationCode = "";
+};
+
+const handleChangePasswordSubmit = () => {
+  if (
+    !changePasswordForm.currentPassword.trim() ||
+    !changePasswordForm.newPassword.trim() ||
+    !changePasswordForm.confirmPassword.trim()
+  ) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى ملء جميع الحقول المطلوبة",
+      life: 3000,
+    });
+    return;
+  }
+  if (changePasswordForm.newPassword !== changePasswordForm.confirmPassword) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "كلمة المرور الجديدة وتأكيدها غير متطابقين",
+      life: 3000,
+    });
+    return;
+  }
+  console.log("Change password form submitted:", changePasswordForm);
+  // Add your form submission logic here
+  toast.add({
+    severity: "success",
+    summary: "نجح",
+    detail: "تم تغيير كلمة المرور بنجاح",
+    life: 3000,
+  });
+  // Reset form
+  changePasswordForm.currentPassword = "";
+  changePasswordForm.newPassword = "";
+  changePasswordForm.confirmPassword = "";
 };
 
 const handleContactUsSubmit = () => {
@@ -1486,6 +2572,53 @@ const handleContactUsSubmit = () => {
   });
 };
 
+const handleCvFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    cvFileName.value = file.name;
+  }
+};
+
+const handleProofFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    proofFileName.value = file.name;
+  }
+};
+
+const handleJoinConsultantSubmit = () => {
+  if (
+    !cvFileName.value ||
+    !proofFileName.value ||
+    !joinConsultantForm.consultationCost.trim()
+  ) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى ملء جميع الحقول المطلوبة",
+      life: 3000,
+    });
+    return;
+  }
+  console.log("Join consultant form submitted:", {
+    cvFile: cvFileName.value,
+    proofFile: proofFileName.value,
+    consultationCost: joinConsultantForm.consultationCost,
+  });
+  // Add your form submission logic here
+  // Reset form after successful submission
+  cvFileName.value = "";
+  proofFileName.value = "";
+  joinConsultantForm.consultationCost = "";
+  // Show success message
+  toast.add({
+    severity: "success",
+    summary: "نجح",
+    detail: "تم إرسال الطلب بنجاح",
+    life: 3000,
+  });
+};
+
 const handleDeleteAccount = () => {
   if (confirm("هل أنت متأكد من حذف الحساب؟ لا يمكن التراجع عن هذا الإجراء.")) {
     console.log("Account deletion requested");
@@ -1493,12 +2626,20 @@ const handleDeleteAccount = () => {
   }
 };
 
-const handleLogout = () => {
-  if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
-    console.log("Logout requested");
-    // Add your logout logic here
-    // Example: router.push("/login");
-  }
+const openLogoutModal = () => {
+  isLogoutModalOpen.value = true;
+};
+
+const closeLogoutModal = () => {
+  isLogoutModalOpen.value = false;
+};
+
+const confirmLogout = () => {
+  console.log("Logout confirmed");
+  // Add your logout logic here (clear tokens, etc.)
+  closeLogoutModal();
+  // Navigate to login page
+  navigateTo("/login");
 };
 
 const openChargeModal = () => {
@@ -1543,7 +2684,10 @@ const closeCommissionPaymentModal = () => {
 const handleCommissionPayment = () => {
   const amount = commissionAmount.value || "60";
   console.log("Processing commission payment with amount:", amount);
-  console.log("Selected payment method:", selectedCommissionPaymentMethod.value);
+  console.log(
+    "Selected payment method:",
+    selectedCommissionPaymentMethod.value
+  );
   // Add your payment processing logic here
   // After successful payment, close the modal
   closeCommissionPaymentModal();
@@ -1586,6 +2730,17 @@ watch(
   () => isCommissionPaymentModalOpen.value,
   (isOpen) => {
     updateCommissionPaymentModalBodyOverflow(isOpen);
+  },
+  { immediate: true }
+);
+
+// Logout Modal - Prevent body scroll when modal is open
+watch(
+  () => isLogoutModalOpen.value,
+  (isOpen) => {
+    if (process.client && typeof document !== "undefined") {
+      document.body.style.overflow = isOpen ? "hidden" : "";
+    }
   },
   { immediate: true }
 );
