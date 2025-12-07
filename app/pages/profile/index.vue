@@ -250,7 +250,9 @@
             <!-- Settings Tab Content -->
             <div v-if="activeTab === 'settings'" class="space-y-6">
               <!-- Settings Sub-tabs Navigation -->
-              <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-6">
+              <div
+                class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-6"
+              >
                 <button
                   @click="settingsSubTab = 'personal-info'"
                   :class="[
@@ -558,7 +560,10 @@
               </div>
 
               <!-- Change Password Sub-tab -->
-              <div v-if="settingsSubTab === 'change-password'" class="space-y-6">
+              <div
+                v-if="settingsSubTab === 'change-password'"
+                class="space-y-6"
+              >
                 <form
                   class="space-y-4 sm:space-y-6"
                   @submit.prevent="handleChangePasswordSubmit"
@@ -810,7 +815,442 @@
 
             <!-- My Ads Tab Content -->
             <div v-if="activeTab === 'my-ads'" class="space-y-6">
-              <p class="text-gray-600">صفحة إعلاناتي - قيد التطوير</p>
+              <!-- Add Ad Form -->
+              <div v-if="isAddAdFormOpen" class="space-y-6">
+                <div class="flex items-center justify-end mb-4">
+                  <!-- <h2 class="text-xl sm:text-2xl font-bold text-gray-900">
+                    اضافة اعلان
+                  </h2> -->
+                  <button
+                    type="button"
+                    @click="closeAddAdForm"
+                    class="text-gray-500 hover:text-gray-700 transition-colors"
+                    aria-label="رجوع"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="w-6 h-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+
+                <form class="space-y-6" @submit.prevent="handleAdSubmit">
+                  <!-- Department Selection -->
+                  <div class="space-y-2">
+                    <div
+                      class="flex items-center justify-start text-sm font-medium text-gray-800"
+                    >
+                      تحديد القسم
+                      <span class="text-red-500 ms-1">*</span>
+                    </div>
+                    <select
+                      v-model="adForm.department"
+                      class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                    >
+                      <option value="" disabled>اختر القسم</option>
+                      <option
+                        v-for="option in departments"
+                        :key="option.value"
+                        :value="option.value"
+                      >
+                        {{ option.label }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <!-- Title Fields -->
+                  <div class="grid grid-cols-1  gap-6">
+                    <div class="space-y-2">
+                      <div
+                        class="flex items-center justify-start text-sm font-medium text-gray-800"
+                      >
+                        اسم الاعلان بالعربية
+                        <span class="text-red-500 ms-1">*</span>
+                      </div>
+                      <input
+                        v-model="adForm.titleAr"
+                        type="text"
+                        placeholder="اسم الاعلان بالعربية"
+                        class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                        required
+                      />
+                    </div>
+
+                    <div class="space-y-2">
+                      <div
+                        class="flex items-center justify-start text-sm font-medium text-gray-800"
+                      >
+                        اسم الاعلان بالإنجليزية
+                        <span class="text-red-500 ms-1">*</span>
+                      </div>
+                      <input
+                        v-model="adForm.titleEn"
+                        type="text"
+                        placeholder="اسم الاعلان بالإنجليزية"
+                        class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Cost -->
+                  <div class="space-y-2">
+                    <div
+                      class="flex items-center justify-start text-sm font-medium text-gray-800"
+                    >
+                      تحديد تكلفة الاعلان
+                      <span class="text-red-500 ms-1">*</span>
+                    </div>
+                    <input
+                      v-model="adForm.cost"
+                      type="text"
+                      placeholder="التكلفة"
+                      class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                      required
+                    />
+                  </div>
+
+                  <!-- City -->
+                  <div class="space-y-2">
+                    <div
+                      class="flex items-center justify-start text-sm font-medium text-gray-800"
+                    >
+                      المدينة
+                      <span class="text-red-500 ms-1">*</span>
+                    </div>
+                    <select
+                      v-model="adForm.city"
+                      class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                      required
+                    >
+                      <option value="" disabled>اختر المدينة</option>
+                      <option
+                        v-for="option in cities"
+                        :key="option.value"
+                        :value="option.value"
+                      >
+                        {{ option.label }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <!-- Location -->
+                  <div class="space-y-2">
+                    <div
+                      class="flex items-center justify-start text-sm font-medium text-gray-800"
+                    >
+                      تحديد الموقع
+                      <span class="text-red-500 ms-1">*</span>
+                    </div>
+                    <div class="relative">
+                      <span
+                        class="absolute inset-y-0 end-4 flex items-center text-sm text-gray-400"
+                        aria-hidden="true"
+                      >
+                        <img src="/icons/location-icon.svg" alt="location" class="" />
+                      </span>
+                      <input
+                        v-model="adForm.location"
+                        type="text"
+                        placeholder="تحديد الموقع"
+                        class="w-full rounded-xl border border-gray-200 pe-10 ps-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 cursor-pointer focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                        readonly
+                        @click="openLocationModal"
+                        @keydown.enter.prevent="openLocationModal"
+                        role="button"
+                        :aria-expanded="isLocationModalOpen"
+                        aria-haspopup="dialog"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Description Arabic -->
+                  <div class="space-y-2">
+                    <div
+                      class="flex items-center justify-start text-sm font-medium text-gray-800"
+                    >
+                      نص الاعلان بالعربية
+                      <span class="text-red-500 ms-1">*</span>
+                    </div>
+                    <textarea
+                      v-model="adForm.descriptionAr"
+                      rows="5"
+                      placeholder="وصف"
+                      class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                      required
+                    ></textarea>
+                  </div>
+
+                  <!-- Description English -->
+                  <div class="space-y-2">
+                    <div
+                      class="flex items-center justify-start text-sm font-medium text-gray-800"
+                    >
+                      نص الاعلان بالإنجليزية
+                      <span class="text-red-500 ms-1">*</span>
+                    </div>
+                    <textarea
+                      v-model="adForm.descriptionEn"
+                      rows="5"
+                      placeholder="وصف"
+                      class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                      required
+                    ></textarea>
+                  </div>
+
+                  <!-- Gallery Images Upload -->
+                  <div class="space-y-3">
+                    <div
+                      class="flex items-center justify-start text-sm font-medium text-gray-800"
+                    >
+                      ارفاق صور ( بحد اقصي ٥ صور )
+                    </div>
+                    <label
+                      class="flex h-32 w-full max-w-[200px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white px-4 text-gray-500 cursor-pointer transition hover:border-primary-200 shadow-sm"
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        class="sr-only"
+                        @change="handleGalleryImagesChange"
+                      />
+                      <template v-if="galleryPreviews.length">
+                        <div class="flex gap-2 overflow-hidden">
+                          <img
+                            v-for="(preview, index) in galleryPreviews"
+                            :key="`preview-${index}`"
+                            :src="preview"
+                            alt="gallery preview"
+                            class="h-16 w-16 rounded-lg object-cover"
+                          />
+                        </div>
+                      </template>
+                      <template v-else>
+                        <span class="flex items-center justify-center text-5xl">
+                          <img
+                            src="/icons/upload-icon.svg"
+                            alt="upload"
+                            class="w-6 h-6"
+                          />
+                        </span>
+                        <span class="mt-3 text-sm font-medium text-gray-600">
+                          إرفاق صورة
+                        </span>
+                      </template>
+                    </label>
+                  </div>
+
+                  <!-- Ad Image Upload -->
+                  <div class="space-y-3">
+                    <div
+                      class="flex items-center justify-start text-sm font-medium text-gray-800"
+                    >
+                      ارفاق صور للاعلان
+                      <span class="text-red-500 ms-1">*</span>
+                    </div>
+                    <label
+                      class="flex h-32 w-full max-w-[200px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white px-4 text-gray-500 cursor-pointer transition hover:border-primary-200 shadow-sm"
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        class="sr-only"
+                        @change="handleAdImageChange"
+                      />
+                      <template v-if="adImagePreview">
+                        <img
+                          :src="adImagePreview"
+                          alt="ad preview"
+                          class="h-24 w-24 rounded-xl object-cover"
+                        />
+                      </template>
+                      <template v-else>
+                        <span class="flex items-center justify-center text-5xl">
+                          <img
+                            src="/icons/upload-icon.svg"
+                            alt="upload"
+                            class="w-6 h-6"
+                          />
+                        </span>
+                        <span class="mt-3 text-sm font-medium text-gray-600">
+                          إرفاق صورة
+                        </span>
+                      </template>
+                    </label>
+                  </div>
+
+                  <!-- Submit Button -->
+                  <div class="w-full">
+                    <button
+                      type="submit"
+                      class="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-4 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl"
+                    >
+                      اضافة
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Ads Grid -->
+              <div v-else>
+                <div
+                  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
+                >
+                <article
+                  v-for="ad in myAds"
+                  :key="ad.id"
+                  class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+                >
+                  <!-- Product Image -->
+                  <div class="relative">
+                    <img
+                      :src="ad.image"
+                      :alt="ad.title"
+                      class="w-full h-40 sm:h-48 object-cover"
+                    />
+                    <!-- Edit and Delete Buttons -->
+                    <div class="absolute top-2 right-2 flex gap-2">
+
+                      <button
+                        @click="openDeleteAdModal(ad.id)"
+                        class="p-2 bg-white rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
+                        aria-label="Delete"
+                      >
+                        <img
+                          src="/icons/trash-icon.svg"
+                          alt="delete-ad-icon"
+                          class="w-8 h-8"
+                        />
+                      </button>
+                      
+                      <button
+                        @click="editAd(ad.id)"
+                        class="p-2 bg-white rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
+                        aria-label="Edit"
+                      >
+                        <img
+                          src="/icons/edit-icon.svg"
+                          alt="edit-ad-icon"
+                          class="w-8 h-8"
+                        />
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Product Content -->
+                  <div class="p-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <!-- Rating -->
+                      <div class="flex items-center gap-1">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4 text-amber-400 fill-current"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                          />
+                        </svg>
+                        <span class="text-sm font-bold text-gray-600">{{
+                          ad.rating
+                        }}</span>
+                      </div>
+                      <!-- Product Title -->
+                      <h3
+                        class="text-base font-bold text-gray-900 text-right flex-1 pr-2"
+                      >
+                        {{ ad.title }}
+                      </h3>
+                    </div>
+
+                    <!-- Price -->
+                    <div
+                      class="text-lg font-bold text-[#15C472] mb-2 text-right"
+                    >
+                      {{ ad.price }} <span class="text-sm">ر.س</span>
+                    </div>
+
+                    <!-- Location and Time -->
+                    <div
+                      class="flex items-center gap-2 text-sm text-gray-600 mb-3"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4 text-[#15C472]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                      <span>{{ ad.location }}</span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4 text-[#15C472] mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span>{{ ad.timeAgo }}</span>
+                    </div>
+
+                    <!-- Seller Information -->
+                    <div
+                      class="flex items-center gap-2 pt-2 border-t border-gray-100"
+                    >
+                      <img
+                        :src="ad.seller.avatar"
+                        :alt="ad.seller.name"
+                        class="w-6 h-6 rounded-full object-cover"
+                      />
+                      <span class="text-sm text-gray-700">{{
+                        ad.seller.name
+                      }}</span>
+                    </div>
+                  </div>
+                </article>
+                </div>
+
+                <!-- Add Advertisement Button -->
+                <div class="flex justify-center w-full mt-6">
+                  <button
+                    type="button"
+                    @click="addAdvertisement"
+                    class="w-full mx-auto max-w-xl 2xl:max-w-xl xl:max-w-lg lg:max-w-md md:max-w-sm sm:max-w-sm px-6 py-4 bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300 transform hover:scale-105"
+                  >
+                    اضافة اعلان
+                  </button>
+                </div>
+              </div>
             </div>
 
             <!-- Ratings Tab Content -->
@@ -1009,7 +1449,9 @@
                   <div class="flex items-start justify-between mb-6">
                     <!-- Price -->
                     <div class="flex items-center gap-1">
-                      <span class="text-3xl sm:text-4xl font-bold text-[#15c472]">
+                      <span
+                        class="text-3xl sm:text-4xl font-bold text-[#15c472]"
+                      >
                         {{ packageItem.price }}
                       </span>
                       <img
@@ -1024,7 +1466,6 @@
                       <span class="text-lg sm:text-xl font-bold text-[#FE9B0E]">
                         {{ packageItem.title }}
                       </span>
-                     
                     </div>
                   </div>
 
@@ -1052,7 +1493,9 @@
 
             <!-- Subscription Tab Content -->
             <div v-if="activeTab === 'subscription'" class="space-y-6">
-              <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-3 2xl:grid-cols-3 gap-6">
+              <div
+                class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-3 2xl:grid-cols-3 gap-6"
+              >
                 <!-- Subscription Cards -->
                 <div
                   v-for="(subscription, index) in subscriptions"
@@ -1063,7 +1506,9 @@
                   <div class="flex items-start justify-between mb-6">
                     <!-- Price -->
                     <div class="flex items-center gap-1">
-                      <span class="text-3xl sm:text-4xl font-bold text-[#15c472]">
+                      <span
+                        class="text-3xl sm:text-4xl font-bold text-[#15c472]"
+                      >
                         {{ subscription.price }}
                       </span>
                       <img
@@ -1074,7 +1519,9 @@
                     </div>
                     <!-- Title with Medal Icon -->
                     <div class="flex items-center gap-2">
-                      <span class="text-xl sm:text-2xl font-bold text-orange-500">
+                      <span
+                        class="text-xl sm:text-2xl font-bold text-orange-500"
+                      >
                         {{ subscription.title }}
                       </span>
                       <div class="relative">
@@ -1123,9 +1570,9 @@
             </div>
 
             <!-- Favorites Tab Content -->
-            <div v-if="activeTab === 'favorites'" class="space-y-6">
+            <!-- <div v-if="activeTab === 'favorites'" class="space-y-6">
               <p class="text-gray-600">صفحة المفضلة - قيد التطوير</p>
-            </div>
+            </div> -->
 
             <!-- FAQ Tab Content -->
             <div v-if="activeTab === 'faq'" class="space-y-6">
@@ -1192,9 +1639,7 @@
             <div v-if="activeTab === 'about-us'" class="space-y-6">
               <div class="space-y-6">
                 <!-- Introduction Section -->
-                <div
-                  class=" rounded-xl p-4 sm:p-6"
-                >
+                <div class="rounded-xl p-4 sm:p-6">
                   <p
                     class="text-gray-700 text-base sm:text-lg leading-relaxed text-start mb-4"
                   >
@@ -1635,7 +2080,7 @@
                 </button>
 
                 <!-- 3. المفضلة -->
-                <button
+                <!-- <button
                   @click="setActiveTab('favorites')"
                   :class="[
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
@@ -1650,7 +2095,7 @@
                     class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
                   />
                   <span>المفضلة</span>
-                </button>
+                </button> -->
 
                 <!-- 4. المحفظة -->
                 <button
@@ -2100,7 +2545,7 @@
         aria-modal="true"
         aria-labelledby="success-modal-title"
         @click.self="closeSuccessModal"
-        style="z-index: 9999 !important;"
+        style="z-index: 9999 !important"
       >
         <div
           class="w-full max-w-xl rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
@@ -2118,7 +2563,11 @@
 
             <!-- Loading Spinner -->
             <div class="flex justify-center mb-6">
-              <img src="/icons/success-icon.gif" alt="success-icon" class="w-20 h-20 sm:w-24 sm:h-24">
+              <img
+                src="/icons/success-icon.gif"
+                alt="success-icon"
+                class="w-20 h-20 sm:w-24 sm:h-24"
+              />
             </div>
           </div>
         </div>
@@ -2291,6 +2740,181 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- Delete Account Confirmation Modal -->
+    <Teleport to="body">
+      <div
+        v-if="isDeleteAccountModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3 sm:px-4 py-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-account-modal-title"
+        @click.self="closeDeleteAccountModal"
+      >
+        <div
+          class="w-full max-w-sm sm:max-w-md md:max-w-xl rounded-xl sm:rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
+          @click.stop
+        >
+          <!-- Content -->
+          <div class="p-4 sm:p-6 md:p-8 text-center">
+            <!-- Question -->
+            <h2
+              id="delete-account-modal-title"
+              class="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mb-4 sm:mb-6"
+            >
+              هل انت متاكد من حذف الحساب
+            </h2>
+
+            <!-- Icon -->
+            <div class="flex justify-center mb-4 sm:mb-6">
+              <div class="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24">
+                <!-- Trash Can Icon -->
+                <img src="/icons/delete-account.svg" alt="delete-icon" class="w-full h-full object-contain text-[#A6282A]" />
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-2 sm:gap-3 md:gap-4">
+                <!-- Yes Button (Right) -->
+                <button
+                type="button"
+                @click="confirmDeleteAccount"
+                class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-red-700 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-red-800 transition-colors"
+              >
+                نعم
+              </button>
+              <!-- No Button (Left) -->
+              <button
+                type="button"
+                @click="closeDeleteAccountModal"
+                class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-white border-2 border-[#15c472] text-gray-800 text-sm sm:text-base font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                لا
+              </button>
+            
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Delete Ad Confirmation Modal -->
+    <Teleport to="body">
+      <div
+        v-if="isDeleteAdModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3 sm:px-4 py-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-ad-modal-title"
+        @click.self="closeDeleteAdModal"
+      >
+        <div
+          class="w-full max-w-sm sm:max-w-md md:max-w-xl rounded-xl sm:rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
+          @click.stop
+        >
+          <!-- Content -->
+          <div class="p-4 sm:p-6 md:p-8 text-center">
+            <!-- Question -->
+            <h2
+              id="delete-ad-modal-title"
+              class="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mb-4 sm:mb-6"
+            >
+              هل انت متاكد من مسح الاعلان
+            </h2>
+
+            <!-- Icon -->
+            <div class="flex justify-center mb-4 sm:mb-6">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 flex items-center justify-center">
+                <img
+                  src="/icons/trash-icon.svg"
+                  alt="delete-icon"
+                  class="w-full h-full object-contain text-[#A6282A]"
+                />
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-2 sm:gap-3 md:gap-4">
+              <!-- Delete Button (Right) -->
+              <button
+                type="button"
+                @click="confirmDeleteAd"
+                class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-[#A6282A] text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-red-700 transition-colors"
+              >
+                حذف المنتج
+              </button>
+              <!-- Back Button (Left) -->
+              <button
+                type="button"
+                @click="closeDeleteAdModal"
+                class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-white border-2 border-[#15c472] text-gray-800 text-sm sm:text-base font-semibold rounded-lg hover:bg-gray-50 transition-colors order-1"
+              >
+                رجوع
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Location Modal -->
+    <Teleport to="body">
+      <div
+        v-if="isLocationModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="location-modal-title"
+        @click.self="closeLocationModal"
+      >
+        <div
+          class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl"
+          @click.stop
+        >
+          <div class="flex items-center justify-between">
+            <h2
+              id="location-modal-title"
+              class="text-lg font-semibold text-gray-900"
+            >
+              تحديد الموقع
+            </h2>
+            <button
+              type="button"
+              class="text-gray-500 transition hover:text-gray-700"
+              @click="closeLocationModal"
+              aria-label="إغلاق"
+            >
+              ✕
+            </button>
+          </div>
+          <p class="mt-2 text-sm text-gray-500">
+            يمكن ربط هذه النافذة بخريطة أو محدد موقع لاحقًا. استخدم الأزرار
+            بالأسفل لحفظ الإحداثيات.
+          </p>
+          <div
+            class="mt-6 h-52 rounded-xl border border-dashed border-gray-200 bg-gray-50 flex items-center justify-center text-gray-400 text-sm"
+          >
+            مساحة محتوى الخريطة / اختيار الموقع
+          </div>
+          <div class="mt-6 flex items-center justify-end gap-3">
+            <button
+              type="button"
+              class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+              @click="closeLocationModal"
+            >
+              إلغاء
+            </button>
+            <button
+              type="button"
+              class="rounded-xl bg-gradient-to-r from-teal-500 to-teal-600 px-5 py-2 text-sm font-semibold text-white shadow hover:from-teal-600 hover:to-teal-700"
+              @click="confirmLocation"
+            >
+              حفظ الموقع
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -2343,6 +2967,48 @@ const selectedPackage = ref(null);
 
 // Logout Modal State
 const isLogoutModalOpen = ref(false);
+
+// Delete Account Modal State
+const isDeleteAccountModalOpen = ref(false);
+
+// Delete Ad Modal State
+const isDeleteAdModalOpen = ref(false);
+const selectedAdToDelete = ref(null);
+
+// Add Ad Form State
+const isAddAdFormOpen = ref(false);
+const isLocationModalOpen = ref(false);
+
+// Departments and Cities
+const departments = [
+  { label: "العميل", value: "client" },
+  { label: "المشاريع", value: "projects" },
+  { label: "الخدمات", value: "services" },
+];
+
+const cities = [
+  { label: "الرياض", value: "riyadh" },
+  { label: "جدة", value: "jeddah" },
+  { label: "الدمام", value: "dammam" },
+];
+
+// Ad Form Data
+const adForm = reactive({
+  department: "",
+  titleAr: "",
+  titleEn: "",
+  cost: "",
+  city: "",
+  location: "",
+  descriptionAr: "",
+  descriptionEn: "",
+  adImage: null,
+  galleryImages: [],
+});
+
+// Image Previews
+const adImagePreview = ref("");
+const galleryPreviews = ref([]);
 
 // FAQ State
 const openFaqIndex = ref(null);
@@ -2538,6 +3204,171 @@ const onReviewsPageChange = (event) => {
   if (process.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+};
+
+// My Ads Data
+const myAds = ref([
+  {
+    id: 1,
+    title: "سنارة سمك كبيرة",
+    image: "/images/card-img.jpg",
+    rating: 4.5,
+    price: "50",
+    location: "مدينة الرياض",
+    timeAgo: "منذ ٦ ساعات",
+    seller: {
+      name: "محمود عبد العزيز",
+      avatar: "/images/profile-avatar.png",
+    },
+  },
+  {
+    id: 2,
+    title: "سنارة سمك كبيرة",
+    image: "/images/card-img.jpg",
+    rating: 4.5,
+    price: "50",
+    location: "مدينة الرياض",
+    timeAgo: "منذ ٦ ساعات",
+    seller: {
+      name: "محمود عبد العزيز",
+      avatar: "/images/profile-avatar.png",
+    },
+  },
+  {
+    id: 3,
+    title: "سنارة سمك كبيرة",
+    image: "/images/card-img.jpg",
+    rating: 4.5,
+    price: "50",
+    location: "مدينة الرياض",
+    timeAgo: "منذ ٦ ساعات",
+    seller: {
+      name: "محمود عبد العزيز",
+      avatar: "/images/profile-avatar.png",
+    },
+  },
+]);
+
+// My Ads Methods
+const editAd = (adId) => {
+  console.log("Editing ad:", adId);
+  // Add your edit logic here
+};
+
+const openDeleteAdModal = (adId) => {
+  selectedAdToDelete.value = adId;
+  isDeleteAdModalOpen.value = true;
+};
+
+const closeDeleteAdModal = () => {
+  isDeleteAdModalOpen.value = false;
+  selectedAdToDelete.value = null;
+};
+
+const confirmDeleteAd = () => {
+  if (selectedAdToDelete.value) {
+    console.log("Deleting ad:", selectedAdToDelete.value);
+    // Remove the ad from the array
+    const index = myAds.value.findIndex(ad => ad.id === selectedAdToDelete.value);
+    if (index > -1) {
+      myAds.value.splice(index, 1);
+    }
+    // Add your delete API call here
+    closeDeleteAdModal();
+  }
+};
+
+const addAdvertisement = () => {
+  isAddAdFormOpen.value = true;
+  // Scroll to top when opening form
+  if (process.client) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+};
+
+const closeAddAdForm = () => {
+  isAddAdFormOpen.value = false;
+  // Reset form
+  Object.assign(adForm, {
+    department: "",
+    titleAr: "",
+    titleEn: "",
+    cost: "",
+    city: "",
+    location: "",
+    descriptionAr: "",
+    descriptionEn: "",
+    adImage: null,
+    galleryImages: [],
+  });
+  // Clear previews
+  if (adImagePreview.value) {
+    revokePreview(adImagePreview.value);
+    adImagePreview.value = "";
+  }
+  galleryPreviews.value.forEach(revokePreview);
+  galleryPreviews.value = [];
+};
+
+const revokePreview = (url) => {
+  if (url?.startsWith("blob:")) URL.revokeObjectURL(url);
+};
+
+const handleAdImageChange = (event) => {
+  const [file] = event.target.files || [];
+  adForm.adImage = file || null;
+  if (adImagePreview.value) {
+    revokePreview(adImagePreview.value);
+    adImagePreview.value = "";
+  }
+  if (file) {
+    adImagePreview.value = URL.createObjectURL(file);
+  }
+};
+
+const handleGalleryImagesChange = (event) => {
+  const files = Array.from(event.target.files || []).slice(0, 5);
+  adForm.galleryImages = files;
+  galleryPreviews.value.forEach(revokePreview);
+  galleryPreviews.value = files.map((file) => URL.createObjectURL(file));
+};
+
+const openLocationModal = () => {
+  isLocationModalOpen.value = true;
+};
+
+const closeLocationModal = () => {
+  isLocationModalOpen.value = false;
+};
+
+const confirmLocation = () => {
+  // Placeholder: integrate real selection logic later
+  // For now, just set a placeholder location
+  if (!adForm.location) {
+    adForm.location = "موقع محدد";
+  }
+  isLocationModalOpen.value = false;
+};
+
+const handleAdSubmit = () => {
+  console.log("Ad form submitted", { ...adForm });
+  // Add your API call here to create the ad
+  // After successful creation, add to myAds array and close form
+  const newAd = {
+    id: Date.now(), // Temporary ID
+    title: adForm.titleAr,
+    image: "/images/fishing-rod.jpg",
+    rating: 4.5,
+    price: adForm.cost || "50",
+    location: cities.find(c => c.value === adForm.city)?.label || "مدينة الرياض",
+    timeAgo: "الآن",
+    seller: {
+      name: "محمود عبد العزيز",
+      avatar: "/images/profile-avatar.png",
+    },
+  };
+  myAds.value.unshift(newAd);
+  closeAddAdForm();
 };
 
 // Following Pagination State
@@ -2920,7 +3751,6 @@ const proofFileName = ref("");
 const tabTitles = {
   profile: "الملف الشخصي",
   settings: "الاعدادات",
-  favorites: "المفضلة",
   wallet: "المحفظة",
   "my-ads": "اعلاناتي",
   ratings: "تقييماتي",
@@ -3058,22 +3888,19 @@ const handlePackagePayment = () => {
     return;
   }
   console.log("Processing package payment:", selectedPackage.value);
-  console.log(
-    "Selected payment method:",
-    selectedPackagePaymentMethod.value
-  );
+  console.log("Selected payment method:", selectedPackagePaymentMethod.value);
   // Add your payment processing logic here
-  
+
   // Open success modal first (it has higher z-index z-[100])
   console.log("Opening success modal now...");
   isSuccessModalOpen.value = true;
   console.log("Success modal state set to:", isSuccessModalOpen.value);
-  
+
   // Close package payment modal after a delay
   setTimeout(() => {
     closePackagePaymentModal();
   }, 200);
-  
+
   // Auto-close success modal after 3 seconds
   setTimeout(() => {
     closeSuccessModal();
@@ -3163,11 +3990,22 @@ const handleJoinConsultantSubmit = () => {
   });
 };
 
+const openDeleteAccountModal = () => {
+  isDeleteAccountModalOpen.value = true;
+};
+
+const closeDeleteAccountModal = () => {
+  isDeleteAccountModalOpen.value = false;
+};
+
+const confirmDeleteAccount = () => {
+  console.log("Account deletion confirmed");
+  // Add your account deletion logic here
+  closeDeleteAccountModal();
+};
+
 const handleDeleteAccount = () => {
-  if (confirm("هل أنت متأكد من حذف الحساب؟ لا يمكن التراجع عن هذا الإجراء.")) {
-    console.log("Account deletion requested");
-    // Add your account deletion logic here
-  }
+  openDeleteAccountModal();
 };
 
 const openLogoutModal = () => {
@@ -3233,17 +4071,17 @@ const handleCommissionPayment = () => {
     selectedCommissionPaymentMethod.value
   );
   // Add your payment processing logic here
-  
+
   // Open success modal first (it has higher z-index z-[60])
   console.log("Opening success modal now...");
   isSuccessModalOpen.value = true;
   console.log("Success modal state set to:", isSuccessModalOpen.value);
-  
+
   // Close commission modal after a delay
   setTimeout(() => {
     closeCommissionPaymentModal();
   }, 200);
-  
+
   // Auto-close success modal after 3 seconds
   setTimeout(() => {
     closeSuccessModal();
@@ -3345,6 +4183,28 @@ watch(
   { immediate: true }
 );
 
+// Delete Ad Modal - Prevent body scroll when modal is open
+watch(
+  () => isDeleteAdModalOpen.value,
+  (isOpen) => {
+    if (process.client && typeof document !== "undefined") {
+      document.body.style.overflow = isOpen ? "hidden" : "";
+    }
+  },
+  { immediate: true }
+);
+
+// Delete Account Modal - Prevent body scroll when modal is open
+watch(
+  () => isDeleteAccountModalOpen.value,
+  (isOpen) => {
+    if (process.client && typeof document !== "undefined") {
+      document.body.style.overflow = isOpen ? "hidden" : "";
+    }
+  },
+  { immediate: true }
+);
+
 // Reset password visibility when switching away from change-password sub-tab
 watch(
   () => settingsSubTab.value,
@@ -3377,7 +4237,10 @@ select {
   background-repeat: no-repeat;
   background-position: left 0.75rem center;
   background-size: 1.25rem;
-  padding-right: 2.5rem;
+  padding-left: 2.5rem;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
 /* Hide scrollbar but keep functionality */
