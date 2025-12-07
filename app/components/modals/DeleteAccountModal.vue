@@ -39,7 +39,7 @@
             <!-- Yes Button (Right) -->
             <button
               type="button"
-              @click="$emit('confirm')"
+              @click="handleConfirmDelete"
               class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-red-700 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-red-800 transition-colors"
             >
               نعم
@@ -69,7 +69,28 @@ const props = defineProps({
   },
 });
 
-defineEmits(["update:modelValue", "confirm"]);
+const emit = defineEmits(["update:modelValue", "confirm"]);
+
+const { logout } = useAuth();
+
+const handleConfirmDelete = async () => {
+  // Emit confirm event for parent component to handle any additional logic
+  emit("confirm");
+  
+  // Close the modal
+  emit("update:modelValue", false);
+  
+  // TODO: Replace with actual API call to delete account
+  // await $fetch('/api/auth/delete-account', {
+  //   method: 'DELETE'
+  // });
+  
+  // Logout the user (clears authentication state)
+  logout();
+  
+  // Navigate to login page
+  navigateTo("/login");
+};
 
 watch(
   () => props.modelValue,

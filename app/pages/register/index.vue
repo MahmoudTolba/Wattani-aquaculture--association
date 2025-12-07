@@ -122,14 +122,14 @@
             <!-- Phone number -->
             <div class="space-y-3">
               <label
-                class="text-base font-medium text-dark flex justify-end items-center gap-1"
+                class="text-base font-medium text-dark flex justify-start items-center gap-1"
                 for="phone"
               >
-                <span class="text-red-500">*</span>
-                رقم الجوال
+              رقم الجوال
+              <span class="text-red-500">*</span>
               </label>
               <div
-                class="flex rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] border border-transparent overflow-hidden"
+                class="flex  rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] border border-transparent overflow-hidden"
               >
                 <div
                   class="flex items-center gap-2 border-l border-gray-100 px-4 py-3 bg-gray-50 text-sm text-dark/70"
@@ -155,7 +155,7 @@
             <!-- Email -->
             <div class="space-y-3">
               <label
-                class="text-base font-medium text-dark flex justify-end items-center gap-1"
+                class="text-base font-medium text-dark flex justify-start items-center gap-1"
                 for="email"
               >
                 البريد الإلكتروني
@@ -233,7 +233,7 @@
                   class="w-full rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] border border-transparent px-4 py-3 pl-10 focus:outline-none text-dark placeholder:text-gray-400 text-right"
                 />
                 <div
-                  class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
+                  class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -279,7 +279,7 @@
                 <button
                   type="button"
                   @click="showPassword = !showPassword"
-                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   <svg
                     v-if="!showPassword"
@@ -341,7 +341,7 @@
                 <button
                   type="button"
                   @click="showConfirmPassword = !showConfirmPassword"
-                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   <svg
                     v-if="!showConfirmPassword"
