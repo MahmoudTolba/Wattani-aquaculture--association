@@ -83,28 +83,32 @@
             </span>
           </div>
         </div>
-        <!-- user profile - hidden on mobile, shown in menu -->
+        <!-- user profile - shown when authenticated, hidden on mobile -->
         <NuxtLink
+          v-if="isAuthenticated"
           to="/profile"
           class="hidden md:flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
         >
-          <img src="/images/profile-avatar.png" alt="user-icon" class="w-10 h-10 rounded-full object-cover" />
+          <img :src="userAvatar" alt="user-icon" class="w-10 h-10 rounded-full object-cover" />
           <span class="text-gray-700 text-sm"> {{ userName }} </span>
         </NuxtLink>
         <!-- actions - hidden on mobile, shown in menu -->
         <div class="hidden md:flex flex-wrap items-center gap-2 md:w-auto">
-          <NuxtLink
-            to="/login"
-            class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#00a859] to-[#15c472] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow w-full md:w-auto text-center"
-          >
-            {{ loginText }}
-          </NuxtLink>
-          <NuxtLink
-            to="/register"
-            class="inline-flex items-center justify-center rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-[#15c472] w-full md:w-auto text-center"
-          >
-            {{ createAccountText }}
-          </NuxtLink>
+          <!-- Show login/register buttons when not authenticated -->
+          <template v-if="!isAuthenticated">
+            <NuxtLink
+              to="/login"
+              class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#00a859] to-[#15c472] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow w-full md:w-auto text-center"
+            >
+              {{ loginText }}
+            </NuxtLink>
+            <NuxtLink
+              to="/register"
+              class="inline-flex items-center justify-center rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-[#15c472] w-full md:w-auto text-center"
+            >
+              {{ createAccountText }}
+            </NuxtLink>
+          </template>
           <div class="w-full md:w-auto flex justify-center">
             <LangSwitch />
           </div>
@@ -118,13 +122,14 @@
           class="md:hidden bg-white rounded-lg shadow-lg p-4 mt-2"
         >
           <nav class="flex flex-col space-y-3">
-            <!-- User Profile in Mobile Menu -->
+            <!-- User Profile in Mobile Menu - shown when authenticated -->
             <NuxtLink
+              v-if="isAuthenticated"
               to="/profile"
               class="flex items-center gap-3 px-3 py-3 rounded-md bg-gray-50 hover:bg-gray-100 transition border border-gray-200"
               @click="isMobileMenuOpen = false"
             >
-              <img src="/images/profile-avatar.png" alt="user-icon" class="w-10 h-10 rounded-full object-cover" />
+              <img :src="userAvatar" alt="user-icon" class="w-10 h-10 rounded-full object-cover" />
               <div class="flex flex-col">
                 <span class="text-gray-700 text-sm font-medium">{{ userName }}</span>
                 <span class="text-gray-500 text-xs">عرض الملف الشخصي</span>
@@ -199,8 +204,8 @@
               </NuxtLink>
             </div>
 
-            <!-- Login and Register Buttons -->
-            <div class="flex flex-col gap-2 border-t border-gray-100 pt-3">
+            <!-- Login and Register Buttons - shown when not authenticated -->
+            <div v-if="!isAuthenticated" class="flex flex-col gap-2 border-t border-gray-100 pt-3">
               <NuxtLink
                 to="/login"
                 class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#00a859] to-[#15c472] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow text-center"
@@ -218,6 +223,10 @@
               <div class="flex justify-center pt-2">
                 <LangSwitch />
               </div>
+            </div>
+            <!-- Language switcher when authenticated -->
+            <div v-else class="flex justify-center border-t border-gray-100 pt-3">
+              <LangSwitch />
             </div>
 
             <!-- Add Listing Button -->
@@ -349,9 +358,15 @@ onBeforeUnmount(() => {
   document.removeEventListener("click", handleClickOutside);
 });
 const { locale } = useI18n();
-const navItems = [
+
+// Authentication
+const { isAuthenticated, getUserName, getUserAvatar } = useAuth();
+const userName = computed(() => getUserName.value || "محمد عبدالعزيز");
+const userAvatar = computed(() => getUserAvatar.value);
+
+// Base navigation items (always shown)
+const baseNavItems = [
   { id: "home", to: "/", labels: { ar: "الرئيسية", en: "Home" } },
-  { id: "consultation", to: "/my-consultation", labels: { ar: "استشاراتي", en: "My consultation" } },
   {
     id: "services",
     to: "/services",
@@ -364,6 +379,19 @@ const navItems = [
     labels: { ar: "تواصل معنا", en: "Contact us" },
   },
 ];
+
+// Consultation link (only shown when authenticated)
+const consultationItem = { id: "consultation", to: "/my-consultation", labels: { ar: "استشاراتي", en: "My consultation" } };
+
+// Computed navigation items - include consultation only when authenticated
+const navItems = computed(() => {
+  const items = [...baseNavItems];
+  if (isAuthenticated.value) {
+    // Insert consultation after home
+    items.splice(1, 0, consultationItem);
+  }
+  return items;
+});
 const actionButtons = [
   {
     id: "favorites",
@@ -384,9 +412,6 @@ const actionButtons = [
     aria: { ar: "الإشعارات", en: "Notifications" },
   },
 ];
-const userName = computed(() => {
-  return " محمد عبدالعزيز ";
-});
 const isRTL = computed(() => locale.value === "ar");
 const resolveLabel = (labels) =>
   labels[locale.value] ?? labels.en ?? Object.values(labels)[0] ?? "";

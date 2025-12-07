@@ -46,6 +46,7 @@
                 </div>
                 <input
                   id="phone"
+                  v-model="form.phone"
                   type="tel"
                   placeholder="رقم الجوال"
                   required
@@ -79,6 +80,7 @@
                 </button>
                 <input
                   id="password"
+                  v-model="form.password"
                   :type="showPassword ? 'text' : 'password'"
                   placeholder="كلمة المرور"
                   required
@@ -139,17 +141,38 @@ import { ref } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
 
 const showPassword = ref(false);
+const form = ref({
+  phone: "",
+  password: "",
+});
 
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
 };
 
-const handleSubmit = (event: Event) => {
-  // const form = event.target as HTMLFormElement;
-  // if (!form.checkValidity()) {
-  //   form.reportValidity();
-  //   return;
-  // }
+const { login } = useAuth();
+
+const handleSubmit = async (event: Event) => {
+  event.preventDefault();
+  
+  // TODO: Replace with actual API call
+  // const response = await $fetch('/api/auth/login', {
+  //   method: 'POST',
+  //   body: {
+  //     phone: form.value.phone,
+  //     password: form.value.password
+  //   }
+  // });
+  
+  // For now, simulate successful login
+  // When API is ready, use the user data from the response
+  login({
+    name: "محمد عبدالعزيز",
+    phone: form.value.phone,
+    avatar: "/images/profile-avatar.png",
+  });
+  
+  // Navigate to home page after successful login
   navigateTo("/");
 };
 </script>
