@@ -869,7 +869,7 @@
                   </div>
 
                   <!-- Title Fields -->
-                  <div class="grid grid-cols-1  gap-6">
+                  <div class="grid grid-cols-1 gap-6">
                     <div class="space-y-2">
                       <div
                         class="flex items-center justify-start text-sm font-medium text-gray-800"
@@ -957,7 +957,11 @@
                         class="absolute inset-y-0 end-4 flex items-center text-sm text-gray-400"
                         aria-hidden="true"
                       >
-                        <img src="/icons/location-icon.svg" alt="location" class="" />
+                        <img
+                          src="/icons/location-icon.svg"
+                          alt="location"
+                          class=""
+                        />
                       </span>
                       <input
                         v-model="adForm.location"
@@ -1097,7 +1101,7 @@
                       type="submit"
                       class="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-4 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl"
                     >
-                      اضافة
+                      {{ selectedAdToEdit ? "تعديل" : "اضافة" }}
                     </button>
                   </div>
                 </form>
@@ -1108,136 +1112,135 @@
                 <div
                   class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
                 >
-                <article
-                  v-for="ad in myAds"
-                  :key="ad.id"
-                  class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
-                >
-                  <!-- Product Image -->
-                  <div class="relative">
-                    <img
-                      :src="ad.image"
-                      :alt="ad.title"
-                      class="w-full h-40 sm:h-48 object-cover"
-                    />
-                    <!-- Edit and Delete Buttons -->
-                    <div class="absolute top-2 right-2 flex gap-2">
+                  <article
+                    v-for="ad in myAds"
+                    :key="ad.id"
+                    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+                  >
+                    <!-- Product Image -->
+                    <div class="relative">
+                      <img
+                        :src="ad.image"
+                        :alt="ad.title"
+                        class="w-full h-40 sm:h-48 object-cover"
+                      />
+                      <!-- Edit and Delete Buttons -->
+                      <div class="absolute top-2 right-2 flex gap-2">
+                        <button
+                          @click="openDeleteAdModal(ad.id)"
+                          class="p-2 bg-white rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
+                          aria-label="Delete"
+                        >
+                          <img
+                            src="/icons/trash-icon.svg"
+                            alt="delete-ad-icon"
+                            class="w-8 h-8"
+                          />
+                        </button>
 
-                      <button
-                        @click="openDeleteAdModal(ad.id)"
-                        class="p-2 bg-white rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
-                        aria-label="Delete"
-                      >
-                        <img
-                          src="/icons/trash-icon.svg"
-                          alt="delete-ad-icon"
-                          class="w-8 h-8"
-                        />
-                      </button>
-                      
-                      <button
-                        @click="editAd(ad.id)"
-                        class="p-2 bg-white rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
-                        aria-label="Edit"
-                      >
-                        <img
-                          src="/icons/edit-icon.svg"
-                          alt="edit-ad-icon"
-                          class="w-8 h-8"
-                        />
-                      </button>
+                        <button
+                          @click="editAd(ad.id)"
+                          class="p-2 bg-white rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
+                          aria-label="Edit"
+                        >
+                          <img
+                            src="/icons/edit-icon.svg"
+                            alt="edit-ad-icon"
+                            class="w-8 h-8"
+                          />
+                        </button>
+                      </div>
                     </div>
-                  </div>
 
-                  <!-- Product Content -->
-                  <div class="p-4">
-                    <div class="flex items-center justify-between mb-2">
-                      <!-- Rating -->
-                      <div class="flex items-center gap-1">
+                    <!-- Product Content -->
+                    <div class="p-4">
+                      <div class="flex items-center justify-between mb-2">
+                        <!-- Rating -->
+                        <div class="flex items-center gap-1">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 text-amber-400 fill-current"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                            />
+                          </svg>
+                          <span class="text-sm font-bold text-gray-600">{{
+                            ad.rating
+                          }}</span>
+                        </div>
+                        <!-- Product Title -->
+                        <h3
+                          class="text-base font-bold text-gray-900 text-right flex-1 pr-2"
+                        >
+                          {{ ad.title }}
+                        </h3>
+                      </div>
+
+                      <!-- Price -->
+                      <div
+                        class="text-lg font-bold text-[#15C472] mb-2 text-right"
+                      >
+                        {{ ad.price }} <span class="text-sm">ر.س</span>
+                      </div>
+
+                      <!-- Location and Time -->
+                      <div
+                        class="flex items-center gap-2 text-sm text-gray-600 mb-3"
+                      >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          class="h-4 w-4 text-amber-400 fill-current"
-                          viewBox="0 0 20 20"
+                          class="w-4 h-4 text-[#15C472]"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
                         >
                           <path
-                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                           />
                         </svg>
-                        <span class="text-sm font-bold text-gray-600">{{
-                          ad.rating
+                        <span>{{ ad.location }}</span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-4 h-4 text-[#15C472] mr-2"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <span>{{ ad.timeAgo }}</span>
+                      </div>
+
+                      <!-- Seller Information -->
+                      <div
+                        class="flex items-center gap-2 pt-2 border-t border-gray-100"
+                      >
+                        <img
+                          :src="ad.seller.avatar"
+                          :alt="ad.seller.name"
+                          class="w-6 h-6 rounded-full object-cover"
+                        />
+                        <span class="text-sm text-gray-700">{{
+                          ad.seller.name
                         }}</span>
                       </div>
-                      <!-- Product Title -->
-                      <h3
-                        class="text-base font-bold text-gray-900 text-right flex-1 pr-2"
-                      >
-                        {{ ad.title }}
-                      </h3>
                     </div>
-
-                    <!-- Price -->
-                    <div
-                      class="text-lg font-bold text-[#15C472] mb-2 text-right"
-                    >
-                      {{ ad.price }} <span class="text-sm">ر.س</span>
-                    </div>
-
-                    <!-- Location and Time -->
-                    <div
-                      class="flex items-center gap-2 text-sm text-gray-600 mb-3"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="w-4 h-4 text-[#15C472]"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                      <span>{{ ad.location }}</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="w-4 h-4 text-[#15C472] mr-2"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <span>{{ ad.timeAgo }}</span>
-                    </div>
-
-                    <!-- Seller Information -->
-                    <div
-                      class="flex items-center gap-2 pt-2 border-t border-gray-100"
-                    >
-                      <img
-                        :src="ad.seller.avatar"
-                        :alt="ad.seller.name"
-                        class="w-6 h-6 rounded-full object-cover"
-                      />
-                      <span class="text-sm text-gray-700">{{
-                        ad.seller.name
-                      }}</span>
-                    </div>
-                  </div>
-                </article>
+                  </article>
                 </div>
 
                 <!-- Add Advertisement Button -->
@@ -2381,540 +2384,54 @@
     <footerSection />
 
     <!-- Charge Wallet Modal -->
-    <Teleport to="body">
-      <div
-        v-if="isChargeModalOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-4"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="charge-modal-title"
-        @click.self="closeChargeModal"
-      >
-        <div
-          class="w-full max-w-xl 2xl:max-w-xl xl:max-w-lg lg:max-w-md md:max-w-sm sm:max-w-sm rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
-          @click.stop
-        >
-          <!-- Header -->
-          <div class="px-6 py-4 text-right">
-            <h2
-              id="charge-modal-title"
-              class="text-xl sm:text-2xl font-bold text-black"
-            >
-              الشحن
-            </h2>
-            <p class="text-sm sm:text-base text-gray-700 mt-1">اشحن محفظتك</p>
-          </div>
-
-          <!-- Content -->
-          <div class="px-6 pb-6">
-            <!-- Input Field -->
-            <div class="mb-6">
-              <input
-                v-model="chargeAmount"
-                type="number"
-                placeholder="شحن المحفظة"
-                class="w-full px-4 py-3 sm:py-4 border border-gray-300 rounded-xl text-right text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-[#15c472] focus:border-transparent placeholder:text-gray-400"
-              />
-            </div>
-
-            <!-- Charge Button -->
-            <button
-              type="button"
-              @click="handleCharge"
-              class="w-full bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300"
-            >
-              شحن
-            </button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <ChargeWalletModal
+      v-model="isChargeModalOpen"
+      @confirm="handleCharge"
+    />
 
     <!-- Commission Payment Modal -->
-    <Teleport to="body">
-      <div
-        v-if="isCommissionPaymentModalOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="commission-payment-modal-title"
-        @click.self="closeCommissionPaymentModal"
-      >
-        <div
-          class="w-full max-w-3xl rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
-          @click.stop
-        >
-          <!-- Header -->
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2
-              id="commission-payment-modal-title"
-              class="text-xl font-bold text-black text-right"
-            >
-              تحديد طريقة الدفع
-            </h2>
-          </div>
-
-          <!-- Content -->
-          <div class="p-6">
-            <!-- Payment Method Options -->
-            <div class="space-y-4">
-              <!-- Wallet Option -->
-              <div
-                @click="selectedCommissionPaymentMethod = 'wallet'"
-                class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all"
-                :class="
-                  selectedCommissionPaymentMethod === 'wallet'
-                    ? 'bg-gray-50 border-2 border-[#15C472]'
-                    : 'bg-gray-50 border-2 border-gray-200'
-                "
-              >
-                <label
-                  for="commission-wallet"
-                  class="flex-1 flex items-center gap-2 justify-start cursor-pointer"
-                >
-                  <img
-                    src="/icons/wallet-icon.svg"
-                    alt="wallet"
-                    class="w-8 h-8"
-                  />
-                  <span class="text-black font-medium text-right">المحفظة</span>
-                </label>
-                <input
-                  type="radio"
-                  id="commission-wallet"
-                  v-model="selectedCommissionPaymentMethod"
-                  value="wallet"
-                  class="w-5 h-5 cursor-pointer accent-[#15C472]"
-                />
-              </div>
-
-              <!-- Electronic Payment Option -->
-              <div
-                @click="selectedCommissionPaymentMethod = 'electronic'"
-                class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all"
-                :class="
-                  selectedCommissionPaymentMethod === 'electronic'
-                    ? 'bg-gray-50 border-2 border-[#15C472]'
-                    : 'bg-gray-50 border-2 border-gray-200'
-                "
-              >
-                <label
-                  for="commission-electronic"
-                  class="flex-1 flex items-center justify-start gap-2 cursor-pointer"
-                >
-                  <img
-                    src="/icons/epay-icon.svg"
-                    alt="electronic payment"
-                    class="w-8 h-8"
-                  />
-                  <span class="text-black font-medium text-right"
-                    >دفع الكتروني</span
-                  >
-                </label>
-                <input
-                  type="radio"
-                  id="commission-electronic"
-                  v-model="selectedCommissionPaymentMethod"
-                  value="electronic"
-                  class="w-5 h-5 cursor-pointer accent-[#15C472]"
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Footer with confirm button -->
-          <div class="px-6 pb-6">
-            <button
-              type="button"
-              class="w-full bg-gradient-to-r from-[#0A717E] to-[#15C472] text-white font-semibold py-3 rounded-lg shadow-sm hover:opacity-90 transition-all duration-200"
-              @click="handleCommissionPayment"
-            >
-              تأكيد
-            </button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <CommissionPaymentModal
+      v-model="isCommissionPaymentModalOpen"
+      :payment-method="selectedCommissionPaymentMethod"
+      @confirm="handleCommissionPaymentConfirm"
+    />
 
     <!-- Success Modal -->
-    <Teleport to="body">
-      <div
-        v-if="isSuccessModalOpen"
-        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="success-modal-title"
-        @click.self="closeSuccessModal"
-        style="z-index: 9999 !important"
-      >
-        <div
-          class="w-full max-w-xl rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
-          @click.stop
-        >
-          <!-- Content -->
-          <div class="p-8 sm:p-12 text-center">
-            <!-- Success Message -->
-            <h2
-              id="success-modal-title"
-              class="text-xl sm:text-2xl font-bold text-gray-900 mb-6"
-            >
-              تم الاشتراك بنجاح
-            </h2>
-
-            <!-- Loading Spinner -->
-            <div class="flex justify-center mb-6">
-              <img
-                src="/icons/success-icon.gif"
-                alt="success-icon"
-                class="w-20 h-20 sm:w-24 sm:h-24"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <SuccessModal
+      v-model="isSuccessModalOpen"
+      title="تم الاشتراك بنجاح"
+    />
 
     <!-- Package Payment Modal -->
-    <Teleport to="body">
-      <div
-        v-if="isPackagePaymentModalOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="payment-modal-title"
-        @click.self="closePackagePaymentModal"
-      >
-        <div
-          class="w-full max-w-3xl rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
-          @click.stop
-        >
-          <!-- Header -->
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2
-              id="payment-modal-title"
-              class="text-xl font-bold text-black text-right"
-            >
-              تحديد طريقة الدفع
-            </h2>
-          </div>
-
-          <!-- Content -->
-          <div class="p-6">
-            <!-- Payment Method Options -->
-            <div class="space-y-4">
-              <!-- Wallet Option -->
-              <div
-                @click="selectedPackagePaymentMethod = 'wallet'"
-                class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all"
-                :class="
-                  selectedPackagePaymentMethod === 'wallet'
-                    ? 'bg-gray-50 border-2 border-[#15C472]'
-                    : 'bg-gray-50 border-2 border-gray-200'
-                "
-              >
-                <label
-                  for="package-wallet"
-                  class="flex-1 flex items-center gap-2 justify-start cursor-pointer"
-                >
-                  <img
-                    src="/icons/wallet-icon.svg"
-                    alt="wallet"
-                    class="w-8 h-8"
-                  />
-                  <span class="text-black font-medium text-right">المحفظة</span>
-                </label>
-                <input
-                  type="radio"
-                  id="package-wallet"
-                  v-model="selectedPackagePaymentMethod"
-                  value="wallet"
-                  class="w-5 h-5 cursor-pointer accent-[#15C472]"
-                />
-              </div>
-
-              <!-- Electronic Payment Option -->
-              <div
-                @click="selectedPackagePaymentMethod = 'electronic'"
-                class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all"
-                :class="
-                  selectedPackagePaymentMethod === 'electronic'
-                    ? 'bg-gray-50 border-2 border-[#15C472]'
-                    : 'bg-gray-50 border-2 border-gray-200'
-                "
-              >
-                <label
-                  for="package-electronic"
-                  class="flex-1 flex items-center justify-start gap-2 cursor-pointer"
-                >
-                  <img
-                    src="/icons/epay-icon.svg"
-                    alt="electronic payment"
-                    class="w-8 h-8"
-                  />
-                  <span class="text-black font-medium text-right"
-                    >دفع الكتروني</span
-                  >
-                </label>
-                <input
-                  type="radio"
-                  id="package-electronic"
-                  v-model="selectedPackagePaymentMethod"
-                  value="electronic"
-                  class="w-5 h-5 cursor-pointer accent-[#15C472]"
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Footer with confirm button -->
-          <div class="px-6 pb-6">
-            <button
-              type="button"
-              class="w-full bg-gradient-to-r from-[#0A717E] to-[#15C472] text-white font-semibold py-3 rounded-lg shadow-sm hover:opacity-90 transition-all duration-200"
-              @click="handlePackagePayment"
-            >
-              تأكيد
-            </button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <PackagePaymentModal
+      v-model="isPackagePaymentModalOpen"
+      :payment-method="selectedPackagePaymentMethod"
+      @confirm="handlePackagePaymentConfirm"
+    />
 
     <!-- Logout Confirmation Modal -->
-    <Teleport to="body">
-      <div
-        v-if="isLogoutModalOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3 sm:px-4 py-4"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="logout-modal-title"
-        @click.self="closeLogoutModal"
-      >
-        <div
-          class="w-full max-w-sm sm:max-w-md md:max-w-xl rounded-xl sm:rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
-          @click.stop
-        >
-          <!-- Content -->
-          <div class="p-4 sm:p-6 md:p-8 text-center">
-            <!-- Question -->
-            <h2
-              id="logout-modal-title"
-              class="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mb-4 sm:mb-6"
-            >
-              هل انت متاكد من تسجيل الخروج
-            </h2>
-
-            <!-- Icon -->
-            <div class="flex justify-center mb-4 sm:mb-6">
-              <div
-                class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center"
-              >
-                <img
-                  src="/icons/logout-modal.svg"
-                  alt="logout-icon"
-                  class="w-full h-full object-contain"
-                />
-              </div>
-            </div>
-
-            <!-- Buttons -->
-            <div class="flex gap-2 sm:gap-3 md:gap-4">
-              <!-- Yes Button (Right) -->
-              <button
-                type="button"
-                @click="confirmLogout"
-                class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-red-700 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-red-800 transition-colors"
-              >
-                نعم
-              </button>
-              <!-- No Button (Left) -->
-              <button
-                type="button"
-                @click="closeLogoutModal"
-                class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-white border-2 border-[#15c472] text-gray-800 text-sm sm:text-base font-semibold rounded-lg hover:bg-gray-50 transition-colors order-1"
-              >
-                لا
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <LogoutModal
+      v-model="isLogoutModalOpen"
+      @confirm="confirmLogout"
+    />
 
     <!-- Delete Account Confirmation Modal -->
-    <Teleport to="body">
-      <div
-        v-if="isDeleteAccountModalOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3 sm:px-4 py-4"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="delete-account-modal-title"
-        @click.self="closeDeleteAccountModal"
-      >
-        <div
-          class="w-full max-w-sm sm:max-w-md md:max-w-xl rounded-xl sm:rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
-          @click.stop
-        >
-          <!-- Content -->
-          <div class="p-4 sm:p-6 md:p-8 text-center">
-            <!-- Question -->
-            <h2
-              id="delete-account-modal-title"
-              class="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mb-4 sm:mb-6"
-            >
-              هل انت متاكد من حذف الحساب
-            </h2>
-
-            <!-- Icon -->
-            <div class="flex justify-center mb-4 sm:mb-6">
-              <div class="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24">
-                <!-- Trash Can Icon -->
-                <img src="/icons/delete-account.svg" alt="delete-icon" class="w-full h-full object-contain text-[#A6282A]" />
-              </div>
-            </div>
-
-            <!-- Buttons -->
-            <div class="flex gap-2 sm:gap-3 md:gap-4">
-                <!-- Yes Button (Right) -->
-                <button
-                type="button"
-                @click="confirmDeleteAccount"
-                class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-red-700 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-red-800 transition-colors"
-              >
-                نعم
-              </button>
-              <!-- No Button (Left) -->
-              <button
-                type="button"
-                @click="closeDeleteAccountModal"
-                class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-white border-2 border-[#15c472] text-gray-800 text-sm sm:text-base font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                لا
-              </button>
-            
-            </div>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <DeleteAccountModal
+      v-model="isDeleteAccountModalOpen"
+      @confirm="confirmDeleteAccount"
+    />
 
     <!-- Delete Ad Confirmation Modal -->
-    <Teleport to="body">
-      <div
-        v-if="isDeleteAdModalOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3 sm:px-4 py-4"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="delete-ad-modal-title"
-        @click.self="closeDeleteAdModal"
-      >
-        <div
-          class="w-full max-w-sm sm:max-w-md md:max-w-xl rounded-xl sm:rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
-          @click.stop
-        >
-          <!-- Content -->
-          <div class="p-4 sm:p-6 md:p-8 text-center">
-            <!-- Question -->
-            <h2
-              id="delete-ad-modal-title"
-              class="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mb-4 sm:mb-6"
-            >
-              هل انت متاكد من مسح الاعلان
-            </h2>
-
-            <!-- Icon -->
-            <div class="flex justify-center mb-4 sm:mb-6">
-              <div class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 flex items-center justify-center">
-                <img
-                  src="/icons/trash-icon.svg"
-                  alt="delete-icon"
-                  class="w-full h-full object-contain text-[#A6282A]"
-                />
-              </div>
-            </div>
-
-            <!-- Buttons -->
-            <div class="flex gap-2 sm:gap-3 md:gap-4">
-              <!-- Delete Button (Right) -->
-              <button
-                type="button"
-                @click="confirmDeleteAd"
-                class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-[#A6282A] text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-red-700 transition-colors"
-              >
-                حذف المنتج
-              </button>
-              <!-- Back Button (Left) -->
-              <button
-                type="button"
-                @click="closeDeleteAdModal"
-                class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-white border-2 border-[#15c472] text-gray-800 text-sm sm:text-base font-semibold rounded-lg hover:bg-gray-50 transition-colors order-1"
-              >
-                رجوع
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <DeleteAdModal
+      v-model="isDeleteAdModalOpen"
+      @confirm="confirmDeleteAd"
+    />
 
     <!-- Location Modal -->
-    <Teleport to="body">
-      <div
-        v-if="isLocationModalOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="location-modal-title"
-        @click.self="closeLocationModal"
-      >
-        <div
-          class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl"
-          @click.stop
-        >
-          <div class="flex items-center justify-between">
-            <h2
-              id="location-modal-title"
-              class="text-lg font-semibold text-gray-900"
-            >
-              تحديد الموقع
-            </h2>
-            <button
-              type="button"
-              class="text-gray-500 transition hover:text-gray-700"
-              @click="closeLocationModal"
-              aria-label="إغلاق"
-            >
-              ✕
-            </button>
-          </div>
-          <p class="mt-2 text-sm text-gray-500">
-            يمكن ربط هذه النافذة بخريطة أو محدد موقع لاحقًا. استخدم الأزرار
-            بالأسفل لحفظ الإحداثيات.
-          </p>
-          <div
-            class="mt-6 h-52 rounded-xl border border-dashed border-gray-200 bg-gray-50 flex items-center justify-center text-gray-400 text-sm"
-          >
-            مساحة محتوى الخريطة / اختيار الموقع
-          </div>
-          <div class="mt-6 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
-              @click="closeLocationModal"
-            >
-              إلغاء
-            </button>
-            <button
-              type="button"
-              class="rounded-xl bg-gradient-to-r from-teal-500 to-teal-600 px-5 py-2 text-sm font-semibold text-white shadow hover:from-teal-600 hover:to-teal-700"
-              @click="confirmLocation"
-            >
-              حفظ الموقع
-            </button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <LocationModal
+      v-model="isLocationModalOpen"
+      @confirm="confirmLocation"
+    />
   </div>
 </template>
 
@@ -2924,8 +2441,6 @@ import {
   ref,
   computed,
   watch,
-  onBeforeUnmount,
-  onMounted,
   nextTick,
 } from "vue";
 import navHeader from "~/components/navHeader.vue";
@@ -2936,6 +2451,14 @@ import Accordion from "primevue/accordion";
 import AccordionPanel from "primevue/accordionpanel";
 import AccordionHeader from "primevue/accordionheader";
 import AccordionContent from "primevue/accordioncontent";
+import ChargeWalletModal from "~/components/modals/ChargeWalletModal.vue";
+import CommissionPaymentModal from "~/components/modals/CommissionPaymentModal.vue";
+import SuccessModal from "~/components/modals/SuccessModal.vue";
+import PackagePaymentModal from "~/components/modals/PackagePaymentModal.vue";
+import LogoutModal from "~/components/modals/LogoutModal.vue";
+import DeleteAccountModal from "~/components/modals/DeleteAccountModal.vue";
+import DeleteAdModal from "~/components/modals/DeleteAdModal.vue";
+import LocationModal from "~/components/modals/LocationModal.vue";
 
 const toast = useToast();
 
@@ -2978,6 +2501,7 @@ const selectedAdToDelete = ref(null);
 // Add Ad Form State
 const isAddAdFormOpen = ref(false);
 const isLocationModalOpen = ref(false);
+const selectedAdToEdit = ref(null);
 
 // Departments and Cities
 const departments = [
@@ -3251,8 +2775,34 @@ const myAds = ref([
 
 // My Ads Methods
 const editAd = (adId) => {
-  console.log("Editing ad:", adId);
-  // Add your edit logic here
+  const ad = myAds.value.find((a) => a.id === adId);
+  if (!ad) {
+    console.error("Ad not found:", adId);
+    return;
+  }
+
+  // Set the ad to edit
+  selectedAdToEdit.value = adId;
+
+  // Populate form with ad data
+  // Note: The ad structure might not have all form fields, so we map what we can
+  adForm.titleAr = ad.title || "";
+  adForm.titleEn = ad.title || ""; // If no English title, use Arabic
+  adForm.cost = ad.price || "";
+  adForm.location = ad.location || "";
+
+  // Set image preview if available
+  if (ad.image) {
+    adImagePreview.value = ad.image;
+  }
+
+  // Open the form
+  isAddAdFormOpen.value = true;
+
+  // Scroll to top when opening form
+  if (process.client) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 };
 
 const openDeleteAdModal = (adId) => {
@@ -3260,21 +2810,19 @@ const openDeleteAdModal = (adId) => {
   isDeleteAdModalOpen.value = true;
 };
 
-const closeDeleteAdModal = () => {
-  isDeleteAdModalOpen.value = false;
-  selectedAdToDelete.value = null;
-};
-
 const confirmDeleteAd = () => {
   if (selectedAdToDelete.value) {
     console.log("Deleting ad:", selectedAdToDelete.value);
     // Remove the ad from the array
-    const index = myAds.value.findIndex(ad => ad.id === selectedAdToDelete.value);
+    const index = myAds.value.findIndex(
+      (ad) => ad.id === selectedAdToDelete.value
+    );
     if (index > -1) {
       myAds.value.splice(index, 1);
     }
     // Add your delete API call here
-    closeDeleteAdModal();
+    isDeleteAdModalOpen.value = false;
+    selectedAdToDelete.value = null;
   }
 };
 
@@ -3288,6 +2836,7 @@ const addAdvertisement = () => {
 
 const closeAddAdForm = () => {
   isAddAdFormOpen.value = false;
+  selectedAdToEdit.value = null;
   // Reset form
   Object.assign(adForm, {
     department: "",
@@ -3337,10 +2886,6 @@ const openLocationModal = () => {
   isLocationModalOpen.value = true;
 };
 
-const closeLocationModal = () => {
-  isLocationModalOpen.value = false;
-};
-
 const confirmLocation = () => {
   // Placeholder: integrate real selection logic later
   // For now, just set a placeholder location
@@ -3352,22 +2897,53 @@ const confirmLocation = () => {
 
 const handleAdSubmit = () => {
   console.log("Ad form submitted", { ...adForm });
-  // Add your API call here to create the ad
-  // After successful creation, add to myAds array and close form
-  const newAd = {
-    id: Date.now(), // Temporary ID
-    title: adForm.titleAr,
-    image: "/images/fishing-rod.jpg",
-    rating: 4.5,
-    price: adForm.cost || "50",
-    location: cities.find(c => c.value === adForm.city)?.label || "مدينة الرياض",
-    timeAgo: "الآن",
-    seller: {
-      name: "محمود عبد العزيز",
-      avatar: "/images/profile-avatar.png",
-    },
-  };
-  myAds.value.unshift(newAd);
+
+  if (selectedAdToEdit.value) {
+    // Edit mode - update existing ad
+    const adIndex = myAds.value.findIndex(
+      (ad) => ad.id === selectedAdToEdit.value
+    );
+    if (adIndex > -1) {
+      // Determine image: use new uploaded image if available, otherwise keep original
+      const imageToUse = adForm.adImage
+        ? adImagePreview.value // New file uploaded, use blob preview (in real app, upload file first)
+        : myAds.value[adIndex].image; // Keep original image
+
+      // Update the ad
+      myAds.value[adIndex] = {
+        ...myAds.value[adIndex],
+        title: adForm.titleAr,
+        price: adForm.cost || myAds.value[adIndex].price,
+        location:
+          cities.find((c) => c.value === adForm.city)?.label ||
+          adForm.location ||
+          myAds.value[adIndex].location,
+        image: imageToUse,
+      };
+      // Add your API call here to update the ad
+      console.log("Ad updated:", myAds.value[adIndex]);
+    }
+  } else {
+    // Add mode - create new ad
+    // Add your API call here to create the ad
+    // After successful creation, add to myAds array and close form
+    const newAd = {
+      id: Date.now(), // Temporary ID
+      title: adForm.titleAr,
+      image: adImagePreview.value || "/images/fishing-rod.jpg",
+      rating: 4.5,
+      price: adForm.cost || "50",
+      location:
+        cities.find((c) => c.value === adForm.city)?.label || "مدينة الرياض",
+      timeAgo: "الآن",
+      seller: {
+        name: "محمود عبد العزيز",
+        avatar: "/images/profile-avatar.png",
+      },
+    };
+    myAds.value.unshift(newAd);
+  }
+
   closeAddAdForm();
 };
 
@@ -3876,35 +3452,25 @@ const openPackagePaymentModal = () => {
   isPackagePaymentModalOpen.value = true;
 };
 
-const closePackagePaymentModal = () => {
-  isPackagePaymentModalOpen.value = false;
-  // Reset payment method selection when closing
-  selectedPackagePaymentMethod.value = "wallet";
-  selectedPackage.value = null;
-};
 
-const handlePackagePayment = () => {
+const handlePackagePaymentConfirm = (paymentMethod) => {
   if (!selectedPackage.value) {
     return;
   }
+  selectedPackagePaymentMethod.value = paymentMethod;
   console.log("Processing package payment:", selectedPackage.value);
-  console.log("Selected payment method:", selectedPackagePaymentMethod.value);
+  console.log("Selected payment method:", paymentMethod);
   // Add your payment processing logic here
 
-  // Open success modal first (it has higher z-index z-[100])
-  console.log("Opening success modal now...");
-  isSuccessModalOpen.value = true;
-  console.log("Success modal state set to:", isSuccessModalOpen.value);
+  // Close package payment modal
+  isPackagePaymentModalOpen.value = false;
+  selectedPackagePaymentMethod.value = "wallet";
+  selectedPackage.value = null;
 
-  // Close package payment modal after a delay
+  // Open success modal after a delay
   setTimeout(() => {
-    closePackagePaymentModal();
+    isSuccessModalOpen.value = true;
   }, 200);
-
-  // Auto-close success modal after 3 seconds
-  setTimeout(() => {
-    closeSuccessModal();
-  }, 3000);
 };
 
 const handleRenewSubscription = (subscription) => {
@@ -3994,14 +3560,10 @@ const openDeleteAccountModal = () => {
   isDeleteAccountModalOpen.value = true;
 };
 
-const closeDeleteAccountModal = () => {
-  isDeleteAccountModalOpen.value = false;
-};
-
 const confirmDeleteAccount = () => {
   console.log("Account deletion confirmed");
   // Add your account deletion logic here
-  closeDeleteAccountModal();
+  isDeleteAccountModalOpen.value = false;
 };
 
 const handleDeleteAccount = () => {
@@ -4012,14 +3574,10 @@ const openLogoutModal = () => {
   isLogoutModalOpen.value = true;
 };
 
-const closeLogoutModal = () => {
-  isLogoutModalOpen.value = false;
-};
-
 const confirmLogout = () => {
   console.log("Logout confirmed");
   // Add your logout logic here (clear tokens, etc.)
-  closeLogoutModal();
+  isLogoutModalOpen.value = false;
   // Navigate to login page
   navigateTo("/login");
 };
@@ -4028,19 +3586,16 @@ const openChargeModal = () => {
   isChargeModalOpen.value = true;
 };
 
-const closeChargeModal = () => {
-  isChargeModalOpen.value = false;
-  chargeAmount.value = "";
-};
 
-const handleCharge = () => {
-  if (!chargeAmount.value || parseFloat(chargeAmount.value) <= 0) {
+const handleCharge = (amount) => {
+  if (!amount || parseFloat(amount) <= 0) {
     // You can add validation feedback here
     return;
   }
-  console.log("Charging wallet with amount:", chargeAmount.value);
+  console.log("Charging wallet with amount:", amount);
   // Add your charge logic here
-  closeChargeModal();
+  isChargeModalOpen.value = false;
+  chargeAmount.value = "";
 };
 
 const openCommissionPaymentModal = () => {
@@ -4057,153 +3612,25 @@ const openCommissionPaymentModal = () => {
   isCommissionPaymentModalOpen.value = true;
 };
 
-const closeCommissionPaymentModal = () => {
-  isCommissionPaymentModalOpen.value = false;
-  // Reset payment method selection when closing
-  selectedCommissionPaymentMethod.value = "wallet";
-};
 
-const handleCommissionPayment = () => {
+const handleCommissionPaymentConfirm = (paymentMethod) => {
   const amount = commissionAmount.value || "60";
+  selectedCommissionPaymentMethod.value = paymentMethod;
   console.log("Processing commission payment with amount:", amount);
-  console.log(
-    "Selected payment method:",
-    selectedCommissionPaymentMethod.value
-  );
+  console.log("Selected payment method:", paymentMethod);
   // Add your payment processing logic here
 
-  // Open success modal first (it has higher z-index z-[60])
-  console.log("Opening success modal now...");
-  isSuccessModalOpen.value = true;
-  console.log("Success modal state set to:", isSuccessModalOpen.value);
+  // Close commission modal
+  isCommissionPaymentModalOpen.value = false;
+  selectedCommissionPaymentMethod.value = "wallet";
 
-  // Close commission modal after a delay
+  // Open success modal after a delay
   setTimeout(() => {
-    closeCommissionPaymentModal();
+    isSuccessModalOpen.value = true;
   }, 200);
-
-  // Auto-close success modal after 3 seconds
-  setTimeout(() => {
-    closeSuccessModal();
-  }, 3000);
 };
 
-const openSuccessModal = () => {
-  console.log("Opening success modal");
-  isSuccessModalOpen.value = true;
-  console.log("Success modal state:", isSuccessModalOpen.value);
-  // Auto-close after 3 seconds
-  setTimeout(() => {
-    closeSuccessModal();
-  }, 3000);
-};
 
-const closeSuccessModal = () => {
-  isSuccessModalOpen.value = false;
-};
-
-// Prevent body scroll when modal is open (client-side only)
-const updateBodyOverflow = (isOpen) => {
-  if (process.client && typeof document !== "undefined") {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-  }
-};
-
-watch(
-  () => isChargeModalOpen.value,
-  (isOpen) => {
-    updateBodyOverflow(isOpen);
-  },
-  { immediate: true }
-);
-
-onMounted(() => {
-  if (isChargeModalOpen.value) {
-    updateBodyOverflow(true);
-  }
-});
-
-onBeforeUnmount(() => {
-  updateBodyOverflow(false);
-});
-
-// Commission Payment Modal - Prevent body scroll when modal is open
-const updateCommissionPaymentModalBodyOverflow = (isOpen) => {
-  if (process.client && typeof document !== "undefined") {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-  }
-};
-
-watch(
-  () => isCommissionPaymentModalOpen.value,
-  (isOpen) => {
-    updateCommissionPaymentModalBodyOverflow(isOpen);
-  },
-  { immediate: true }
-);
-
-// Package Payment Modal - Prevent body scroll when modal is open
-const updatePackagePaymentModalBodyOverflow = (isOpen) => {
-  if (process.client && typeof document !== "undefined") {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-  }
-};
-
-watch(
-  () => isPackagePaymentModalOpen.value,
-  (isOpen) => {
-    updatePackagePaymentModalBodyOverflow(isOpen);
-  },
-  { immediate: true }
-);
-
-// Success Modal - Prevent body scroll when modal is open
-const updateSuccessModalBodyOverflow = (isOpen) => {
-  if (process.client && typeof document !== "undefined") {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-  }
-};
-
-watch(
-  () => isSuccessModalOpen.value,
-  (isOpen) => {
-    updateSuccessModalBodyOverflow(isOpen);
-  },
-  { immediate: true }
-);
-
-// Logout Modal - Prevent body scroll when modal is open
-watch(
-  () => isLogoutModalOpen.value,
-  (isOpen) => {
-    if (process.client && typeof document !== "undefined") {
-      document.body.style.overflow = isOpen ? "hidden" : "";
-    }
-  },
-  { immediate: true }
-);
-
-// Delete Ad Modal - Prevent body scroll when modal is open
-watch(
-  () => isDeleteAdModalOpen.value,
-  (isOpen) => {
-    if (process.client && typeof document !== "undefined") {
-      document.body.style.overflow = isOpen ? "hidden" : "";
-    }
-  },
-  { immediate: true }
-);
-
-// Delete Account Modal - Prevent body scroll when modal is open
-watch(
-  () => isDeleteAccountModalOpen.value,
-  (isOpen) => {
-    if (process.client && typeof document !== "undefined") {
-      document.body.style.overflow = isOpen ? "hidden" : "";
-    }
-  },
-  { immediate: true }
-);
 
 // Reset password visibility when switching away from change-password sub-tab
 watch(
