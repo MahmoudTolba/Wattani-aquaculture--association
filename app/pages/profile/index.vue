@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div >
     <div
-      class="min-h-screen bg-gray-50 py-4 px-3 sm:py-6 sm:px-4 md:py-8 md:px-8 lg:px-12"
+      class="min-h-screen bg-white-50 py-4 px-3 sm:py-6 sm:px-4 md:py-8 md:px-8 lg:px-12"
     >
       <div class="mx-auto">
         <!-- Mobile Menu Toggle Button -->
@@ -258,7 +258,7 @@
                     'px-4 py-2 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-all',
                     settingsSubTab === 'personal-info'
                       ? 'bg-gradient-to-r from-[#15c472] to-[#12a866] text-white shadow-md'
-                      : 'bg-white border-2 border-[#15c472] text-[#15c472] hover:bg-gray-50',
+                      : 'bg-[#FCFCFC] border-2 border-[#15c472] text-[#15c472] hover:bg-gray-50',
                   ]"
                 >
                   البيانات الشخصية
@@ -269,7 +269,7 @@
                     'px-4 py-2 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-all',
                     settingsSubTab === 'change-mobile'
                       ? 'bg-gradient-to-r from-[#15c472] to-[#12a866] text-white shadow-md'
-                      : 'bg-white border-2 border-[#15c472] text-[#15c472] hover:bg-gray-50',
+                      : 'bg-[#FCFCFC] border-2 border-[#15c472] text-[#15c472] hover:bg-gray-50',
                   ]"
                 >
                   تغيير رقم الجوال
@@ -280,7 +280,7 @@
                     'px-4 py-2 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-all',
                     settingsSubTab === 'change-password'
                       ? 'bg-gradient-to-r from-[#15c472] to-[#12a866] text-white shadow-md'
-                      : 'bg-white border-2 border-[#15c472] text-[#15c472] hover:bg-gray-50',
+                      : 'bg-[#FCFCFC] border-2 border-[#15c472] text-[#15c472] hover:bg-gray-50',
                   ]"
                 >
                   تغيير كلمة المرور
@@ -2040,19 +2040,19 @@
             ]"
           >
             <div
-              class="bg-white rounded-xl lg:rounded-2xl shadow-sm p-3 sm:p-4"
+              class="  p-3 sm:p-4"
             >
               <nav
-                class="space-y-1 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar"
+                class="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar"
               >
                 <!-- 1. الملف الشخصي -->
                 <button
                   @click="setActiveTab('profile')"
                   :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
+                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors  w-full text-right',
                     activeTab === 'profile'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img
@@ -2070,7 +2070,7 @@
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
                     activeTab === 'settings'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img
@@ -2088,7 +2088,7 @@
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
                     activeTab === 'favorites'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img
@@ -2106,7 +2106,7 @@
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
                     activeTab === 'wallet'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img
@@ -2142,7 +2142,7 @@
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
                     activeTab === 'ratings'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img
@@ -2160,7 +2160,7 @@
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
                     activeTab === 'following'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img
@@ -2178,7 +2178,7 @@
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
                     activeTab === 'commission'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img
@@ -2196,7 +2196,7 @@
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
                     activeTab === 'packages'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img
@@ -2232,7 +2232,7 @@
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
                     activeTab === 'contact-us'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img
@@ -2250,7 +2250,7 @@
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
                     activeTab === 'about-us'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img
@@ -2268,7 +2268,7 @@
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
                     activeTab === 'faq'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img
@@ -2304,7 +2304,7 @@
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
                     activeTab === 'terms'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img
@@ -2322,7 +2322,7 @@
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
                     activeTab === 'complaints'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img
@@ -2340,7 +2340,7 @@
                     'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
                     activeTab === 'join-consultant'
                       ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
+                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
                   ]"
                 >
                   <img

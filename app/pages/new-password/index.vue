@@ -117,6 +117,11 @@
 import { ref } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
 
+// Use clean auth layout (no nav/footer, just page content)
+definePageMeta({
+  layout: 'auth-clean'
+});
+
 const showPassword = ref(false);
 
 const togglePasswordVisibility = () => {

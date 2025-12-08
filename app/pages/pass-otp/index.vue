@@ -89,6 +89,11 @@
 import { computed, ref, type ComponentPublicInstance } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
 
+// Use clean auth layout (no nav/footer, just page content)
+definePageMeta({
+  layout: 'auth-clean'
+});
+
 const OTP_LENGTH = 6;
 const otpDigits = ref<string[]>(Array(OTP_LENGTH).fill(""));
 const otpInputRefs = ref<(HTMLInputElement | null)[]>(

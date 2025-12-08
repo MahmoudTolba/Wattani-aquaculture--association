@@ -137,6 +137,9 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: 'auth-clean'
+});
 import { ref } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
 

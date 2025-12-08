@@ -85,7 +85,7 @@
         </div>
         <!-- user profile - shown when authenticated, hidden on mobile -->
         <NuxtLink
-          v-if="isAuthenticated"
+          v-if="showAuth"
           to="/profile"
           class="hidden md:flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
         >
@@ -95,7 +95,7 @@
         <!-- actions - hidden on mobile, shown in menu -->
         <div class="hidden md:flex flex-wrap items-center gap-2 md:w-auto">
           <!-- Show login/register buttons when not authenticated -->
-          <template v-if="!isAuthenticated">
+          <template v-if="!showAuth">
             <NuxtLink
               to="/login"
               class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#00a859] to-[#15c472] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow w-full md:w-auto text-center"
@@ -124,7 +124,7 @@
           <nav class="flex flex-col space-y-3">
             <!-- User Profile in Mobile Menu - shown when authenticated -->
             <NuxtLink
-              v-if="isAuthenticated"
+              v-if="showAuth"
               to="/profile"
               class="flex items-center gap-3 px-3 py-3 rounded-md bg-gray-50 hover:bg-gray-100 transition border border-gray-200"
               @click="isMobileMenuOpen = false"
@@ -205,7 +205,7 @@
             </div>
 
             <!-- Login and Register Buttons - shown when not authenticated -->
-            <div v-if="!isAuthenticated" class="flex flex-col gap-2 border-t border-gray-100 pt-3">
+            <div v-if="!showAuth" class="flex flex-col gap-2 border-t border-gray-100 pt-3">
               <NuxtLink
                 to="/login"
                 class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#00a859] to-[#15c472] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow text-center"
@@ -347,7 +347,10 @@ watch(
   }
 );
 
+const isMounted = ref(false);
+
 onMounted(() => {
+  isMounted.value = true;
   windowWidth.value = window.innerWidth;
   window.addEventListener("resize", updateWindowWidth);
   document.addEventListener("click", handleClickOutside);
@@ -361,8 +364,10 @@ const { locale } = useI18n();
 
 // Authentication
 const { isAuthenticated, getUserName, getUserAvatar } = useAuth();
-const userName = computed(() => getUserName.value || "محمد عبدالعزيز");
-const userAvatar = computed(() => getUserAvatar.value);
+// Only show user data after mount to prevent hydration mismatches
+const showAuth = computed(() => isMounted.value && isAuthenticated.value);
+const userName = computed(() => isMounted.value ? (getUserName.value || "محمد عبدالعزيز") : "");
+const userAvatar = computed(() => isMounted.value ? getUserAvatar.value : "/images/profile-avatar.png");
 
 // Base navigation items (always shown)
 const baseNavItems = [
@@ -386,7 +391,7 @@ const consultationItem = { id: "consultation", to: "/my-consultation", labels: {
 // Computed navigation items - include consultation only when authenticated
 const navItems = computed(() => {
   const items = [...baseNavItems];
-  if (isAuthenticated.value) {
+  if (isMounted.value && isAuthenticated.value) {
     // Insert consultation after home
     items.splice(1, 0, consultationItem);
   }

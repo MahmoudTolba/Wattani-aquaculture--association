@@ -81,6 +81,11 @@
 <script setup lang="ts">
 import langSwitch from "~/components/langSwitch.vue";
 
+// Use clean auth layout (no nav/footer, just page content)
+definePageMeta({
+  layout: 'auth-clean'
+});
+
 const handleSubmit = (event: Event) => {
   // const form = event.target as HTMLFormElement;
   // if (!form.checkValidity()) {

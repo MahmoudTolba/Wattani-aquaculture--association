@@ -469,6 +469,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
+definePageMeta({
+  layout: 'auth-clean'
+});
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const avatarPreview = ref<string | undefined>(undefined);

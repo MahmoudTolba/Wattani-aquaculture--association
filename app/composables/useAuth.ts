@@ -1,23 +1,35 @@
 // Composable to manage authentication state
 // TODO: When API is ready, replace localStorage with API calls and token management
 
+import { nextTick } from 'vue';
+
 export const useAuth = () => {
   // Shared state across all instances - must be called inside setup function
-  const user = useState<any>('auth.user', () => {
-    // Initialize from localStorage on client side
-    if (process.client) {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        try {
-          return JSON.parse(storedUser);
-        } catch (e) {
-          console.error('Error parsing user data:', e);
-          localStorage.removeItem('user');
+  // Always initialize as null to prevent hydration mismatches
+  // Server and client will both start with null, then client hydrates after mount
+  const user = useState<any>('auth.user', () => null);
+  
+  // Track if we've hydrated from localStorage (client-side only)
+  const isHydrated = useState<boolean>('auth.hydrated', () => false);
+
+  // Hydrate from localStorage on client side only, after initial render
+  // This prevents hydration mismatches by ensuring server and client start with the same state
+  if (process.client && !isHydrated.value) {
+    // Use nextTick to ensure this runs after initial render/hydration
+    nextTick(() => {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          user.value = parsedUser;
         }
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+        localStorage.removeItem('user');
       }
-    }
-    return null;
-  });
+      isHydrated.value = true;
+    });
+  }
 
   const isAuthenticated = computed(() => !!user.value);
 
