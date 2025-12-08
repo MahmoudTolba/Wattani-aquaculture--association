@@ -1,6 +1,5 @@
 <template>
   <div>
-    <navHeader />
     <div
       class="min-h-screen bg-gray-50 py-4 px-3 sm:py-6 sm:px-4 md:py-8 md:px-8 lg:px-12"
     >
@@ -2381,7 +2380,6 @@
         </div>
       </div>
     </div>
-    <footerSection />
 
     <!-- Charge Wallet Modal -->
     <ChargeWalletModal
@@ -2443,8 +2441,6 @@ import {
   watch,
   nextTick,
 } from "vue";
-import navHeader from "~/components/navHeader.vue";
-import footerSection from "~/components/footerSection.vue";
 import Paginator from "primevue/paginator";
 import { useToast } from "primevue/usetoast";
 import Accordion from "primevue/accordion";

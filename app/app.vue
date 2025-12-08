@@ -14,7 +14,6 @@
     </Head>
 
     <Body class="bg-[#ffffff]">
-      <PageLoader />
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>

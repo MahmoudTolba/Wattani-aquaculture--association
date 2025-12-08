@@ -1,6 +1,5 @@
 <template>
   <div>
-    <navHeader />
     <div class="mt-8">
       <div>
         <div class="privacy-policy">
@@ -66,7 +65,6 @@
         </div>
       </div>
     </div>
-    <footerSection />
   </div>
 </template>
 

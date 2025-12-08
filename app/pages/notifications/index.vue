@@ -1,6 +1,5 @@
 <template>
   <div dir="rtl">
-    <navHeader class="mb-10" />
     <!-- start of notification content -->
     <div class="notifications-container p-10 mx-10 bg-white font-sans">
       <div class="header flex justify-between items-center mb-5">
@@ -87,7 +86,6 @@
       </Dialog>
     </div>
     <!-- end of notification content -->
-    <footerSection />
   </div>
 </template>
 

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavHeader />
     <main class="p-3 sm:p-6 md:p-10 mx-2 sm:mx-4 md:mx-15">
       <!-- Navigation Tabs -->
       <section class="mb-6">
@@ -53,8 +52,9 @@
           <div class="flex items-center gap-3">
             <!-- Map Pin Icon -->
             <button
-              class="p-2 text-gray-600 hover:text-[#15C472] transition-colors"
+              class="p-2 text-gray-600 hover:text-[#15C472] transition-colors cursor-pointer"
               aria-label="عرض الخريطة"
+              @click="openMapModal"
             >
               <img src="/icons/map-icon.svg" alt="map-icon" class="w-6 h-6" />
             </button>
@@ -326,7 +326,12 @@
         />
       </section>
     </main>
-    <footerSection />
+
+    <!-- Map Modal -->
+    <LocationModal
+      v-model="isMapModalOpen"
+      @confirm="handleLocationConfirm"
+    />
 
     <!-- Regions Filter Modal -->
     <Teleport to="body">
@@ -611,6 +616,7 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import { useRoute } from "#imports";
+import LocationModal from "~/components/modals/LocationModal.vue";
 
 const route = useRoute();
 
@@ -802,6 +808,32 @@ const applyFilter = () => {
 // Toggle view mode between grid and list
 const toggleViewMode = () => {
   viewMode.value = viewMode.value === "grid" ? "list" : "grid";
+};
+
+// Map Modal State
+const isMapModalOpen = ref(false);
+
+// Map Modal Methods
+const openMapModal = () => {
+  isMapModalOpen.value = true;
+  // Prevent body scroll
+  if (process.client) {
+    document.body.style.overflow = "hidden";
+  }
+};
+
+const closeMapModal = () => {
+  isMapModalOpen.value = false;
+  // Restore body scroll
+  if (process.client) {
+    document.body.style.overflow = "";
+  }
+};
+
+const handleLocationConfirm = (location) => {
+  console.log("Location selected:", location);
+  // You can use the location data here (lat, lng, address)
+  closeMapModal();
 };
 </script>
 

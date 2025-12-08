@@ -1,5 +1,4 @@
 <template>
-  <navHeader />
   <div class="min-h-screen bg-white flex justify-center p-4 md:p-10">
     <div class="w-full max-w-[95%] xl:max-w-[1600px] h-full flex gap-8">
       <!-- Sidebar - Contacts List -->
@@ -179,13 +178,10 @@
       </div>
     </div>
   </div>
-  <footerSection />
 </template>
 
 <script setup>
 import { ref, computed, watch, nextTick } from "vue";
-import navHeader from "~/components/navHeader.vue";
-import footerSection from "~/components/footerSection.vue";
 
 // Mock Data
 const contactsData = ref([

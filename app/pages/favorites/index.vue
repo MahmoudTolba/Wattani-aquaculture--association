@@ -1,6 +1,5 @@
 <template>
   <div>
-    <navHeader />
     <div class="min-h-screen p-10">
       <h1 class="text-3xl font-bold mb-8 text-gray-800">المفضلة</h1>
       
@@ -91,8 +90,6 @@
         />
       </div>
     </div>
-    
-    <footerSection />
   </div>
 </template>
 
@@ -100,8 +97,6 @@
 import { ref, computed } from "vue";
 import { useRouter } from "#imports";
 import Paginator from "primevue/paginator";
-import navHeader from "~/components/navHeader.vue";
-import footerSection from "~/components/footerSection.vue";
 
 const router = useRouter();
 

@@ -1,6 +1,4 @@
 <template>
-  <PageLoader />
-  <NavHeader />
   <main class="p-3 sm:p-6 md:p-10 mx-2 sm:mx-4 md:mx-15">
     <!-- Breadcrumb -->
     <div class="w-full flex items-center justify-start gap-2 mb-4 sm:mb-6">
@@ -219,7 +217,6 @@
       </div>
     </section>
   </main>
-  <footerSection />
   <!-- Report Modal -->
   <ReportModal
     :is-open="isReportModalOpen"

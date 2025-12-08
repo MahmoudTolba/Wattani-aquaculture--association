@@ -1,6 +1,5 @@
 <template>
   <div>
-    <navHeader />
     <main class="p-3 sm:p-6 md:p-10 mx-2 sm:mx-4 md:mx-15">
       <!-- Navigation Tabs -->
       <section class="mb-4 sm:mb-6">
@@ -102,7 +101,6 @@
         />
       </section>
     </main>
-    <footerSection />
   </div>
 </template>
 

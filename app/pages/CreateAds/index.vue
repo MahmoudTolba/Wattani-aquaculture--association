@@ -1,8 +1,6 @@
 <template>
   <div class="parent">
     <div>
-      <NavHeader />
-
       <section class="mt-10 mx-6 p-6 md:p-10">
         <div class="flex flex-col items-start gap-2">
           <h1 class="text-2xl md:text-[28px] font-semibold text-gray-900">
@@ -261,8 +259,6 @@
           </div>
         </form>
       </section>
-
-      <FooterSection class="mt-16" />
     </div>
   </div>
 
@@ -323,8 +319,6 @@
 
 <script setup>
 import { reactive, ref, computed } from "vue";
-import FooterSection from "~/components/footerSection.vue";
-import NavHeader from "~/components/navHeader.vue";
 
 const departments = [
   { label: "العميل", value: "client" },
