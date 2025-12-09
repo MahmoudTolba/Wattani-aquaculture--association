@@ -93,9 +93,36 @@
 
       <!-- Products Grid/List -->
       <section class="mb-4 sm:mb-6">
+        <!-- Loading State for Experts -->
+        <div
+          v-if="activeTab === 'experts' && isLoadingExperts"
+          class="flex items-center justify-center py-12"
+        >
+          <div class="text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#15C472] border-t-transparent mb-4"></div>
+            <p class="text-gray-600 text-sm sm:text-base">جاري تحميل الخبراء...</p>
+          </div>
+        </div>
+
+        <!-- Error State for Experts -->
+        <div
+          v-else-if="activeTab === 'experts' && expertsError"
+          class="flex items-center justify-center py-12"
+        >
+          <div class="text-center max-w-md mx-auto px-4">
+            <p class="text-red-600 text-sm sm:text-base mb-4">{{ expertsError }}</p>
+            <button
+              @click="fetchConsultants"
+              class="px-4 py-2 bg-[#15C472] text-white rounded-lg hover:bg-[#12a866] transition-colors text-sm sm:text-base"
+            >
+              إعادة المحاولة
+            </button>
+          </div>
+        </div>
+
         <!-- Grid View -->
         <div
-          v-if="viewMode === 'grid'"
+          v-if="viewMode === 'grid' && !(activeTab === 'experts' && isLoadingExperts) && !(activeTab === 'experts' && expertsError)"
           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
         >
           <article
@@ -205,7 +232,7 @@
 
         <!-- List View -->
         <div
-          v-else
+          v-if="viewMode === 'list' && !(activeTab === 'experts' && isLoadingExperts) && !(activeTab === 'experts' && expertsError)"
           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-6"
         >
           <article
@@ -312,10 +339,23 @@
             </div>
           </article>
         </div>
+
+        <!-- Empty State -->
+        <div
+          v-if="!isLoadingExperts && !expertsError && activeTab === 'experts' && paginatedProducts.length === 0"
+          class="flex items-center justify-center py-12"
+        >
+          <div class="text-center">
+            <p class="text-gray-600 text-sm sm:text-base">لا توجد خبراء متاحين حالياً</p>
+          </div>
+        </div>
       </section>
 
       <!-- Pagination -->
-      <section class="mb-4 sm:mb-6 flex justify-center">
+      <section
+        v-if="!(activeTab === 'experts' && isLoadingExperts) && !(activeTab === 'experts' && expertsError)"
+        class="mb-4 sm:mb-6 flex justify-center"
+      >
         <Paginator
           :rows="rows"
           :total-records="totalProducts"
@@ -614,11 +654,14 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, reactive, onMounted } from "vue";
 import { useRoute } from "#imports";
 import LocationModal from "~/components/modals/LocationModal.vue";
+import { useAuth } from "~/composables/useAuth";
+import Paginator from "primevue/paginator";
 
 const route = useRoute();
+const { user } = useAuth();
 
 // Navigation Tabs
 const tabs = [
@@ -646,8 +689,162 @@ watch(
   }
 );
 
+// Get user's geolocation
+const getUserLocation = () => {
+  return new Promise((resolve) => {
+    if (!process.client || !navigator.geolocation) {
+      // Use default location if geolocation is not available
+      resolve({ lat: 26.2372, lng: 50.1321 });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      },
+      () => {
+        // Use default location on error
+        resolve({ lat: 26.2372, lng: 50.1321 });
+      },
+      { timeout: 5000 }
+    );
+  });
+};
+
+// Fetch consultants from API
+const fetchConsultants = async () => {
+  if (activeTab.value !== "experts") return;
+
+  isLoadingExperts.value = true;
+  expertsError.value = null;
+
+  try {
+    // Get user location
+    const location = await getUserLocation();
+    userLocation.value = location;
+
+    // Prepare headers
+    const headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "X-Requested-With": "XMLHttpRequest",
+    };
+
+    // Try to get token if available (for API token auth)
+    let token = user.value?.token || user.value?.access_token;
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    // Add Authorization header if token exists
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    // Make API call
+    const response = await $fetch(
+      `https://backend.wattani-sa.com/api/v1/consultants?nearest=1&lat=${location.lat}&lng=${location.lng}`,
+      {
+        method: "GET",
+        headers: headers,
+      }
+    );
+
+    // Check if response indicates success
+    if (response && response.key === "success" && response.data) {
+      // Transform API response to match product structure
+      const consultants = Array.isArray(response.data)
+        ? response.data
+        : response.data.data || [];
+
+      productsByTab.experts = consultants.map((consultant, index) => ({
+        id: consultant.id || `consultant-${index}`,
+        title: consultant.name || consultant.title || "استشارة تربية أسماك",
+        price: consultant.consultation_cost || consultant.price || "200",
+        rating: consultant.rating || consultant.rate || "4.5",
+        image:
+          consultant.image ||
+          consultant.avatar ||
+          consultant.photo ||
+          "/images/card-user2.png",
+        location: consultant.location || consultant.city || "مدينة الرياض",
+        timeAgo: consultant.created_at
+          ? getTimeAgo(consultant.created_at)
+          : "منذ ٦ ساعات",
+        owner: {
+          name: consultant.name || consultant.user?.name || "مستشار",
+          avatar:
+            consultant.avatar ||
+            consultant.user?.avatar ||
+            consultant.image ||
+            "/images/card-user.jpg",
+        },
+        isFav: false,
+        consultant: consultant, // Store full consultant data
+      }));
+
+      // If no consultants returned, use default data
+      if (productsByTab.experts.length === 0) {
+        productsByTab.experts = createProducts(
+          "استشارة تربية أسماك",
+          "200",
+          "/images/card-user2.png"
+        );
+      }
+    } else {
+      throw new Error(response?.msg || "فشل في تحميل الخبراء");
+    }
+  } catch (error) {
+    console.error("Error fetching consultants:", error);
+    expertsError.value =
+      error?.data?.message ||
+      error?.data?.msg ||
+      error?.message ||
+      "حدث خطأ أثناء تحميل الخبراء. الرجاء المحاولة مرة أخرى.";
+
+    // Use default data on error
+    productsByTab.experts = createProducts(
+      "استشارة تربية أسماك",
+      "200",
+      "/images/card-user2.png"
+    );
+  } finally {
+    isLoadingExperts.value = false;
+  }
+};
+
+// Helper function to calculate time ago
+const getTimeAgo = (dateString) => {
+  if (!dateString) return "منذ ٦ ساعات";
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+
+    if (diffInHours < 1) return "منذ أقل من ساعة";
+    if (diffInHours < 24) return `منذ ${diffInHours} ساعة`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `منذ ${diffInDays} يوم`;
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    return `منذ ${diffInWeeks} أسبوع`;
+  } catch (e) {
+    return "منذ ٦ ساعات";
+  }
+};
+
 // Set active tab method
-const setActiveTab = (key) => {
+const setActiveTab = async (key) => {
   activeTab.value = key;
   // Reset pagination when switching tabs
   first.value = 0;
@@ -659,6 +856,11 @@ const setActiveTab = (key) => {
     },
     { replace: true }
   );
+
+  // Fetch consultants when expert tab is selected
+  if (key === "experts") {
+    await fetchConsultants();
+  }
 };
 
 // Pagination State
@@ -683,12 +885,17 @@ const createProducts = (title, price, image = "/images/card-img.jpg") => {
   }));
 };
 
-const productsByTab = {
+const productsByTab = reactive({
   home: createProducts("سنارة سمك كبيرة", "50"),
   benefits: createProducts("شبكة صيد احترافية", "120"),
-  experts: createProducts("استشارة تربية أسماك", "200", "/images/card-user2.png"),
+  experts: [],
   courses: createProducts("دورة إدارة المزارع", "350"),
-};
+});
+
+// Loading and error states for experts
+const isLoadingExperts = ref(false);
+const expertsError = ref(null);
+const userLocation = ref({ lat: 26.2372, lng: 50.1321 }); // Default location (Dammam, Saudi Arabia)
 
 const currentProducts = computed(() => {
   return productsByTab[activeTab.value] || productsByTab.home;
@@ -830,11 +1037,36 @@ const closeMapModal = () => {
   }
 };
 
-const handleLocationConfirm = (location) => {
+const handleLocationConfirm = async (location) => {
   console.log("Location selected:", location);
-  // You can use the location data here (lat, lng, address)
+  userLocation.value = {
+    lat: location.lat,
+    lng: location.lng,
+  };
+  // Refetch consultants with new location if expert tab is active
+  if (activeTab.value === "experts") {
+    await fetchConsultants();
+  }
   closeMapModal();
 };
+
+// Watch for activeTab changes to fetch consultants
+watch(
+  () => activeTab.value,
+  async (newTab) => {
+    if (newTab === "experts" && productsByTab.experts.length === 0) {
+      await fetchConsultants();
+    }
+  },
+  { immediate: true }
+);
+
+// Fetch consultants on mount if expert tab is active
+onMounted(async () => {
+  if (activeTab.value === "experts") {
+    await fetchConsultants();
+  }
+});
 </script>
 
 <style scoped>

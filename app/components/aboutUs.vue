@@ -3,11 +3,22 @@
     <div class="grid md:grid-cols-2 gap-15">
       <!-- Text -->
       <div class="text-right">
-        <h3 class="text-gray-500 text-lg mb-2 leading-7">من نحن</h3>
+        <h3 class="text-gray-500 text-lg mb-2 leading-7">
+          {{ aboutData?.title || 'من نحن' }}
+        </h3>
         <h1 class="text-3xl font-bold mb-6 leading-tight">
           جمعية وطني للاستزراع المائي
         </h1>
-        <p class="leading-[52px] text-xl">
+        <p v-if="isLoading" class="leading-[52px] text-xl text-gray-400">
+          جاري التحميل...
+        </p>
+        <p v-else-if="error" class="leading-[52px] text-xl text-red-500">
+          {{ error }}
+        </p>
+        <p v-else-if="aboutData?.content" class="leading-[52px] text-xl">
+          {{ aboutData.content }}
+        </p>
+        <p v-else class="leading-[52px] text-xl">
           هي جمعية تعاونية سعودية تعمل على تطوير وتنمية قطاع الاستزراع المائي في
           المملكة العربية السعودية، بما يواكب أهداف رؤية المملكة 2030 نحو تحقيق
           الأمن الغذائي والاستدامة البيئية. تسعى الجمعية إلى تمكين المزارعين
@@ -34,6 +45,22 @@
   </section>
 </template>
 
-<script setup></script>
+<script setup>
+import { computed, onMounted } from 'vue';
+
+// Landing page data
+const { landingPageData, isLoading, error, fetchLandingPageData } = useLandingPage();
+
+const aboutData = computed(() => landingPageData.value?.about);
+
+// Fetch content on component mount
+onMounted(async () => {
+  try {
+    await fetchLandingPageData();
+  } catch (err) {
+    console.error('Failed to load landing page data:', err);
+  }
+});
+</script>
 
 <style scoped></style>

@@ -1,11 +1,11 @@
 {
   "site": {
-    "title": "Rita",
+    "title": "Wattani",
     "language": "English",
     "home": "Home"
   },
   "auth": {
-    "welcome_to_rita": "Welcome to Rita",
+    "welcome_to_wattani": "Welcome to Wattani",
     "email": "Email",
     "email_placeholder": "Enter your email",
     "password": "Password",
@@ -16,7 +16,7 @@
     "new_account": "New Account",
     "login": {
       "title": "Login",
-      "welcome_back": "Welcome Back to Rita",
+      "welcome_back": "Welcome Back to Wattani",
       "subtitle": "Everything You Need To Support Your Clients <br> And Grow Your Impact — Right At Your <br> Fingertips.",
       "slogan": {
         "title": "Your Gateway to Professional <br> Care",
@@ -29,7 +29,7 @@
     },
     "register": {
       "title": "Register",
-      "welcome_to_rita": "Welcome to Rita",
+      "welcome_to_wattani": "Welcome to Wattani",
       "subtitle": "Everything You Need To Support Your Clients <br> And Grow Your Impact — Right At Your <br> Fingertips.",
       "slogan": {
         "title": "Your Gateway to Professional <br> Care",
@@ -41,7 +41,7 @@
       },
       "choose_type": {
         "title": "Choose Your Account Type",
-        "subtitle": "Let us know how you’ll be using Rita — as an independent expert or as a registered Medical <br> Center.",
+        "subtitle": "Let us know how you’ll be using Wattani — as an independent expert or as a registered Medical <br> Center.",
         "type": {
           "hospital-medical-center": "Hospital / Medical Center",
           "individual-expert": "Individual Expert",

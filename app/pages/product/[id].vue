@@ -142,11 +142,21 @@
       </button>
       <button
         @click="toggleFollow"
-        class="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-3 rounded-lg text-white font-semibold cursor-pointer text-xs sm:text-sm md:text-base flex-1 sm:flex-none min-w-0"
+        :disabled="isLoadingFollow"
+        class="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-3 rounded-lg text-white font-semibold cursor-pointer text-xs sm:text-sm md:text-base flex-1 sm:flex-none min-w-0 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <img src="/icons/follow.svg" alt="follow-icon" class="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+        <img 
+          v-if="!isLoadingFollow"
+          src="/icons/follow.svg" 
+          alt="follow-icon" 
+          class="w-4 h-4 sm:w-5 sm:h-5 shrink-0" 
+        />
+        <div 
+          v-else
+          class="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0"
+        ></div>
         <span class="truncate">
-          {{ isFollowing ? 'الغاء المتابعة' : 'متابعة' }}
+          {{ isLoadingFollow ? 'جاري التحميل...' : (isFollowing ? 'الغاء المتابعة' : 'متابعة') }}
         </span>
       </button>
     </div>
@@ -228,8 +238,11 @@
 <script setup>
 import { computed, ref } from "vue";
 import { useRoute } from "#imports";
+import { useToast } from "primevue/usetoast";
 
 const route = useRoute();
+const toast = useToast();
+const { user, isAuthenticated } = useAuth();
 const id = route.params.id;
 
 // Merchant ID - replace with actual merchant data when available
@@ -279,11 +292,125 @@ const backLink = computed(() => {
       return "/favorites";
   }
 });
-const isFollowing = ref(false)
 
-const toggleFollow = () => {
-  isFollowing.value = !isFollowing.value
-}
+// Follow state
+const isFollowing = ref(false);
+const isLoadingFollow = ref(false);
+
+// Toggle follow/unfollow via API
+const toggleFollow = async () => {
+  if (isLoadingFollow.value) return; // Prevent multiple clicks
+
+  // Check if user is authenticated
+  if (!isAuthenticated.value || !user.value) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يجب تسجيل الدخول لمتابعة المستخدمين",
+      life: 3000,
+    });
+    return;
+  }
+
+  isLoadingFollow.value = true;
+
+  try {
+    // Debug: Log user info
+    console.log("User object:", user.value);
+    console.log("Is authenticated:", isAuthenticated.value);
+    
+    // Prepare headers - Laravel APIs typically use session cookies for authentication
+    const headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "X-Requested-With": "XMLHttpRequest", // Required for Laravel to recognize as AJAX request
+    };
+    
+    // Try to get token if available (for API token auth)
+    let token = user.value?.token || user.value?.access_token;
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+          console.log("Token from localStorage:", token);
+        }
+      } catch (e) {
+        console.error('Error getting token from localStorage:', e);
+      }
+    }
+    
+    // Add Authorization header if token exists (for API token auth)
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+      console.log("Using Bearer token authentication");
+    } else {
+      console.log("No token found - using session cookie authentication");
+    }
+
+    // Make the API request
+    // Note: For cross-origin requests with cookies, backend CORS must allow credentials
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/users/toggle-follow",
+      {
+        method: "POST",
+        headers: headers,
+        body: {
+          user_id: merchantId.value, // Send the merchant/user ID to follow/unfollow
+        },
+      }
+    );
+
+    if (response && response.key === "success") {
+      // Toggle the follow state based on API response
+      // If API returns the new state, use it; otherwise toggle locally
+      if (response.data !== undefined) {
+        isFollowing.value = response.data.is_following || response.data.following || !isFollowing.value;
+      } else {
+        isFollowing.value = !isFollowing.value;
+      }
+
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: isFollowing.value ? "تم المتابعة بنجاح" : "تم إلغاء المتابعة بنجاح",
+        life: 3000,
+      });
+    } else {
+      throw new Error(response?.msg || "فشل في تحديث حالة المتابعة");
+    }
+  } catch (err) {
+    console.error("Error toggling follow:", err);
+    console.error("Full error object:", err);
+    
+    // Check if error is due to authentication
+    const errorMessage = err?.data?.message || err?.message || err?.data?.msg || "";
+    const isAuthError = errorMessage.includes("user") && errorMessage.includes("null") || 
+                        err?.status === 401 || 
+                        err?.statusCode === 401;
+    
+    if (isAuthError) {
+      toast.add({
+        severity: "error",
+        summary: "خطأ في المصادقة",
+        detail: "يجب تسجيل الدخول من خلال واجهة برمجة التطبيقات. الرجاء تسجيل الدخول أولاً.",
+        life: 5000,
+      });
+      // Optionally redirect to login
+      // navigateTo('/login');
+    } else {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: errorMessage || "حدث خطأ أثناء تحديث حالة المتابعة. الرجاء المحاولة مرة أخرى.",
+        life: 3000,
+      });
+    }
+  } finally {
+    isLoadingFollow.value = false;
+  }
+};
 </script>
 
 <style scoped>

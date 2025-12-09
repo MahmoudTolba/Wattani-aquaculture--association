@@ -86,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, reactive } from "vue";
 import { useRouter } from "#imports";
 
 /* Tabs */
@@ -104,12 +104,12 @@ const activeTab = ref(tabs[0].key);
 const router = useRouter();
 
 /* Listings (mock data) */
-const listingsByTab = {
+const listingsByTab = reactive({
   home: createListings("سنارة سمك كبيرة", "50 ر.س"),
   benefits: createListings("شبكة صيد احترافية", "120 ر.س"),
   experts: createListings("استشارة تربية أسماك", "200 ر.س"),
   courses: createListings("دورة إدارة المزارع", "350 ر.س"),
-};
+});
 
 const currentListings = computed(
   () => listingsByTab[activeTab.value] ?? []
@@ -131,8 +131,7 @@ function goToDetails(listing) {
 }
 
 function toggleFav(listing) {
-  // placeholder: هنا تضع منطق الحفظ (API أو تغيير حالة محلية)
-  console.log("toggle fav", listing.id);
+  listing.isFav = !listing.isFav;
 }
 
 /* Mock Data Generator */
@@ -149,6 +148,7 @@ function createListings(title, price) {
       name: "محمود عبد العزيز",
       avatar: "/images/card-user.jpg",
     },
+    isFav: true,
   }));
 }
 </script>

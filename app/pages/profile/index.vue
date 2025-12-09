@@ -1257,8 +1257,33 @@
 
             <!-- Ratings Tab Content -->
             <div v-if="activeTab === 'ratings'" class="space-y-6">
+              <!-- Loading State -->
+              <div v-if="isLoadingRatings" class="flex justify-center items-center py-12">
+                <div class="text-center">
+                  <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"></div>
+                  <p class="text-gray-600 text-sm">جاري التحميل...</p>
+                </div>
+              </div>
+
+              <!-- Error State -->
+              <div v-else-if="ratingsError" class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                <p class="text-red-600 text-sm">{{ ratingsError }}</p>
+                <button
+                  @click="fetchRatings(ratingsCurrentPage)"
+                  class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                >
+                  إعادة المحاولة
+                </button>
+              </div>
+
               <!-- Reviews List -->
-              <div class="space-y-4">
+              <div v-else class="space-y-4">
+                <!-- Empty State -->
+                <div v-if="paginatedReviews.length === 0" class="text-center py-12">
+                  <p class="text-gray-500 text-lg">لا توجد تقييمات حالياً</p>
+                </div>
+
+                <!-- Reviews -->
                 <div
                   v-for="review in paginatedReviews"
                   :key="review.id"
@@ -1308,7 +1333,7 @@
               </div>
 
               <!-- Pagination -->
-              <div class="flex justify-center pt-4">
+              <div v-if="!isLoadingRatings && !ratingsError && totalReviews > 0" class="flex justify-center pt-4">
                 <Paginator
                   :rows="reviewsPerPage"
                   :total-records="totalReviews"
@@ -1322,8 +1347,33 @@
 
             <!-- Following Tab Content -->
             <div v-if="activeTab === 'following'" class="space-y-6">
+              <!-- Loading State -->
+              <div v-if="isLoadingFollowing" class="flex justify-center items-center py-12">
+                <div class="text-center">
+                  <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"></div>
+                  <p class="text-gray-600 text-sm">جاري التحميل...</p>
+                </div>
+              </div>
+
+              <!-- Error State -->
+              <div v-else-if="followingError" class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                <p class="text-red-600 text-sm">{{ followingError }}</p>
+                <button
+                  @click="fetchFollowers(followingCurrentPage)"
+                  class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                >
+                  إعادة المحاولة
+                </button>
+              </div>
+
               <!-- Following Users List -->
-              <div class="space-y-3 sm:space-y-4">
+              <div v-else class="space-y-3 sm:space-y-4">
+                <!-- Empty State -->
+                <div v-if="paginatedFollowing.length === 0" class="text-center py-12">
+                  <p class="text-gray-500 text-lg">لا يوجد متابعين حالياً</p>
+                </div>
+
+                <!-- Users List -->
                 <div
                   v-for="user in paginatedFollowing"
                   :key="user.id"
@@ -1362,7 +1412,7 @@
               </div>
 
               <!-- Pagination -->
-              <div class="flex justify-center pt-4">
+              <div v-if="!isLoadingFollowing && !followingError && totalFollowing > 0" class="flex justify-center pt-4">
                 <Paginator
                   :rows="followingPerPage"
                   :total-records="totalFollowing"
@@ -1578,24 +1628,59 @@
 
             <!-- FAQ Tab Content -->
             <div v-if="activeTab === 'faq'" class="space-y-6">
+              <!-- Loading State -->
+              <div v-if="isLoadingFaq" class="flex justify-center items-center py-12">
+                <div class="text-center">
+                  <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"></div>
+                  <p class="text-gray-600 text-sm">جاري التحميل...</p>
+                </div>
+              </div>
+
+              <!-- Error State -->
+              <div v-else-if="faqError" class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                <p class="text-red-600 text-sm">{{ faqError }}</p>
+                <button
+                  @click="fetchFAQContent"
+                  class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                >
+                  إعادة المحاولة
+                </button>
+              </div>
+
               <!-- FAQ Accordion -->
-              <div class="space-y-3">
+              <div v-else class="space-y-3">
+                <!-- Empty State -->
+                <div v-if="faqs.length === 0" class="text-center py-12">
+                  <p class="text-gray-500 text-lg">لا توجد أسئلة متكررة حالياً</p>
+                </div>
+
+                <!-- FAQs -->
                 <Accordion :value="openFaqIndex">
                   <AccordionPanel
-                    v-for="(faq, index) in faqs"
-                    :key="faq.id"
+                    v-for="(faq, index) in paginatedFaqs"
+                    :key="faq.id || index"
                     :value="index.toString()"
                   >
                     <AccordionHeader>
                       {{ faq.question }}
                     </AccordionHeader>
                     <AccordionContent>
-                      <p class="m-0 text-gray-700 leading-relaxed">
-                        {{ faq.answer }}
-                      </p>
+                      <div class="m-0 text-gray-700 leading-relaxed" v-html="faq.answer"></div>
                     </AccordionContent>
                   </AccordionPanel>
                 </Accordion>
+              </div>
+
+              <!-- Pagination -->
+              <div v-if="!isLoadingFaq && !faqError && totalFaqs > 0" class="flex justify-center pt-4">
+                <Paginator
+                  :rows="faqPerPage"
+                  :total-records="totalFaqs"
+                  :first="faqFirst"
+                  @page="onFaqPageChange"
+                  template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+                  class="p-paginator"
+                />
               </div>
             </div>
 
@@ -1977,9 +2062,11 @@
                 <!-- Submit Button -->
                 <button
                   type="submit"
-                  class="w-full bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300"
+                  :disabled="isSubmittingConsultant"
+                  class="w-full bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  ارسال طلب
+                  <span v-if="isSubmittingConsultant">جاري الإرسال...</span>
+                  <span v-else>ارسال طلب</span>
                 </button>
               </form>
             </div>
@@ -2041,9 +2128,9 @@
           >
             <div
               class="  p-3 sm:p-4"
-            >
+            > 
               <nav
-                class="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar"
+                class="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar"
               >
                 <!-- 1. الملف الشخصي -->
                 <button
@@ -2534,6 +2621,8 @@ const galleryPreviews = ref([]);
 const openFaqIndex = ref(null);
 const faqPerPage = ref(4); // Items per page
 const faqFirst = ref(0); // First item index
+const isLoadingFaq = ref(false);
+const faqError = ref(null);
 
 // Complaints Pagination State
 const complaintsPerPage = ref(4); // Items per page
@@ -2541,80 +2630,118 @@ const complaintsFirst = ref(0); // First item index
 const selectedComplaint = ref(null);
 
 // FAQ Data
-const faqs = ref([
-  {
-    id: 1,
-    question: "ما هي الثروة السمكية وكيفية انشاء مزرعة سمكية كبيره ؟",
-    answer:
-      "الثروة السمكية وكيفية انشاء مزرعة سمكية كبيرة الثروة السمكية وكيفية انشاء مزرعة سمكية كبيرة. الثروة السمكية تعتبر من أهم الموارد الطبيعية التي تساهم في تحقيق الأمن الغذائي.",
-  },
-  {
-    id: 2,
-    question: "ما هي الثروة السمكية وكيفية انشاء مزرعة سمكية كبيره ؟",
-    answer:
-      "الثروة السمكية وكيفية انشاء مزرعة سمكية كبيرة الثروة السمكية وكيفية انشاء مزرعة سمكية كبيرة. الثروة السمكية تعتبر من أهم الموارد الطبيعية التي تساهم في تحقيق الأمن الغذائي.",
-  },
-  {
-    id: 3,
-    question: "ما هي الثروة السمكية وكيفية انشاء مزرعة سمكية كبيره ؟",
-    answer:
-      "الثروة السمكية وكيفية انشاء مزرعة سمكية كبيرة الثروة السمكية وكيفية انشاء مزرعة سمكية كبيرة. الثروة السمكية تعتبر من أهم الموارد الطبيعية التي تساهم في تحقيق الأمن الغذائي.",
-  },
-  {
-    id: 4,
-    question: "ما هي الثروة السمكية وكيفية انشاء مزرعة سمكية كبيره ؟",
-    answer:
-      "الثروة السمكية وكيفية انشاء مزرعة سمكية كبيرة الثروة السمكية وكيفية انشاء مزرعة سمكية كبيرة. الثروة السمكية تعتبر من أهم الموارد الطبيعية التي تساهم في تحقيق الأمن الغذائي.",
-  },
-  {
-    id: 5,
-    question: "كيف يمكنني التسجيل في المنصة؟",
-    answer:
-      "يمكنك التسجيل في المنصة من خلال الضغط على زر التسجيل وإدخال البيانات المطلوبة مثل الاسم والبريد الإلكتروني ورقم الجوال.",
-  },
-  {
-    id: 6,
-    question: "ما هي طرق الدفع المتاحة؟",
-    answer:
-      "المنصة تدعم طريقتين للدفع: الدفع من خلال المحفظة الإلكترونية والدفع الإلكتروني عبر البطاقات الائتمانية.",
-  },
-  {
-    id: 7,
-    question: "كيف يمكنني التواصل مع الدعم الفني؟",
-    answer:
-      "يمكنك التواصل مع الدعم الفني من خلال صفحة تواصل معنا أو عبر البريد الإلكتروني أو رقم الهاتف المخصص للدعم.",
-  },
-  {
-    id: 8,
-    question: "ما هي سياسة الإرجاع والاستبدال؟",
-    answer:
-      "يمكنك إرجاع أو استبدال المنتجات خلال 7 أيام من تاريخ الشراء بشرط أن يكون المنتج في حالته الأصلية.",
-  },
-  {
-    id: 9,
-    question: "كيف يمكنني تحديث بياناتي الشخصية؟",
-    answer:
-      "يمكنك تحديث بياناتك الشخصية من خلال صفحة الملف الشخصي حيث يمكنك تعديل جميع المعلومات الخاصة بك.",
-  },
-  {
-    id: 10,
-    question: "ما هي شروط استخدام المنصة؟",
-    answer:
-      "شروط استخدام المنصة متاحة في صفحة الشروط والأحكام ويمكنك الاطلاع عليها في أي وقت.",
-  },
-  {
-    id: 11,
-    question: "كيف يمكنني إضافة إعلان جديد؟",
-    answer:
-      "يمكنك إضافة إعلان جديد من خلال صفحة إعلاناتي والضغط على زر إضافة إعلان جديد ثم ملء البيانات المطلوبة.",
-  },
-  {
-    id: 12,
-    question: "ما هي رسوم المنصة؟",
-    answer:
-      "رسوم المنصة تختلف حسب نوع الخدمة والاشتراك. يمكنك الاطلاع على تفاصيل الرسوم في صفحة حساب عمولة التطبيق.",
-  },
-]);
+const faqs = ref([]);
+
+// Parse HTML content to extract Q&A pairs
+const parseFAQHTML = (htmlString) => {
+  if (!htmlString) return [];
+  
+  const items = [];
+  
+  // Check if we're in browser environment
+  if (process.client && typeof document !== 'undefined') {
+    // Create a temporary DOM element to parse HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlString;
+    
+    // Find all h3 elements (questions)
+    const questions = tempDiv.querySelectorAll('h3');
+    
+    questions.forEach((questionEl, index) => {
+      const question = questionEl.textContent.trim();
+      
+      // Find the next sibling paragraph (answer)
+      let answerEl = questionEl.nextElementSibling;
+      let answer = '';
+      
+      // Collect all paragraphs until the next h3 or end
+      while (answerEl && answerEl.tagName !== 'H3') {
+        if (answerEl.tagName === 'P') {
+          answer += answerEl.outerHTML;
+        }
+        answerEl = answerEl.nextElementSibling;
+      }
+      
+      if (question && answer) {
+        items.push({
+          id: index + 1,
+          question,
+          answer
+        });
+      }
+    });
+  } else {
+    // Fallback: use regex parsing for SSR
+    const parts = htmlString.split(/<h3>/);
+    
+    parts.forEach((part, index) => {
+      if (index === 0) return; // Skip first empty part
+      
+      const h3Match = part.match(/^(.*?)<\/h3>/);
+      if (h3Match) {
+        const question = h3Match[1].trim();
+        const rest = part.substring(h3Match[0].length);
+        
+        // Extract all paragraphs
+        const pMatches = rest.match(/<p>[\s\S]*?<\/p>/g);
+        let answer = '';
+        if (pMatches) {
+          answer = pMatches.join('');
+        }
+        
+        if (question && answer) {
+          items.push({
+            id: index,
+            question,
+            answer
+          });
+        }
+      }
+    });
+  }
+  
+  return items;
+};
+
+// Fetch FAQ content from API
+const fetchFAQContent = async () => {
+  isLoadingFaq.value = true;
+  faqError.value = null;
+
+  try {
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/frequently_asked_questions",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    // API response structure: { key: "success", msg: "...", data: "..." }
+    if (response && response.key === "success" && response.data) {
+      faqs.value = parseFAQHTML(response.data);
+    } else {
+      throw new Error(response?.msg || "فشل في تحميل الأسئلة المتكررة");
+    }
+  } catch (err) {
+    console.error("Error fetching FAQ content:", err);
+    faqError.value =
+      err?.data?.message ||
+      err?.message ||
+      err?.data?.msg ||
+      "حدث خطأ أثناء تحميل الأسئلة المتكررة. الرجاء المحاولة مرة أخرى.";
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: faqError.value,
+      life: 3000,
+    });
+  } finally {
+    isLoadingFaq.value = false;
+  }
+};
 
 // Total FAQs count
 const totalFaqs = computed(() => faqs.value.length);
@@ -2641,85 +2768,102 @@ const onFaqPageChange = (event) => {
 // Reviews Pagination State
 const reviewsPerPage = ref(5); // Items per page
 const reviewsFirst = ref(0); // First item index
+const ratingsCurrentPage = ref(1); // Current page for API
+const isLoadingRatings = ref(false);
+const ratingsError = ref(null);
 
 // Reviews Data
-const reviews = ref([
-  {
-    id: 1,
-    name: "بهاء العثمان",
-    rating: 4,
-    text: "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور",
-  },
-  {
-    id: 2,
-    name: "بهاء العثمان",
-    rating: 4,
-    text: "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور",
-  },
-  {
-    id: 3,
-    name: "محمد أحمد",
-    rating: 5,
-    text: "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي",
-  },
-  {
-    id: 4,
-    name: "سارة علي",
-    rating: 3,
-    text: "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر",
-  },
-  {
-    id: 5,
-    name: "عبدالله خالد",
-    rating: 4,
-    text: "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي",
-  },
-  {
-    id: 6,
-    name: "فاطمة محمد",
-    rating: 5,
-    text: "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور",
-  },
-  {
-    id: 7,
-    name: "خالد سعيد",
-    rating: 4,
-    text: "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة",
-  },
-  {
-    id: 8,
-    name: "نورا حسن",
-    rating: 3,
-    text: "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر",
-  },
-  {
-    id: 9,
-    name: "يوسف مالك",
-    rating: 5,
-    text: "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي",
-  },
-  {
-    id: 10,
-    name: "ليلى أحمد",
-    rating: 4,
-    text: "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور",
-  },
-]);
-
-// Total reviews count
-const totalReviews = computed(() => reviews.value.length);
-
-// Paginated reviews
-const paginatedReviews = computed(() => {
-  const start = reviewsFirst.value;
-  const end = start + reviewsPerPage.value;
-  return reviews.value.slice(start, end);
+const reviews = ref([]);
+const ratingsPagination = ref({
+  total_items: 0,
+  count_items: 0,
+  per_page: 5,
+  total_pages: 1,
+  current_page: 1,
+  next_page_url: "",
+  perv_page_url: "",
 });
 
+// Fetch ratings from API
+const fetchRatings = async (page = 1) => {
+  isLoadingRatings.value = true;
+  ratingsError.value = null;
+
+  try {
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/my-rate",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        query: {
+          page: page,
+          per_page: reviewsPerPage.value,
+        },
+      }
+    );
+
+    if (response && response.key === "success" && response.data) {
+      // Map API response to review structure
+      // Try different possible response structures
+      const ratesData = response.data.rates || response.data.data || response.data || [];
+      reviews.value = ratesData.map((rate) => ({
+        id: rate.id || rate.rate_id,
+        name: rate.user?.name || rate.name || rate.user_name || "مستخدم",
+        rating: rate.rate || rate.rating || rate.stars || 0,
+        text: rate.comment || rate.review || rate.text || "",
+      }));
+
+      // Handle pagination if available
+      if (response.data.pagination) {
+        ratingsPagination.value = response.data.pagination;
+        ratingsCurrentPage.value = response.data.pagination.current_page;
+        reviewsPerPage.value = response.data.pagination.per_page;
+        reviewsFirst.value = (response.data.pagination.current_page - 1) * reviewsPerPage.value;
+      } else {
+        // If no pagination, assume all data is loaded
+        ratingsPagination.value.total_items = reviews.value.length;
+        ratingsPagination.value.current_page = page;
+      }
+    } else {
+      throw new Error(response?.msg || "فشل في تحميل التقييمات");
+    }
+  } catch (err) {
+    console.error("Error fetching ratings:", err);
+    ratingsError.value =
+      err?.data?.message ||
+      err?.message ||
+      err?.data?.msg ||
+      "حدث خطأ أثناء تحميل التقييمات. الرجاء المحاولة مرة أخرى.";
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: ratingsError.value,
+      life: 3000,
+    });
+  } finally {
+    isLoadingRatings.value = false;
+  }
+};
+
+// Total reviews count
+const totalReviews = computed(() => ratingsPagination.value.total_items || reviews.value.length);
+
+// Paginated reviews (now directly from API)
+const paginatedReviews = computed(() => reviews.value);
+
 // Pagination handler
-const onReviewsPageChange = (event) => {
+const onReviewsPageChange = async (event) => {
   reviewsFirst.value = event.first;
   reviewsPerPage.value = event.rows;
+  const newPage = Math.floor(event.first / event.rows) + 1;
+  
+  // Fetch new page data from API
+  if (newPage !== ratingsCurrentPage.value) {
+    await fetchRatings(newPage);
+  }
+  
   // Scroll to top when page changes
   if (process.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2944,107 +3088,127 @@ const handleAdSubmit = () => {
 };
 
 // Following Pagination State
-const followingPerPage = ref(5); // Items per page
+const followingPerPage = ref(15); // Items per page (matching API default)
 const followingFirst = ref(0); // First item index
+const followingCurrentPage = ref(1); // Current page for API
+const isLoadingFollowing = ref(false);
+const followingError = ref(null);
 
 // Following Users Data
-const followingUsers = ref([
-  {
-    id: 1,
-    name: "خالد ال مبشر",
-    avatar: "/images/following-avatar2.svg",
-  },
-  {
-    id: 2,
-    name: "خالد ال مبشر",
-    avatar: "/images/following-avatar2.svg",
-  },
-  {
-    id: 3,
-    name: "خالد ال مبشر",
-    avatar: "/images/following-avatar2.svg",
-  },
-  {
-    id: 4,
-    name: "خالد ال مبشر",
-    avatar: "/images/following-avatar2.svg",
-  },
-  {
-    id: 5,
-    name: "محمد أحمد",
-    avatar: "/images/following-avatar2.svg",
-  },
-  {
-    id: 6,
-    name: "سارة علي",
-    avatar: "/images/following-avatar2.svg",
-  },
-  {
-    id: 7,
-    name: "عبدالله خالد",
-    avatar: "/images/following-avatar2.svg",
-  },
-  {
-    id: 8,
-    name: "فاطمة محمد",
-    avatar: "/images/following-avatar2.svg",
-  },
-  {
-    id: 9,
-    name: "يوسف مالك",
-    avatar: "/images/following-avatar2.svg",
-  },
-  {
-    id: 10,
-    name: "ليلى أحمد",
-    avatar: "/images/following-avatar2.svg",
-  },
-  {
-    id: 11,
-    name: "نورا حسن",
-    avatar: "/images/following-avatar2.svg",
-  },
-  {
-    id: 12,
-    name: "أحمد سعيد",
-    avatar: "/images/following-avatar2.svg",
-  },
-]);
-
-// Total following count
-const totalFollowing = computed(() => followingUsers.value.length);
-
-// Paginated following users
-const paginatedFollowing = computed(() => {
-  const start = followingFirst.value;
-  const end = start + followingPerPage.value;
-  return followingUsers.value.slice(start, end);
+const followingUsers = ref([]);
+const followingPagination = ref({
+  total_items: 0,
+  count_items: 0,
+  per_page: 15,
+  total_pages: 1,
+  current_page: 1,
+  next_page_url: "",
+  perv_page_url: "",
 });
 
+// Fetch followers from API
+const fetchFollowers = async (page = 1) => {
+  isLoadingFollowing.value = true;
+  followingError.value = null;
+
+  try {
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/users/followers",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        query: {
+          page: page,
+          per_page: followingPerPage.value,
+        },
+      }
+    );
+
+    if (response && response.key === "success" && response.data) {
+      followingUsers.value = response.data.data.map((user) => ({
+        id: user.id,
+        name: user.name || "مستخدم",
+        avatar: user.avatar || user.image || "/images/following-avatar2.svg",
+      }));
+      followingPagination.value = response.data.pagination;
+      followingCurrentPage.value = response.data.pagination.current_page;
+      followingPerPage.value = response.data.pagination.per_page;
+      followingFirst.value = (response.data.pagination.current_page - 1) * followingPerPage.value;
+    } else {
+      throw new Error(response?.msg || "فشل في تحميل المتابعين");
+    }
+  } catch (err) {
+    console.error("Error fetching followers:", err);
+    followingError.value =
+      err?.data?.message ||
+      err?.message ||
+      err?.data?.msg ||
+      "حدث خطأ أثناء تحميل المتابعين. الرجاء المحاولة مرة أخرى.";
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: followingError.value,
+      life: 3000,
+    });
+  } finally {
+    isLoadingFollowing.value = false;
+  }
+};
+
+// Total following count
+const totalFollowing = computed(() => followingPagination.value.total_items);
+
+// Paginated following users (now directly from API)
+const paginatedFollowing = computed(() => followingUsers.value);
+
 // Pagination handler
-const onFollowingPageChange = (event) => {
+const onFollowingPageChange = async (event) => {
   followingFirst.value = event.first;
   followingPerPage.value = event.rows;
+  const newPage = Math.floor(event.first / event.rows) + 1;
+  
+  // Fetch new page data from API
+  if (newPage !== followingCurrentPage.value) {
+    await fetchFollowers(newPage);
+  }
+  
   // Scroll to top when page changes
   if (process.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 };
 
+// Watch activeTab to fetch data when following, ratings, or faq tab is opened
+watch(activeTab, (newTab) => {
+  if (newTab === "following") {
+    fetchFollowers(followingCurrentPage.value || 1);
+  } else if (newTab === "ratings") {
+    fetchRatings(ratingsCurrentPage.value || 1);
+  } else if (newTab === "faq") {
+    fetchFAQContent();
+  }
+});
+
 // Unfollow handler
-const handleUnfollow = (userId) => {
+const handleUnfollow = async (userId) => {
   if (confirm("هل أنت متأكد من إلغاء المتابعة؟")) {
+    // Remove from local state immediately for better UX
     const index = followingUsers.value.findIndex((user) => user.id === userId);
     if (index !== -1) {
       followingUsers.value.splice(index, 1);
-      // Adjust pagination if needed
-      if (followingFirst.value >= followingUsers.value.length) {
-        followingFirst.value = Math.max(
-          0,
-          followingFirst.value - followingPerPage.value
-        );
-      }
     }
+    
+    // Refresh data from API to ensure sync
+    await fetchFollowers(followingCurrentPage.value);
+    
+    toast.add({
+      severity: "success",
+      summary: "نجح",
+      detail: "تم إلغاء المتابعة بنجاح",
+      life: 3000,
+    });
   }
 };
 
@@ -3319,6 +3483,9 @@ const joinConsultantForm = reactive({
 
 const cvFileName = ref("");
 const proofFileName = ref("");
+const cvFile = ref(null);
+const proofFile = ref(null);
+const isSubmittingConsultant = ref(false);
 
 const tabTitles = {
   profile: "الملف الشخصي",
@@ -3509,6 +3676,7 @@ const handleCvFileChange = (event) => {
   const file = event.target.files[0];
   if (file) {
     cvFileName.value = file.name;
+    cvFile.value = file;
   }
 };
 
@@ -3516,13 +3684,15 @@ const handleProofFileChange = (event) => {
   const file = event.target.files[0];
   if (file) {
     proofFileName.value = file.name;
+    proofFile.value = file;
   }
 };
 
-const handleJoinConsultantSubmit = () => {
+const handleJoinConsultantSubmit = async () => {
+  // Validate form
   if (
-    !cvFileName.value ||
-    !proofFileName.value ||
+    !cvFile.value ||
+    !proofFile.value ||
     !joinConsultantForm.consultationCost.trim()
   ) {
     toast.add({
@@ -3533,23 +3703,67 @@ const handleJoinConsultantSubmit = () => {
     });
     return;
   }
-  console.log("Join consultant form submitted:", {
-    cvFile: cvFileName.value,
-    proofFile: proofFileName.value,
-    consultationCost: joinConsultantForm.consultationCost,
-  });
-  // Add your form submission logic here
-  // Reset form after successful submission
-  cvFileName.value = "";
-  proofFileName.value = "";
-  joinConsultantForm.consultationCost = "";
-  // Show success message
-  toast.add({
-    severity: "success",
-    summary: "نجح",
-    detail: "تم إرسال الطلب بنجاح",
-    life: 3000,
-  });
+
+  isSubmittingConsultant.value = true;
+
+  try {
+    // Create FormData for file upload
+    const formData = new FormData();
+    formData.append("cv", cvFile.value);
+    formData.append("proof", proofFile.value);
+    formData.append("consultation_cost", joinConsultantForm.consultationCost.trim());
+
+    // Make API call
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/consultant-application",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    // Check if response indicates success
+    if (response && response.key === "success") {
+      // Reset form after successful submission
+      cvFileName.value = "";
+      proofFileName.value = "";
+      cvFile.value = null;
+      proofFile.value = null;
+      joinConsultantForm.consultationCost = "";
+      
+      // Reset file inputs
+      const cvInput = document.getElementById("cvFile");
+      const proofInput = document.getElementById("proofFile");
+      if (cvInput) cvInput.value = "";
+      if (proofInput) proofInput.value = "";
+
+      // Show success message
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم إرسال الطلب بنجاح",
+        life: 3000,
+      });
+    } else {
+      throw new Error(response?.msg || "فشل في إرسال الطلب");
+    }
+  } catch (error) {
+    console.error("Error submitting consultant application:", error);
+    const errorMessage =
+      error?.data?.message ||
+      error?.data?.msg ||
+      error?.message ||
+      "حدث خطأ أثناء إرسال الطلب. الرجاء المحاولة مرة أخرى.";
+    
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: errorMessage,
+      life: 3000,
+    });
+  } finally {
+    isSubmittingConsultant.value = false;
+  }
 };
 
 const openDeleteAccountModal = () => {

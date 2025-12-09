@@ -26,6 +26,7 @@
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="heart-icon"
+                :class="listing.isFav ? 'text-[#15C472] fill-current' : 'text-gray-400'"
                 viewBox="0 0 24 24"
                 fill="currentColor"
               >
@@ -94,7 +95,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, reactive } from "vue";
 import { useRouter } from "#imports";
 import Paginator from "primevue/paginator";
 
@@ -123,7 +124,7 @@ function createListings(title, price) {
 }
 
 // All listings
-const allListings = createListings("سنارة سمك كبيرة", "50");
+const allListings = reactive(createListings("سنارة سمك كبيرة", "50"));
 
 // Total listings count
 const totalListings = computed(() => allListings.length);

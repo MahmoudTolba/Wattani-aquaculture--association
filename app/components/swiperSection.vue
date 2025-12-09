@@ -21,8 +21,8 @@
       <SwiperSlide class="relative w-full h-full rounded-2xl overflow-hidden">
         <div class="absolute inset-0 z-10"></div>
         <img
-          src="/images/swiper-img.png"
-          alt="first image of swiper"
+          :src="landingPageImage || '/images/swiper-img.png'"
+          :alt="landingText?.title || 'first image of swiper'"
           class="w-full h-full object-cover"
         />
         <div
@@ -38,7 +38,7 @@
                 url('/images/fish-pattern.png') center/cover, #20b2aa;
             "
           >
-            جمعية وطني للاستزراع المائي
+            {{ landingText?.title || 'جمعية وطني للاستزراع المائي' }}
           </h1>
         </div>
       </SwiperSlide>
@@ -47,8 +47,8 @@
       <SwiperSlide class="relative w-full h-full rounded-2xl overflow-hidden">
         <div class="absolute inset-0 z-10"></div>
         <img
-          src="/images/swiper-img.png"
-          alt="Second image"
+          :src="landingPageImage || '/images/swiper-img.png'"
+          :alt="landingText?.title || 'Second image'"
           class="w-full h-full object-cover"
         />
         <div
@@ -64,7 +64,7 @@
                 url('/images/fish-pattern.png') center/cover, #20b2aa;
             "
           >
-            جمعية وطني للاستزراع المائي
+            {{ landingText?.title || 'جمعية وطني للاستزراع المائي' }}
           </h1>
         </div>
       </SwiperSlide>
@@ -76,7 +76,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import {
@@ -93,6 +93,24 @@ const currentDir = computed(() => {
     (item) => item.code === locale.value
   );
   return activeLocale?.dir ?? "ltr";
+});
+
+// Landing page data
+const { landingPageData, fetchLandingPageData } = useLandingPage();
+const landingPageImage = computed(() => {
+  if (landingPageData.value?.landing_page_image) {
+    return `https://backend.wattani-sa.com${landingPageData.value.landing_page_image}`;
+  }
+  return null;
+});
+const landingText = computed(() => landingPageData.value?.landing_text);
+
+onMounted(async () => {
+  try {
+    await fetchLandingPageData();
+  } catch (error) {
+    console.error('Failed to load landing page data:', error);
+  }
 });
 </script>
 

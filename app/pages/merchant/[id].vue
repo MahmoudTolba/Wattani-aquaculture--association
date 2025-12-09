@@ -29,7 +29,7 @@
       >
         <!-- Right Card: Profile Section -->
         <div
-          class="bg-[#F8F9FA] rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 relative hover:shadow-md transition-shadow order-1 lg:order-2"
+          class="bg-[#F8F9FA] rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 relative hover:shadow-md transition-shadow "
         >
           <!-- Rating Badge (Absolute positioned to top-left) -->
           <div
@@ -379,7 +379,7 @@
 </template>
 
 <script setup>
-import { computed, ref, nextTick } from "vue";
+import { computed, ref, nextTick, reactive } from "vue";
 import { useRoute } from "#imports";
 import { useToast } from "primevue/usetoast";
 
@@ -535,7 +535,7 @@ const createProducts = (title, price) => {
   }));
 };
 
-const productsByMainTab = {
+const productsByMainTab = reactive({
   benefits: {
     all: [
       ...createProducts("سنارة سمك كبيرة", "50 ر.س"),
@@ -563,7 +563,7 @@ const productsByMainTab = {
     section2: createProducts("دورة تربية الأسماك", "400 ر.س"),
     section3: createProducts("دورة متقدمة", "450 ر.س"),
   },
-};
+});
 
 const currentProducts = computed(() => {
   const mainTabProducts = productsByMainTab[activeMainTab.value] || productsByMainTab.benefits;
