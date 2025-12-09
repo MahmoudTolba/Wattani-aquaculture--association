@@ -106,6 +106,13 @@
                   />
                   <span>{{ isFollowing ? "الغاء المتابعة" : "متابعة" }}</span>
                 </button>
+                <button
+                  class="flex items-center gap-2 bg-white border border-gray-100 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors shadow-sm"
+                >
+                <span> سعر الاستشارة </span> 
+                <span class="text-xs font-bold text-[#15C472]"> 20 </span>
+              <img src="/icons/green-currency.svg" alt="email-icon" class="w-4 h-4 text-[#15C472]">
+                </button>
               </div>
             </div>
           </div>
@@ -609,7 +616,9 @@ const backLink = computed(() => {
       return "/benefits";
   }
 });
+
 </script>
+
 
 <style scoped>
 main {
