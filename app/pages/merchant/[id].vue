@@ -29,14 +29,18 @@
       >
         <!-- Right Card: Profile Section -->
         <div
-          class="bg-[#F8F9FA] rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 relative hover:shadow-md transition-shadow "
+          class="bg-[#F8F9FA] rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 relative hover:shadow-md transition-shadow"
         >
           <!-- Rating Badge (Absolute positioned to top-left) -->
           <div
             class="absolute top-4 sm:top-5 left-4 sm:left-5 flex items-center gap-1 text-gray-500 text-sm"
           >
             <span class="font-bold pt-1">4.5</span>
-      <img src="/icons/rating-star.svg" alt="star-icon" class="w-3 h-3 text-amber-400 fill-current">
+            <img
+              src="/icons/rating-star.svg"
+              alt="star-icon"
+              class="w-3 h-3 text-amber-400 fill-current"
+            />
           </div>
 
           <div class="flex flex-col sm:flex-row gap-4">
@@ -74,7 +78,11 @@
                 <button
                   class="flex items-center gap-2 bg-white border border-gray-100 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors shadow-sm"
                 >
-              <img src="/icons/email-icon.svg" alt="email-icon" class="w-4 h-4 text-[#15C472]">
+                  <img
+                    src="/icons/email-icon.svg"
+                    alt="email-icon"
+                    class="w-4 h-4 text-[#15C472]"
+                  />
                   <span>البريد الالكتروني</span>
                 </button>
               </div>
@@ -109,20 +117,26 @@
                 <button
                   class="flex items-center gap-2 bg-white border border-gray-100 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors shadow-sm"
                 >
-                <span> سعر الاستشارة </span> 
-                <span class="text-xs font-bold text-[#15C472]"> 20 </span>
-              <img src="/icons/green-currency.svg" alt="email-icon" class="w-4 h-4 text-[#15C472]">
+                  <span> سعر الاستشارة </span>
+                  <span class="text-xs font-bold text-[#15C472]"> 20 </span>
+                  <img
+                    src="/icons/green-currency.svg"
+                    alt="email-icon"
+                    class="w-4 h-4 text-[#15C472]"
+                  />
                 </button>
               </div>
             </div>
           </div>
         </div>
-           <!-- Left Card: Location and Contact Info -->
-           <div
+        <!-- Left Card: Location and Contact Info -->
+        <div
           class="bg-[#F8F9FA] rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 flex flex-col justify-center gap-4 sm:gap-5 hover:shadow-md transition-shadow order-2 lg:order-1"
         >
           <!-- Location 1 -->
-          <div class="flex items-center justify-end lg:justify-start gap-3 text-gray-800">
+          <div
+            class="flex items-center justify-end lg:justify-start gap-3 text-gray-800"
+          >
             <div class="w-8 flex justify-center">
               <img
                 src="/icons/located.svg"
@@ -136,7 +150,9 @@
           </div>
 
           <!-- Location 2 -->
-          <div class="flex items-center justify-end lg:justify-start gap-3 text-gray-800">
+          <div
+            class="flex items-center justify-end lg:justify-start gap-3 text-gray-800"
+          >
             <div class="w-8 flex justify-center">
               <img
                 src="/icons/located.svg"
@@ -263,7 +279,7 @@
 
       <!-- Main Category Tabs -->
       <section class="mb-4 sm:mb-6 mt-10">
-        <div class="flex items-center gap-6 sm:gap-8 mb-6 ">
+        <div class="flex items-center gap-6 sm:gap-8 mb-6">
           <button
             v-for="tab in mainTabs"
             :key="tab.key"
@@ -304,7 +320,9 @@
         </div>
 
         <!-- Products Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
+        >
           <article
             v-for="product in currentProducts"
             :key="product.id"
@@ -324,7 +342,11 @@
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="w-5 h-5"
-                  :class="product.isFav ? 'text-[#15C472] fill-current' : 'text-gray-400'"
+                  :class="
+                    product.isFav
+                      ? 'text-[#15C472] fill-current'
+                      : 'text-gray-400'
+                  "
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
@@ -337,7 +359,9 @@
 
             <div class="p-4">
               <div class="flex items-center justify-between gap-2 mb-2">
-                <h3 class="text-base font-bold text-gray-900 flex-1">{{ product.title }}</h3>
+                <h3 class="text-base font-bold text-gray-900 flex-1">
+                  {{ product.title }}
+                </h3>
                 <div class="flex items-center gap-1">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -348,11 +372,15 @@
                       d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
                     />
                   </svg>
-                  <span class="text-sm font-bold text-gray-600">{{ product.rating }}</span>
+                  <span class="text-sm font-bold text-gray-600">{{
+                    product.rating
+                  }}</span>
                 </div>
               </div>
 
-              <div class="text-lg font-bold text-[#15C472] mb-2">{{ product.price }}</div>
+              <div class="text-lg font-bold text-[#15C472] mb-2">
+                {{ product.price }}
+              </div>
 
               <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
                 <img src="/icons/location.svg" alt="location" class="w-4 h-4" />
@@ -362,13 +390,17 @@
                 <span>{{ product.timeAgo }}</span>
               </div>
 
-              <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+              <div
+                class="flex items-center gap-2 pt-2 border-t border-gray-100"
+              >
                 <img
                   :src="product.owner.avatar"
                   :alt="product.owner.name"
                   class="w-6 h-6 rounded-full object-cover"
                 />
-                <span class="text-sm text-gray-700">{{ product.owner.name }}</span>
+                <span class="text-sm text-gray-700">{{
+                  product.owner.name
+                }}</span>
               </div>
             </div>
           </article>
@@ -573,7 +605,8 @@ const productsByMainTab = reactive({
 });
 
 const currentProducts = computed(() => {
-  const mainTabProducts = productsByMainTab[activeMainTab.value] || productsByMainTab.benefits;
+  const mainTabProducts =
+    productsByMainTab[activeMainTab.value] || productsByMainTab.benefits;
   return mainTabProducts[activeProductTab.value] || mainTabProducts.all;
 });
 
@@ -616,9 +649,7 @@ const backLink = computed(() => {
       return "/benefits";
   }
 });
-
 </script>
-
 
 <style scoped>
 main {

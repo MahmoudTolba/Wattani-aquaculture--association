@@ -27,16 +27,24 @@
           <form class="space-y-6" @submit.prevent="handleSubmit">
             <!-- Password -->
             <div class="space-y-3">
-              <div class="flex items-center justify-end">
+              <div class="flex items-center justify-start">
                 <label class="text-base font-medium text-dark" for="password">
-                  <span class="text-red-500">*</span>
                   كلمة المرور
+                  <span class="text-red-500">*</span>
                 </label>
               </div>
 
               <div
                 class="flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl border border-gray-100 bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] overflow-hidden"
               >
+                
+                <input
+                  id="password"
+                  :type="showPassword ? 'text' : 'password'"
+                  placeholder="كلمة المرور"
+                  required
+                  class="flex-1 w-full bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
+                />
                 <button
                   type="button"
                   class="px-4 py-3 text-gray-400 text-right sm:text-left border-b border-gray-100 sm:border-b-0 sm:border-r"
@@ -48,27 +56,28 @@
                 >
                   <img src="/icons/openeye-icon.svg" />
                 </button>
-                <input
-                  id="password"
-                  :type="showPassword ? 'text' : 'password'"
-                  placeholder="كلمة المرور"
-                  required
-                  class="flex-1 w-full bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
-                />
               </div>
             </div>
             <!-- Password -->
             <div class="space-y-3">
-              <div class="flex items-center justify-end">
+              <div class="flex items-center justify-start">
                 <label class="text-base font-medium text-dark" for="password">
-                  <span class="text-red-500">*</span>
                   كلمة المرور
+                  <span class="text-red-500">*</span>
                 </label>
               </div>
 
               <div
                 class="flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl border border-gray-100 bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] overflow-hidden"
               >
+              
+                <input
+                  id="password"
+                  :type="showPassword ? 'text' : 'password'"
+                  placeholder="كلمة المرور"
+                  required
+                  class="flex-1 w-full bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
+                />
                 <button
                   type="button"
                   class="px-4 py-3 text-gray-400 text-right sm:text-left border-b border-gray-100 sm:border-b-0 sm:border-r"
@@ -80,13 +89,6 @@
                 >
                   <img src="/icons/openeye-icon.svg" />
                 </button>
-                <input
-                  id="password"
-                  :type="showPassword ? 'text' : 'password'"
-                  placeholder="كلمة المرور"
-                  required
-                  class="flex-1 w-full bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
-                />
               </div>
             </div>
 

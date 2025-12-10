@@ -1686,64 +1686,74 @@
 
             <!-- Privacy Tab Content -->
             <div v-if="activeTab === 'privacy'" class="space-y-6">
-              <p class="text-gray-600 text-xl leading-relaxed">
-                هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد
-                هذا النص من مولد النص العربى، حيث يمكنك أن تولد مثل هذا النص أو
-                العديد من النصوص الأخرى إضافة إلى زيادة عدد الحروف التى يولدها
-                التطبيق.إذا كنت تحتاج إلى عدد أكبر من الفقرات يتيح لك مولد النص
-                العربى زيادة عدد الفقرات كما تريد، النص لن يبدو مقسما ولا يحوي
-                أخطاء لغوية، مولد النص العربى مفيد لمصممي المواقع على وجه
-                الخصوص، حيث يحتاج العميل فى كثير من الأحيان أن يطلع على صورة
-                حقيقية لتصميم الموقع.ومن هنا وجب على المصمم أن يضع نصوصا مؤقتة
-                على التصميم ليظهر للعميل الشكل كاملاً،دور مولد النص العربى أن
-                يوفر على المصمم عناء البحث عن نص بديل لا علاقة له بالموضوع الذى
-                يتحدث عنه التصميم فيظهر بشكل لا يليق.هذا النص يمكن أن يتم تركيبه
-                على أي تصميم دون مشكلة فلن يقتاً ومن هنا وجب على المصمم أن يضع
-                نصوصا مؤقتة على التصميم
-              </p>
+              <div class="rounded-xl p-4 sm:p-6 bg-white border border-gray-200">
+                <p
+                  v-if="isLoadingPrivacy"
+                  class="text-gray-500 text-base sm:text-lg leading-relaxed text-start mb-4"
+                >
+                  جاري التحميل...
+                </p>
+                <p
+                  v-else-if="privacyError"
+                  class="text-red-500 text-base sm:text-lg leading-relaxed text-start mb-4"
+                >
+                  {{ privacyError }}
+                </p>
+                <p
+                  v-else
+                  class="text-gray-700 text-base sm:text-lg leading-relaxed text-start mb-4 whitespace-pre-line"
+                >
+                  {{ privacyContent || "لا توجد بيانات متاحة حاليا" }}
+                </p>
+              </div>
             </div>
 
             <!-- Terms Tab Content -->
             <div v-if="activeTab === 'terms'" class="space-y-6">
-              <p class="text-gray-600 text-xl leading-relaxed">
-                هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد
-                هذا النص من مولد النص العربى، حيث يمكنك أن تولد مثل هذا النص أو
-                العديد من النصوص الأخرى إضافة إلى زيادة عدد الحروف التى يولدها
-                التطبيق.إذا كنت تحتاج إلى عدد أكبر من الفقرات يتيح لك مولد النص
-                العربى زيادة عدد الفقرات كما تريد، النص لن يبدو مقسما ولا يحوي
-                أخطاء لغوية، مولد النص العربى مفيد لمصممي المواقع على وجه
-                الخصوص، حيث يحتاج العميل فى كثير من الأحيان أن يطلع على صورة
-                حقيقية لتصميم الموقع.ومن هنا وجب على المصمم أن يضع نصوصا مؤقتة
-                على التصميم ليظهر للعميل الشكل كاملاً،دور مولد النص العربى أن
-                يوفر على المصمم عناء البحث عن نص بديل لا علاقة له بالموضوع الذى
-                يتحدث عنه التصميم فيظهر بشكل لا يليق.هذا النص يمكن أن يتم تركيبه
-                على أي تصميم دون مشكلة فلن يقتاً ومن هنا وجب على المصمم أن يضع
-                نصوصا مؤقتة على التصميم
-              </p>
+              <div class="rounded-xl p-4 sm:p-6 bg-white border border-gray-200">
+                <p
+                  v-if="isLoadingTerms"
+                  class="text-gray-500 text-base sm:text-lg leading-relaxed text-start mb-4"
+                >
+                  جاري التحميل...
+                </p>
+                <p
+                  v-else-if="termsError"
+                  class="text-red-500 text-base sm:text-lg leading-relaxed text-start mb-4"
+                >
+                  {{ termsError }}
+                </p>
+                <p
+                  v-else
+                  class="text-gray-700 text-base sm:text-lg leading-relaxed text-start mb-4 whitespace-pre-line"
+                >
+                  {{ termsContent || "لا توجد بيانات متاحة حاليا" }}
+                </p>
+              </div>
             </div>
 
             <!-- About Us Tab Content -->
             <div v-if="activeTab === 'about-us'" class="space-y-6">
               <div class="space-y-6">
                 <!-- Introduction Section -->
-                <div class="rounded-xl p-4 sm:p-6">
+                <div class="rounded-xl p-4 sm:p-6 bg-white border border-gray-200">
                   <p
-                    class="text-gray-700 text-base sm:text-lg leading-relaxed text-start mb-4"
+                    v-if="isLoadingAbout"
+                    class="text-gray-500 text-base sm:text-lg leading-relaxed text-start mb-4"
                   >
-                    هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم
-                    توليد هذا النص من مولد النص العربى، حيث يمكنك أن تولد مثل
-                    هذا النص أو العديد من النصوص الأخرى إضافة إلى زيادة عدد
-                    الحروف التى يولدها التطبيق.إذا كنت تحتاج إلى عدد أكبر من
-                    الفقرات يتيح لك مولد النص العربى زيادة عدد الفقرات كما تريد،
-                    النص لن يبدو مقسما ولا يحوي أخطاء لغوية، مولد النص العربى
-                    مفيد لمصممي المواقع على وجه الخصوص، حيث يحتاج العميل فى كثير
-                    من الأحيان أن يطلع على صورة حقيقية لتصميم الموقع.ومن هنا وجب
-                    على المصمم أن يضع نصوصا مؤقتة على التصميم ليظهر للعميل الشكل
-                    كاملاً،دور مولد النص العربى أن يوفر على المصمم عناء البحث عن
-                    نص بديل لا علاقة له بالموضوع الذى يتحدث عنه التصميم فيظهر
-                    بشكل لا يليق.هذا النص يمكن أن يتم تركيبه على أي تصميم دون
-                    مشكلة فلن يقتاً ومن هنا وجب على المصمم أن يضع نصوصا مؤقتة
-                    على التصميم
+                    جاري التحميل...
+                  </p>
+                  <p
+                    v-else-if="aboutError"
+                    class="text-red-500 text-base sm:text-lg leading-relaxed text-start mb-4"
+                  >
+                    {{ aboutError }}
+                  </p>
+                  <p
+                    v-else
+                    class="text-gray-700 text-base sm:text-lg leading-relaxed text-start mb-4 whitespace-pre-line"
+                  >
+                    {{ aboutContent || "لا توجد بيانات متاحة حاليا" }}
                   </p>
                 </div>
               </div>
@@ -2111,9 +2121,11 @@
                 <!-- Submit Button -->
                 <button
                   type="submit"
-                  class="w-full bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300"
+                  :disabled="isSendingContact"
+                  class="w-full bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  ارسال
+                  <span v-if="isSendingContact">جاري الإرسال...</span>
+                  <span v-else>ارسال</span>
                 </button>
               </form>
             </div>
@@ -2542,8 +2554,10 @@ import LogoutModal from "~/components/modals/LogoutModal.vue";
 import DeleteAccountModal from "~/components/modals/DeleteAccountModal.vue";
 import DeleteAdModal from "~/components/modals/DeleteAdModal.vue";
 import LocationModal from "~/components/modals/LocationModal.vue";
+import { useUserStore } from "~/stores/user";
 
 const toast = useToast();
+const userStore = useUserStore();
 
 const activeTab = ref("profile");
 const isMobileMenuOpen = ref(false);
@@ -2573,6 +2587,7 @@ const selectedPackage = ref(null);
 
 // Logout Modal State
 const isLogoutModalOpen = ref(false);
+const isLoggingOut = ref(false);
 
 // Delete Account Modal State
 const isDeleteAccountModalOpen = ref(false);
@@ -3476,6 +3491,19 @@ const contactForm = reactive({
   messageTitle: "",
   messageText: "",
 });
+const aboutContent = ref("");
+const isLoadingAbout = ref(false);
+const aboutError = ref(null);
+const hasFetchedAbout = ref(false);
+const termsContent = ref("");
+const isLoadingTerms = ref(false);
+const termsError = ref(null);
+const hasFetchedTerms = ref(false);
+const privacyContent = ref("");
+const isLoadingPrivacy = ref(false);
+const privacyError = ref(null);
+const hasFetchedPrivacy = ref(false);
+const isSendingContact = ref(false);
 
 const joinConsultantForm = reactive({
   consultationCost: "",
@@ -3648,7 +3676,7 @@ const handleRenewSubscription = (subscription) => {
   openPackagePaymentModal();
 };
 
-const handleContactUsSubmit = () => {
+const handleContactUsSubmit = async () => {
   if (!contactForm.messageTitle.trim() || !contactForm.messageText.trim()) {
     toast.add({
       severity: "warn",
@@ -3658,19 +3686,182 @@ const handleContactUsSubmit = () => {
     });
     return;
   }
-  console.log("Contact form submitted:", contactForm);
-  // Add your contact form submission logic here
-  // Reset form after successful submission
-  contactForm.messageTitle = "";
-  contactForm.messageText = "";
-  // Show success message
-  toast.add({
-    severity: "success",
-    summary: "نجح",
-    detail: "تم إرسال الرسالة بنجاح",
-    life: 3000,
-  });
+  isSendingContact.value = true;
+  try {
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/contact-us-send-message",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          firstName: form.clientName || "مستخدم",
+          phone: form.mobileNumber ? `+966${form.mobileNumber}` : "",
+          subject: contactForm.messageTitle,
+          message: contactForm.messageText,
+        },
+      }
+    );
+
+    if (response && response.key === "success") {
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم إرسال الرسالة بنجاح",
+        life: 3000,
+      });
+      contactForm.messageTitle = "";
+      contactForm.messageText = "";
+    } else {
+      throw new Error(response?.msg || "فشل في إرسال الرسالة");
+    }
+  } catch (error) {
+    console.error("Error sending contact message:", error);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        error?.data?.msg ||
+        error?.message ||
+        "حدث خطأ أثناء إرسال الرسالة. الرجاء المحاولة مرة أخرى.",
+      life: 3000,
+    });
+  } finally {
+    isSendingContact.value = false;
+  }
 };
+
+const fetchAboutContent = async () => {
+  isLoadingAbout.value = true;
+  aboutError.value = null;
+  try {
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/about",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response && response.key === "success" && response.data) {
+      aboutContent.value = response.data;
+      hasFetchedAbout.value = true;
+    } else {
+      throw new Error(response?.msg || "فشل في تحميل صفحة من نحن");
+    }
+  } catch (error) {
+    console.error("Error fetching about content:", error);
+    aboutError.value =
+      error?.data?.msg ||
+      error?.message ||
+      "حدث خطأ أثناء تحميل صفحة من نحن. الرجاء المحاولة مرة أخرى.";
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: aboutError.value,
+      life: 3000,
+    });
+  } finally {
+    isLoadingAbout.value = false;
+  }
+};
+
+const fetchTermsContent = async () => {
+  isLoadingTerms.value = true;
+  termsError.value = null;
+  try {
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/terms",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response && response.key === "success" && response.data) {
+      termsContent.value = response.data;
+      hasFetchedTerms.value = true;
+    } else {
+      throw new Error(response?.msg || "فشل في تحميل الشروط والأحكام");
+    }
+  } catch (error) {
+    console.error("Error fetching terms content:", error);
+    termsError.value =
+      error?.data?.msg ||
+      error?.message ||
+      "حدث خطأ أثناء تحميل الشروط والأحكام. الرجاء المحاولة مرة أخرى.";
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: termsError.value,
+      life: 3000,
+    });
+  } finally {
+    isLoadingTerms.value = false;
+  }
+};
+
+const fetchPrivacyContent = async () => {
+  isLoadingPrivacy.value = true;
+  privacyError.value = null;
+  try {
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/privacy",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response && response.key === "success" && response.data) {
+      privacyContent.value = response.data;
+      hasFetchedPrivacy.value = true;
+    } else {
+      throw new Error(response?.msg || "فشل في تحميل سياسة الخصوصية");
+    }
+  } catch (error) {
+    console.error("Error fetching privacy content:", error);
+    privacyError.value =
+      error?.data?.msg ||
+      error?.message ||
+      "حدث خطأ أثناء تحميل سياسة الخصوصية. الرجاء المحاولة مرة أخرى.";
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: privacyError.value,
+      life: 3000,
+    });
+  } finally {
+    isLoadingPrivacy.value = false;
+  }
+};
+
+watch(
+  () => activeTab.value,
+  (tab) => {
+    if (tab === "about-us" && !hasFetchedAbout.value && !isLoadingAbout.value) {
+      fetchAboutContent();
+    }
+    if (tab === "terms" && !hasFetchedTerms.value && !isLoadingTerms.value) {
+      fetchTermsContent();
+    }
+    if (
+      tab === "privacy" &&
+      !hasFetchedPrivacy.value &&
+      !isLoadingPrivacy.value
+    ) {
+      fetchPrivacyContent();
+    }
+  },
+  { immediate: true }
+);
 
 const handleCvFileChange = (event) => {
   const file = event.target.files[0];
@@ -3784,12 +3975,55 @@ const openLogoutModal = () => {
   isLogoutModalOpen.value = true;
 };
 
-const confirmLogout = () => {
-  console.log("Logout confirmed");
-  // Add your logout logic here (clear tokens, etc.)
-  isLogoutModalOpen.value = false;
-  // Navigate to login page
-  navigateTo("/login");
+const confirmLogout = async () => {
+  if (isLoggingOut.value) return;
+  isLoggingOut.value = true;
+
+  const deviceId =
+    (process.client && localStorage.getItem("device_id")) || "11111111111";
+
+  try {
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/sign-out",
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          ...(userStore.token ? { Authorization: `Bearer ${userStore.token}` } : {}),
+        },
+        query: {
+          device_id: deviceId,
+        },
+      }
+    );
+
+    if (response && response.key === "success") {
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم تسجيل الخروج بنجاح",
+        life: 3000,
+      });
+      userStore.logout();
+      isLogoutModalOpen.value = false;
+      navigateTo("/login");
+    } else {
+      throw new Error(response?.msg || "فشل في تسجيل الخروج");
+    }
+  } catch (error) {
+    console.error("Error during logout:", error);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        error?.data?.msg ||
+        error?.message ||
+        "حدث خطأ أثناء تسجيل الخروج. الرجاء المحاولة مرة أخرى.",
+      life: 3000,
+    });
+  } finally {
+    isLoggingOut.value = false;
+  }
 };
 
 const openChargeModal = () => {

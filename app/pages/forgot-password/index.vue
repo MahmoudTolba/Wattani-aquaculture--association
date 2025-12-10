@@ -28,22 +28,17 @@
             <!-- Phone number -->
             <div class="space-y-3">
               <label
-                class="text-base font-medium text-dark flex justify-end items-center gap-1"
+                class="text-base font-medium text-dark flex justify-start items-center gap-1"
                 for="phone"
                 placeholder=""
               >
-                <span class="text-red-500">*</span>
-                رقم الجوال
+              رقم الجوال
+              <span class="text-red-500">*</span>
               </label>
               <div
-                class="flex rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d]"
+                class="flex rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] overflow-hidden"
               >
-                <div
-                  class="flex items-center gap-2 border-l border-gray-100 px-4 py-3 bg-gray-50 text-sm text-dark/70"
-                >
-                  <img src="/images/Country Flags.png" alt="Country Flag" />
-                  +966
-                </div>
+                
                 <input
                   id="phone"
                   type="tel"
@@ -51,6 +46,21 @@
                   required
                   class="flex-1 bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
                 />
+                <div
+                  class="flex items-center gap-2 border-l border-gray-100 px-3 sm:px-4 py-3 bg-gray-50 text-sm text-dark/70 min-w-[130px]"
+                >
+                  <select
+                    v-model="countryCode"
+                    class="bg-transparent outline-none text-right appearance-none"
+                    style="background-image: none;"
+                  >
+                    <option value="+966">+966</option>
+                    <option value="+971">+971</option>
+                    <option value="+965">+965</option>
+                    <option value="+974">+974</option>
+                  </select>
+                  <img src="/images/Country Flags.png" alt="Country Flag" class="w-6 h-6" />
+                </div>
               </div>
             </div>
 
@@ -79,12 +89,15 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
 
 // Use clean auth layout (no nav/footer, just page content)
 definePageMeta({
   layout: 'auth-clean'
 });
+
+const countryCode = ref("+966");
 
 const handleSubmit = (event: Event) => {
   // const form = event.target as HTMLFormElement;

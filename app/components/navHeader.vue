@@ -188,20 +188,27 @@
             <div
               class="flex items-center justify-between gap-2 border-y border-gray-100 py-3"
             >
-              <NuxtLink
-                v-for="action in actionButtons"
-                :key="'mobile-action-' + action.id"
-                :to="action.to"
-                class="flex h-12 w-12 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:bg-[#15c472]/10"
-                :aria-label="resolveLabel(action.aria)"
-                @click="isMobileMenuOpen = false"
-              >
-                <img
-                  :src="action.icon"
-                  :alt="resolveLabel(action.aria)"
-                  class="h-5 w-5"
-                />
-              </NuxtLink>
+<NuxtLink
+  v-for="action in actionButtons"
+  :key="'mobile-action-' + action.id"
+  :to="action.to"
+  :class="[
+    'relative flex h-12 w-12 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:bg-[#15c472]/10',
+    action.id === 'notifications' && hasNotifications ? 'text-[#15c472]' : '',
+  ]"
+  :aria-label="resolveLabel(action.aria)"
+  @click="isMobileMenuOpen = false"
+>
+  <img
+    :src="action.icon"
+    :alt="resolveLabel(action.aria)"
+    class="h-5 w-5"
+  />
+  <span
+    v-if="action.id === 'notifications' && hasNotifications"
+    class="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#D92D20]"
+  />
+</NuxtLink>
             </div>
 
             <!-- Login and Register Buttons - shown when not authenticated -->
@@ -266,19 +273,26 @@
           </NuxtLink>
         </nav>
         <div class="hidden md:flex items-center gap-4">
-          <NuxtLink
-            v-for="action in actionButtons"
-            :key="'desktop-action-' + action.id"
-            :to="action.to"
-            class="flex h-10 w-10 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:border-[#15c472]/40"
-            :aria-label="resolveLabel(action.aria)"
-          >
-            <img
-              :src="action.icon"
-              :alt="resolveLabel(action.aria)"
-              class="h-5 w-5"
-            />
-          </NuxtLink>
+<NuxtLink
+  v-for="action in actionButtons"
+  :key="'desktop-action-' + action.id"
+  :to="action.to"
+  :class="[
+    'relative flex h-10 w-10 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:border-[#15c472]/40',
+    action.id === 'notifications' && hasNotifications ? 'text-[#15c472]' : '',
+  ]"
+  :aria-label="resolveLabel(action.aria)"
+>
+  <img
+    :src="action.icon"
+    :alt="resolveLabel(action.aria)"
+    class="h-5 w-5"
+  />
+  <span
+    v-if="action.id === 'notifications' && hasNotifications"
+    class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#D92D20]"
+  />
+</NuxtLink>
           <button
             type="button"
             class="inline-flex items-center gap-2 rounded-full border border-[#15c472] px-5 py-2 text-sm font-semibold text-[#15c472] transition hover:bg-[#15c472]/5"
@@ -306,6 +320,10 @@
 import { computed, ref, onMounted, onBeforeUnmount, watch } from "vue";
 import { useRouter, useRoute } from "#imports";
 import CommitmentModal from "~/components/CommitmentModal.vue";
+import { useUserStore } from "~/stores/user";
+import { useNotificationsStore } from "~/stores/notifications";
+const userStore = useUserStore();
+const notificationsStore = useNotificationsStore();
 
 const router = useRouter();
 const route = useRoute();
@@ -368,6 +386,7 @@ const { isAuthenticated, getUserName, getUserAvatar } = useAuth();
 const showAuth = computed(() => isMounted.value && isAuthenticated.value);
 const userName = computed(() => isMounted.value ? (getUserName.value || "محمد عبدالعزيز") : "");
 const userAvatar = computed(() => isMounted.value ? getUserAvatar.value : "/images/profile-avatar.png");
+const hasNotifications = computed(() => notificationsStore.hasNotifications);
 
 // Base navigation items (always shown)
 const baseNavItems = [

@@ -217,20 +217,22 @@
             <!-- Location -->
             <div class="space-y-3">
               <label
-                class="text-base font-medium text-dark flex justify-start items-center gap-1"
+                class="text-base font-medium text-dark flex justify-start items-center gap-1 cursor-pointer"
                 for="location"
+                @click="openLocationModal"
               >
                 تحديد الموقع
                 <span class="text-red-500">*</span>
               </label>
-              <div class="relative">
+              <div class="relative" @click="openLocationModal">
                 <input
                   id="location"
                   v-model="form.location"
                   type="text"
                   placeholder="تحديد الموقع"
                   required
-                  class="w-full rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] border border-transparent px-4 py-3 pl-10 focus:outline-none text-dark placeholder:text-gray-400 text-right"
+                  readonly
+                  class="w-full cursor-pointer rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] border border-transparent px-4 py-3 pl-10 focus:outline-none text-dark placeholder:text-gray-400 text-right"
                 />
                 <div
                   class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
@@ -464,11 +466,17 @@
       </div>
     </div>
   </div>
+
+  <LocationModal
+    v-model="isLocationModalOpen"
+    @confirm="handleLocationConfirm"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
+import LocationModal from "~/components/modals/LocationModal.vue";
 definePageMeta({
   layout: 'auth-clean'
 });
@@ -481,6 +489,7 @@ const showConfirmPassword = ref(false);
 const isLoading = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
+const isLocationModalOpen = ref(false);
 
 const form = ref({
   clientName: "",
@@ -533,6 +542,20 @@ const clearMessages = () => {
     errorMessage.value = "";
     successMessage.value = "";
   }, 5000);
+};
+
+const openLocationModal = () => {
+  isLocationModalOpen.value = true;
+};
+
+const handleLocationConfirm = (locationData: any) => {
+  if (locationData) {
+    const address =
+      locationData.address ||
+      `${locationData.lat?.toFixed?.(5) || ""}, ${locationData.lng?.toFixed?.(5) || ""}`;
+    form.value.location = address.trim();
+  }
+  isLocationModalOpen.value = false;
 };
 
 const handleSubmit = async (event: Event) => {
@@ -636,10 +659,10 @@ const handleSubmit = async (event: Event) => {
     successMessage.value = "تم إنشاء الحساب بنجاح! جاري التوجيه...";
     clearMessages();
     
-    // Navigate to home page after successful registration
+    // Navigate to OTP verification page after successful registration
     setTimeout(() => {
-      navigateTo("/");
-    }, 1500);
+      navigateTo("/register-otp");
+    }, 500);
     
   } catch (error: any) {
     console.error("Registration error:", error);

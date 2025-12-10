@@ -28,22 +28,17 @@
             <!-- Phone number -->
             <div class="space-y-3">
               <label
-                class="text-base font-medium text-dark flex justify-end items-center gap-1"
+                class="text-base font-medium text-dark flex justify-start items-center gap-1"
                 for="phone"
                 placeholder=""
               >
-                <span class="text-red-500">*</span>
-                رقم الجوال
+              رقم الجوال
+              <span class="text-red-500">*</span>
               </label>
               <div
                 class="flex flex-col sm:flex-row rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] overflow-hidden"
               >
-                <div
-                  class="flex items-center justify-between sm:justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-4 py-3 bg-gray-50 text-sm text-dark/70"
-                >
-                  +966
-                  <img src="/images/Country Flags.png" alt="Country Flag" />
-                </div>
+              
                 <input
                   id="phone"
                   v-model="form.phone"
@@ -52,32 +47,37 @@
                   required
                   class="flex-1 w-full bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
                 />
+                <div
+                  class="flex items-center justify-between sm:justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-2 sm:px-3 py-3 bg-gray-50 text-sm text-dark/70 min-w-[115px]"
+                >
+                  <select
+                    v-model="form.countryCode"
+                    class="bg-transparent outline-none text-right appearance-none"
+                    style="background-image: none;"
+                  >
+                    <option value="+966">+966</option>
+                    <option value="+971">+971</option>
+                    <option value="+965">+965</option>
+                    <option value="+974">+974</option>
+                  </select>
+                  <img src="/images/Country Flags.png" alt="Country Flag" class="w-6 h-6" />
+                </div>
               </div>
             </div>
 
             <!-- Password -->
             <div class="space-y-3">
-              <div class="flex items-center justify-end">
+              <div class="flex items-center justify-start">
                 <label class="text-base font-medium text-dark" for="password">
-                  <span class="text-red-500">*</span>
                   كلمة المرور
+                  <span class="text-red-500">*</span>
                 </label>
               </div>
 
               <div
                 class="flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl border border-gray-100 bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] overflow-hidden"
               >
-                <button
-                  type="button"
-                  class="px-4 py-3 text-gray-400 text-right sm:text-left border-b border-gray-100 sm:border-b-0 sm:border-r"
-                  @click="togglePasswordVisibility"
-                  :aria-pressed="showPassword"
-                  :aria-label="
-                    showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'
-                  "
-                >
-                  <img src="/icons/openeye-icon.svg" />
-                </button>
+              
                 <input
                   id="password"
                   v-model="form.password"
@@ -86,6 +86,17 @@
                   required
                   class="flex-1 w-full bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
                 />
+                <button
+                  type="button"
+                  class="px-4 py-3 text-gray-400 text-right sm:text-left "
+                  @click="togglePasswordVisibility"
+                  :aria-pressed="showPassword"
+                  :aria-label="
+                    showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'
+                  "
+                >
+                  <img src="/icons/openeye-icon.svg" />
+                </button>
               </div>
             </div>
             <button
@@ -116,7 +127,7 @@
             </button>
             <p class="text-md text-[#00000]">
               ليس لديك حساب؟
-              <NuxtLink to="/signup" class="text-[#0a9687]">
+              <NuxtLink to="/register" class="text-[#0a9687]">
                 إنشاء حساب
               </NuxtLink>
             </p>
@@ -145,6 +156,7 @@ import langSwitch from "~/components/langSwitch.vue";
 
 const showPassword = ref(false);
 const form = ref({
+  countryCode: "+966",
   phone: "",
   password: "",
 });

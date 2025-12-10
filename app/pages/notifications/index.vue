@@ -93,18 +93,11 @@
 import { computed, ref, watch } from "vue";
 import Dialog from "primevue/dialog";
 import Paginator from "primevue/paginator";
+import { useNotificationsStore } from "~/stores/notifications";
 
-const notifications = ref([
-  " إشعار بتغيير حالة الدورة ",
-  " إشعار بتغيير حالة الدورة ",
-  " إشعار بتغيير حالة الدورة ",
-  " إشعار بتغيير حالة الدورة ",
-  " إشعار بتغيير حالة الدورة ",
-  " إشعار بتغيير حالة الدورة ",
-  "إشعار تجريبي السابع",
-  "إشعار تجريبي الثامن",
-]);
+const notificationsStore = useNotificationsStore();
 
+const notifications = computed(() => notificationsStore.notifications);
 const rows = ref(5);
 const first = ref(0);
 const showDeleteConfirm = ref(false);
@@ -116,11 +109,11 @@ const visibleNotifications = computed(() =>
 );
 
 const deleteSingle = (index) => {
-  notifications.value.splice(index, 1);
+  notificationsStore.deleteSingle(index);
 };
 
 const deleteAll = () => {
-  notifications.value = [];
+  notificationsStore.deleteAll();
 };
 
 const onPageChange = (event) => {
