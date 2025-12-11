@@ -155,7 +155,7 @@
               <button
                 v-else
                 @click="openPaymentModal"
-                class="w-full bg-gradient-to-r from-[#0A717E] to-[#15C472] hover:opacity-90 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200"
+                class="w-full bg-linear-to-r from-[#0A717E] to-[#15C472] hover:opacity-90 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200"
               >
                 دفع
               </button>
@@ -382,7 +382,7 @@
                 <button
                   v-if="!hasRating"
                   @click="openRatingModal"
-                  class="w-full bg-gradient-to-r from-[#0A717E] to-[#15C472] hover:opacity-90 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200"
+                  class="w-full bg-linear-to-r from-[#0A717E] to-[#15C472] hover:opacity-90 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200"
                 >
                   تقييم
                 </button>
@@ -641,7 +641,7 @@
           <div class="px-6 pb-6">
             <button
               type="button"
-              class="w-full bg-gradient-to-r from-[#0A717E] to-[#15C472] text-white font-semibold py-3 rounded-lg shadow-sm hover:opacity-90 transition-all duration-200"
+              class="w-full bg-linear-to-r from-[#0A717E] to-[#15C472] text-white font-semibold py-3 rounded-lg shadow-sm hover:opacity-90 transition-all duration-200"
               @click="handlePayment"
             >
               تأكيد
@@ -718,10 +718,12 @@
             </button> -->
             <button
               type="button"
-              class="flex-1 bg-gradient-to-r from-[#0A717E] to-[#15C472] text-white font-semibold py-3 rounded-lg shadow-sm hover:opacity-90 transition-all duration-200"
+              class="flex-1 bg-linear-to-r from-[#0A717E] to-[#15C472] text-white font-semibold py-3 rounded-lg shadow-sm hover:opacity-90 transition-all duration-200"
+              :disabled="isSubmittingRating"
+              :class="isSubmittingRating ? 'opacity-75 cursor-not-allowed' : ''"
               @click="submitRating"
             >
-              تقييم
+              {{ isSubmittingRating ? "جاري التقييم..." : "تقييم" }}
             </button>
           </div>
         </div>
@@ -740,6 +742,12 @@ const toast = useToast();
 const orderId = route.params.id;
 const tabParam = route.params.tab || "new";
 
+// Course ID for rating API - fallback to 2 if route param is not numeric
+const courseId = computed(() => {
+  const parsedId = Number(route.params.id);
+  return Number.isFinite(parsedId) && parsedId > 0 ? parsedId : 2;
+});
+
 // Tab labels mapping
 const tabLabels = {
   new: "جديدة",
@@ -756,6 +764,103 @@ const tabLabel = computed(() => tabLabels[tabParam] || "جديدة");
 // const orderData = ref(await getOrderById(orderId, tabParam));
 const { getOrderById } = useOrders();
 const orderData = ref(getOrderById(orderId, tabParam));
+const isLoadingOrder = ref(false);
+const orderError = ref(null);
+
+const buildAuthHeaders = () => {
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "X-Requested-With": "XMLHttpRequest",
+  };
+
+  let token = null;
+  try {
+    const userStore = useState("auth.user");
+    token = userStore?.value?.token || userStore?.value?.access_token || null;
+  } catch (e) {
+    // ignore if store not available
+  }
+
+  if (!token && process.client) {
+    try {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        token = parsedUser?.token || parsedUser?.access_token;
+      }
+    } catch (e) {
+      console.error("Error getting token from localStorage:", e);
+    }
+  }
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  return headers;
+};
+
+const fetchCourseOrder = async () => {
+  isLoadingOrder.value = true;
+  orderError.value = null;
+
+  try {
+    const response = await $fetch(
+      `https://backend.wattani-sa.com/api/v1/course-orders/${courseId.value}`,
+      {
+        method: "GET",
+        headers: buildAuthHeaders(),
+      }
+    );
+
+    if (response?.key === "success" && response?.data) {
+      const data = response.data;
+      orderData.value = {
+        orderNumber: data.order_number ?? data.id ?? orderData.value.orderNumber,
+        status: data.status ?? data.state ?? orderData.value.status ?? "معلق",
+        department:
+          data.department ??
+          data.department_name ??
+          data.category ??
+          orderData.value.department,
+        courseName:
+          data.course?.title ??
+          data.course_name ??
+          data.title ??
+          orderData.value.courseName,
+        location:
+          data.location ??
+          data.city ??
+          data.course?.location ??
+          orderData.value.location,
+        price:
+          data.price ??
+          data.cost ??
+          data.amount ??
+          data.total ??
+          orderData.value.price,
+      };
+    } else {
+      throw new Error(response?.msg || "فشل في جلب بيانات الطلب");
+    }
+  } catch (err) {
+    console.error("Error fetching course order:", err);
+    orderError.value =
+      err?.data?.message ||
+      err?.message ||
+      err?.data?.msg ||
+      "حدث خطأ أثناء تحميل الطلب. الرجاء المحاولة مرة أخرى.";
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: orderError.value,
+      life: 3000,
+    });
+  } finally {
+    isLoadingOrder.value = false;
+  }
+};
 
 function getStatusClass(status) {
   const statusClasses = {
@@ -783,6 +888,7 @@ const userRating = ref({
   stars: 0,
   comment: "",
 });
+const isSubmittingRating = ref(false);
 
 // Cancel order function
 const cancelOrder = () => {
@@ -828,7 +934,7 @@ const closeRatingModal = () => {
   ratingComment.value = "";
 };
 
-const submitRating = () => {
+const submitRating = async () => {
   if (selectedStars.value === 0 || !ratingComment.value.trim()) {
     // You can add validation feedback here
     toast.add({
@@ -839,19 +945,56 @@ const submitRating = () => {
     });
     return;
   }
-  
-  // Save the rating
-  userRating.value = {
-    stars: selectedStars.value,
-    comment: ratingComment.value,
-  };
-  hasRating.value = true;
-  
-  // Close modal and reset form
-  closeRatingModal();
-  
-  // You can add API call here to save the rating
-  console.log("Rating submitted:", userRating.value);
+
+  isSubmittingRating.value = true;
+
+  try {
+    const response = await $fetch(
+      `https://backend.wattani-sa.com/api/v1/courses/${courseId.value}/rate`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          rate: selectedStars.value,
+          comment: ratingComment.value,
+        },
+      }
+    );
+
+    if (response?.key === "success") {
+      userRating.value = {
+        stars: selectedStars.value,
+        comment: ratingComment.value,
+      };
+      hasRating.value = true;
+      toast.add({
+        severity: "success",
+        summary: "تم",
+        detail: "تم إرسال التقييم بنجاح",
+        life: 3000,
+      });
+      closeRatingModal();
+    } else {
+      throw new Error(response?.msg || "فشل في إرسال التقييم");
+    }
+  } catch (err) {
+    console.error("Error submitting rating:", err);
+    const errorMessage =
+      err?.data?.message ||
+      err?.message ||
+      err?.data?.msg ||
+      "حدث خطأ أثناء إرسال التقييم. الرجاء المحاولة مرة أخرى.";
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: errorMessage,
+      life: 3000,
+    });
+  } finally {
+    isSubmittingRating.value = false;
+  }
 };
 
 // Prevent body scroll when modal is open (client-side only)
@@ -880,6 +1023,7 @@ watch(
 );
 
 onMounted(() => {
+  fetchCourseOrder();
   if (isPaymentModalOpen.value || isRatingModalOpen.value) {
     updateBodyOverflow(true);
   }

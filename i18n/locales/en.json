@@ -145,5 +145,56 @@
   },
   "common": {
     "choose_language": "Choose Site Language"
-  }
+  },
+  "footer": {
+    "copyright": "Wattani © 2025",
+    "all_rights_reserved": "All rights reserved",
+    "home": "Home",
+    "about-us": "About us",
+    "services": "Services",
+    "contact-us": "Contact us",
+    "privacy": "Privacy policy",
+    "terms": "Terms of service",
+    "faq": "FAQ",
+    "support": "Support"
+  },
+  "contact-us": {
+    "title": "Contact Us",
+    "description": "We are here to help you. Please contact us for any questions or concerns.",
+    "name": "Name",
+    "name_placeholder": "Enter your name",
+    "phone": "Phone",
+    "phone_placeholder": "Enter your phone",
+    "message": "Message",
+    "message_placeholder": "Enter your message",
+    "send": "Send",
+    "sending": "Sending..."
+  },
+  "create-ads": {
+    "title": "Create Ads",
+    "department": "Select Department",
+    "department_placeholder": "Select Department",
+    "title_ar": "Title in Arabic",
+    "title_ar_placeholder": "Enter title in Arabic",
+    "title_en": "Title in English",
+    "title_en_placeholder": "Enter title in English",
+    "cost": "Cost",
+    "cost_placeholder": "Enter cost",
+    "city": "City",
+    "city_placeholder": "Select City",
+    "location": "Location",
+    "location_placeholder": "Enter location",
+    "description_ar": "Description in Arabic",
+    "description_ar_placeholder": "Enter description in Arabic",
+    "description_en": "Description in English",
+    "description_en_placeholder": "Enter description in English",
+    "ad_image": "Attach Images",
+    "ad_image_placeholder": "Attach images",
+    "gallery_images": "Attach Images",
+    "gallery_images_placeholder": "Attach images",
+    "location_description": "You can link this window to a map or location selection later. Use the buttons",
+    "location_content": "Map content area / location selection",
+    "submit": "Submit",
+    "close": "Close"
+}
 }

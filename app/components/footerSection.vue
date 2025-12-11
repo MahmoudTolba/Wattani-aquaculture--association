@@ -65,18 +65,19 @@
 </template>
 
 <script setup>
+const { t } = useI18n();
 const linksGroups = [
   [
-    { name: "الرئيسية", path: "/" },
-    { name: "من نحن", path: "/aboutUs" },
-    { name: "الخدمات", path: "/services" },
-    { name: "تواصل معنا", path: "/ContactUs" },
+    { name: t("footer.home"), path: "/" },
+    { name: t("footer.about-us"), path: "/aboutUs" },
+    { name: t("footer.services"), path: "/services" },
+    { name: t("footer.contact-us"), path: "/ContactUs" },
   ],
   [
-    { name: "الشروط والأحكام", path: "/terms" },
-    { name: "الاسئلة المتكررة", path: "/faq" },
-    { name: " سياسة الاستخدام", path: "/privacy" },
-    { name: "عن المنصة ", path: "/support" },
+    { name: t("footer.terms"), path: "/terms" },
+    { name: t("footer.faq"), path: "/faq" },
+    { name: t("footer.privacy"), path: "/privacy" },
+    { name: t("footer.support"), path: "/support" },
   ],
 ];
 </script>

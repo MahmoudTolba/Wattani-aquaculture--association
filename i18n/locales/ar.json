@@ -3,7 +3,7 @@
     "title": "جمعية وطنى للاستزراع المائي",
     "language": "العربية",
     "home": "الرئيسية",
-    "welcome_back": "مرحبا في ريتا"
+    "welcome_back": "مرحبا في جمعية وطنى للاستزراع المائي"
   },
   "Auth": {
     "email": "البريد الإلكتروني",
@@ -23,5 +23,56 @@
   },
   "common": {
     "choose_language": "اختر لغة الموقع"
+  },
+  "footer": {
+    "copyright": "جمعية وطنى للاستزراع المائي © 2025",
+    "all_rights_reserved": "جميع الحقوق محفوظة",
+    "home": "الرئيسية",
+    "about-us": "من نحن",
+    "services": "الخدمات",
+    "contact-us": "تواصل معنا",
+    "privacy": "سياسة الخصوصية",
+    "terms": "الشروط والأحكام",
+    "faq": "الأسئلة المتكررة",
+    "support": "عن المنصة"
+  },
+  "contact-us": {
+    "title": "تواصل معنا",
+    "description": "نحن هنا لمساعدتك. يرجى التواصل معنا لأي أسئلة أو مخاوف.",
+    "name": "الاسم",
+    "name_placeholder": "أدخل اسمك",
+    "phone": "رقم الجوال",
+    "phone_placeholder": "أدخل رقم الجوال",
+    "message": "الرسالة",
+    "message_placeholder": "أدخل الرسالة",
+    "send": "إرسال",
+    "sending": "جاري الإرسال..."
+  },
+  "create-ads": {
+    "title": "اضافة اعلان",
+    "department": "تحديد القسم",
+    "department_placeholder": "اختر القسم",
+    "title_ar": "اسم الاعلان باللغة العربية",
+    "title_ar_placeholder": "أدخل اسم الاعلان باللغة العربية",
+    "title_en": "اسم الاعلان باللغة الإنجليزية",
+    "title_en_placeholder": "أدخل اسم الاعلان باللغة الإنجليزية",
+    "cost": "تكلفة الاعلان",
+    "cost_placeholder": "أدخل تكلفة الاعلان",
+    "city": "المدينة",
+    "city_placeholder": "اختر المدينة",
+
+    "location": "تحديد الموقع",
+    "location_placeholder": "أدخل الموقع",
+    "description_ar": "وصف الاعلان باللغة العربية",
+    "description_ar_placeholder": "أدخل وصف الاعلان باللغة العربية",
+    "description_en": "وصف الاعلان باللغة الإنجليزية",
+    "description_en_placeholder": "أدخل وصف الاعلان باللغة الإنجليزية",
+    "ad_image": "ارفاق صور للاعلان",
+    "ad_image_placeholder": "اختر صورة للاعلان",
+    "gallery_images": "ارفاق صور للاعلان",
+    "location_description": "يمكن ربط هذه النافذة بخريطة أو محدد موقع لاحقًا. استخدم الأزرار",
+    "location_content": "مساحة محتوى الخريطة / اختيار الموقع",
+    "submit": "اضافة اعلان",
+    "close": "إغلاق"
   }
 }

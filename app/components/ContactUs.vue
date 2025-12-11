@@ -286,12 +286,12 @@ const submitForm = async () => {
           <label
             class="block text-right text-black-600 text-sm font-medium mb-2"
           >
-            اسم العميل <span class="text-red-600">*</span>
+            {{ $t("contact-us.name") }} <span class="text-red-600">*</span>
           </label>
           <input
             v-model="form.firstName"
             type="text"
-            placeholder="العميل"
+            :placeholder="$t('contact-us.name_placeholder')"
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none text-right transition"
           />
@@ -300,7 +300,7 @@ const submitForm = async () => {
         <!-- Phone Number with Country Code Selector -->
         <div>
           <label class="block text-right text-sm font-medium mb-2">
-            رقم الجوال <span class="text-red-600">*</span>
+            {{ $t("contact-us.phone") }} <span class="text-red-600">*</span>
           </label>
           <div class="country-selector-container">
             <div class="relative flex">
@@ -380,12 +380,12 @@ const submitForm = async () => {
       <!-- Message -->
       <div>
         <label class="block text-right text-black-600 text-sm font-medium mb-2">
-          نص الرسالة <span class="text-red-600">*</span>
+          {{ $t("contact-us.message") }} <span class="text-red-600">*</span>
         </label>
         <textarea
           v-model="form.message"
           rows="6"
-          placeholder=" الرسالة"
+          :placeholder="$t('contact-us.message_placeholder')"
           required
           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none resize-none text-right transition"
         ></textarea>
@@ -398,7 +398,7 @@ const submitForm = async () => {
           :disabled="isLoading"
           class="w-full bg-linear-to-l from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-4 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-102 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {{ isLoading ? 'جاري الإرسال...' : 'إرسال' }}
+          {{ isLoading ? $t("contact-us.sending") : $t("contact-us.send") }}
         </button>
       </div>
     </form>

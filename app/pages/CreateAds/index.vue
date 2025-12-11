@@ -4,7 +4,7 @@
       <section class="mt-10 mx-6 p-6 md:p-10">
         <div class="flex flex-col items-start gap-2">
           <h1 class="text-2xl md:text-[28px] font-semibold text-gray-900">
-            اضافة اعلان
+            {{ $t("create-ads.title") }}
           </h1>
         </div>
 
@@ -13,14 +13,14 @@
             <div
               class="flex items-center justify-start text-sm font-medium text-gray-800"
             >
-              تحديد القسم
+              {{ $t("create-ads.department") }}
               <span class="text-red-500 ms-1">*</span>
             </div>
             <select
               v-model="form.department"
               class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
             >
-              <option value="" disabled>اختر القسم</option>
+              <option value="" disabled>{{ $t("create-ads.department_placeholder") }}</option>
               <option
                 v-for="option in departments"
                 :key="option.value"
@@ -36,13 +36,13 @@
               <div
                 class="flex items-center justify-start text-sm font-medium text-gray-800"
               >
-                اسم الاعلان باللغة العربية
+              {{ $t("create-ads.title_ar") }}
                 <span class="text-red-500 ms-1">*</span>
               </div>
               <input
                 v-model="form.titleAr"
                 type="text"
-                placeholder="اسم الاعلان باللغة العربية"
+                :placeholder="$t('create-ads.title_ar_placeholder')"
                 class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                 required
               />
@@ -52,13 +52,13 @@
               <div
                 class="flex items-center justify-start text-sm font-medium text-gray-800"
               >
-                اسم الاعلان باللغة الإنجليزية
+              {{ $t("create-ads.title_en") }}
                 <span class="text-red-500 ms-1">*</span>
               </div>
               <input
                 v-model="form.titleEn"
                 type="text"
-                placeholder="اسم الاعلان باللغة الإنجليزية"
+                :placeholder="$t('create-ads.title_en_placeholder')"
                 class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                 required
               />
@@ -68,13 +68,13 @@
             <div
               class="flex items-center justify-start text-sm font-medium text-gray-800"
             >
-              تحديد تكلفة الاعلان
+              {{ $t("create-ads.cost") }}
               <span class="text-red-500 ms-1">*</span>
             </div>
             <input
               v-model="form.titleAr"
               type="text"
-              placeholder="اسم الاعلان باللغة العربية"
+              :placeholder="$t('create-ads.cost_placeholder')"
               class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
               required
             />
@@ -85,7 +85,7 @@
               <div
                 class="flex items-center justify-start text-sm font-medium text-gray-800"
               >
-                المدينة
+              {{ $t("create-ads.city") }}
                 <span class="text-red-500 ms-1">*</span>
               </div>
               <select
@@ -93,7 +93,7 @@
                 class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                 required
               >
-                <option value="" disabled>اختر المدينة</option>
+                <option value="" disabled>{{ $t("create-ads.city_placeholder") }}</option>
                 <option
                   v-for="option in cities"
                   :key="option.value"
@@ -109,7 +109,7 @@
             <div
               class="flex items-center justify-start text-sm font-medium text-gray-800"
             >
-              تحديد الموقع
+              {{ $t("create-ads.location") }}
               <span class="text-red-500 ms-1">*</span>
             </div>
             <div class="relative">
@@ -122,7 +122,7 @@
               <input
                 v-model="form.location"
                 type="text"
-                placeholder="تحديد الموقع"
+                :placeholder="$t('create-ads.location_placeholder')"
                 class="w-full rounded-xl border border-gray-200 pe-10 ps-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 cursor-pointer focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                 readonly
                 @click="openLocationModal"
@@ -139,13 +139,13 @@
             <div
               class="flex items-center justify-start text-sm font-medium text-gray-800"
             >
-              نص الاعلان باللغة العربية
+              {{ $t("create-ads.description_ar") }}
               <span class="text-red-500 ms-1">*</span>
             </div>
             <textarea
               v-model="form.descriptionAr"
               rows="5"
-              placeholder="وصف"
+              :placeholder="$t('create-ads.description_ar_placeholder')"
               class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
               required
             ></textarea>
@@ -155,13 +155,13 @@
             <div
               class="flex items-center justify-start text-sm font-medium text-gray-800"
             >
-              نص الاعلان باللغة الإنجليزية
+              {{ $t("create-ads.description_en") }}
               <span class="text-red-500 ms-1">*</span>
             </div>
             <textarea
               v-model="form.descriptionEn"
               rows="5"
-              placeholder="وصف"
+              :placeholder="$t('create-ads.description_en_placeholder')"
               class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
               required
             ></textarea>
@@ -171,7 +171,7 @@
             <div
               class="flex items-center justify-start text-sm font-medium text-gray-800"
             >
-              ارفاق صور للاعلان
+              {{ $t("create-ads.ad_image") }}
               <span class="text-red-500 ms-1">*</span>
             </div>
             <label
@@ -209,7 +209,7 @@
             <div
               class="flex items-center justify-start text-sm font-medium text-gray-800"
             >
-              ارفاق صور
+              {{ $t("create-ads.gallery_images") }}
               <span class="text-xs text-gray-500 ms-2">(يحد اقصي 5 صور)</span>
             </div>
             <label
@@ -254,7 +254,7 @@
               type="submit"
               class="w-full bg-linear-to-l from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-4 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-102"
             >
-              اضافة
+              {{ $t("create-ads.submit") }}
             </button>
           </div>
         </form>
@@ -262,63 +262,15 @@
     </div>
   </div>
 
-  <Teleport to="body">
-    <div
-      v-if="isLocationModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="location-modal-title"
-    >
-      <div class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl">
-        <div class="flex items-center justify-between">
-          <h2
-            id="location-modal-title"
-            class="text-lg font-semibold text-gray-900"
-          >
-            تحديد الموقع
-          </h2>
-          <button
-            type="button"
-            class="text-gray-500 transition hover:text-gray-700"
-            @click="closeLocationModal"
-            aria-label="إغلاق"
-          >
-            ✕
-          </button>
-        </div>
-        <p class="mt-2 text-sm text-gray-500">
-          يمكن ربط هذه النافذة بخريطة أو محدد موقع لاحقًا. استخدم الأزرار
-          بالأسفل لحفظ الإحداثيات.
-        </p>
-        <div
-          class="mt-6 h-52 rounded-xl border border-dashed border-gray-200 bg-gray-50 flex items-center justify-center text-gray-400 text-sm"
-        >
-          مساحة محتوى الخريطة / اختيار الموقع
-        </div>
-        <div class="mt-6 flex items-center justify-end gap-3">
-          <button
-            type="button"
-            class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
-            @click="closeLocationModal"
-          >
-            إلغاء
-          </button>
-          <button
-            type="button"
-            class="rounded-xl bg-linear-to-l from-teal-500 to-teal-600 px-5 py-2 text-sm font-semibold text-white shadow hover:from-teal-600 hover:to-teal-700"
-            @click="confirmLocation"
-          >
-            حفظ الموقع
-          </button>
-        </div>
-      </div>
-    </div>
-  </Teleport>
+  <LocationModal
+    v-model="isLocationModalOpen"
+    @confirm="handleLocationConfirm"
+  />
 </template>
 
 <script setup>
 import { reactive, ref, computed } from "vue";
+import LocationModal from "~/components/modals/LocationModal.vue";
 
 const departments = [
   { label: "العميل", value: "client" },
@@ -351,12 +303,13 @@ const openLocationModal = () => {
   isLocationModalOpen.value = true;
 };
 
-const closeLocationModal = () => {
-  isLocationModalOpen.value = false;
-};
-
-const confirmLocation = () => {
-  // Placeholder: integrate real selection logic later
+const handleLocationConfirm = (locationData) => {
+  if (locationData) {
+    const address =
+      locationData.address ||
+      `${locationData.lat?.toFixed?.(5) || ""}, ${locationData.lng?.toFixed?.(5) || ""}`;
+    form.location = address.trim();
+  }
   isLocationModalOpen.value = false;
 };
 
