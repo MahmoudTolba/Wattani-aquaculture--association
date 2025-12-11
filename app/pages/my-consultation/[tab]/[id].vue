@@ -35,7 +35,7 @@
       </div>
 
       <!-- Order Detail Content -->
-      <section class="mb-4 sm:mb-6">
+      <section v-if="!isLoadingOrder && orderData" class="mb-4 sm:mb-6">
         <div class="rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
           <!-- Content for New Tab (جديدة) -->
           <template v-if="tabParam === 'new'">
@@ -544,6 +544,21 @@
           </template>
         </div>
       </section>
+
+      <!-- Loading Skeleton -->
+      <section v-else class="mb-4 sm:mb-6">
+        <div class="rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 bg-white border border-gray-200 animate-pulse">
+          <div class="h-6 w-32 bg-gray-200 rounded mb-4"></div>
+          <div class="space-y-3">
+            <div class="h-4 bg-gray-200 rounded"></div>
+            <div class="h-4 bg-gray-200 rounded"></div>
+            <div class="h-4 bg-gray-200 rounded"></div>
+            <div class="h-4 bg-gray-200 rounded"></div>
+            <div class="h-4 bg-gray-200 rounded"></div>
+            <div class="h-4 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <!-- Payment Modal -->
@@ -763,7 +778,8 @@ const tabLabel = computed(() => tabLabels[tabParam] || "جديدة");
 // const { getOrderById } = useOrders();
 // const orderData = ref(await getOrderById(orderId, tabParam));
 const { getOrderById } = useOrders();
-const orderData = ref(getOrderById(orderId, tabParam));
+const fallbackOrderData = getOrderById(orderId, tabParam);
+const orderData = ref(null);
 const isLoadingOrder = ref(false);
 const orderError = ref(null);
 
@@ -817,29 +833,29 @@ const fetchCourseOrder = async () => {
     if (response?.key === "success" && response?.data) {
       const data = response.data;
       orderData.value = {
-        orderNumber: data.order_number ?? data.id ?? orderData.value.orderNumber,
-        status: data.status ?? data.state ?? orderData.value.status ?? "معلق",
+        orderNumber: data.order_number ?? data.id ?? fallbackOrderData.orderNumber,
+        status: data.status ?? data.state ?? fallbackOrderData.status ?? "معلق",
         department:
           data.department ??
           data.department_name ??
           data.category ??
-          orderData.value.department,
+          fallbackOrderData.department,
         courseName:
           data.course?.title ??
           data.course_name ??
           data.title ??
-          orderData.value.courseName,
+          fallbackOrderData.courseName,
         location:
           data.location ??
           data.city ??
           data.course?.location ??
-          orderData.value.location,
+          fallbackOrderData.location,
         price:
           data.price ??
           data.cost ??
           data.amount ??
           data.total ??
-          orderData.value.price,
+          fallbackOrderData.price,
       };
     } else {
       throw new Error(response?.msg || "فشل في جلب بيانات الطلب");
@@ -857,6 +873,7 @@ const fetchCourseOrder = async () => {
       detail: orderError.value,
       life: 3000,
     });
+    orderData.value = fallbackOrderData;
   } finally {
     isLoadingOrder.value = false;
   }

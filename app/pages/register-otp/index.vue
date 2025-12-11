@@ -94,7 +94,22 @@ definePageMeta({
 const OTP_LENGTH = 4;
 const COUNTDOWN_START = 40;
 
-const maskedPhone = "9665••••••"; // replace with real phone when available
+// Get phone from query params
+const route = useRoute();
+const phoneNumber = computed(() => route.query.phone as string || "");
+
+// Mask phone number for display
+const maskedPhone = computed(() => {
+  if (!phoneNumber.value) return "9665••••••";
+  const phone = phoneNumber.value;
+  if (phone.length > 4) {
+    const lastFour = phone.slice(-4);
+    const masked = "••".repeat(Math.max(phone.length - 4, 2));
+    return `+966${masked}${lastFour}`;
+  }
+  return `+966${phone}`;
+});
+
 const otpDigits = ref<string[]>(Array(OTP_LENGTH).fill(""));
 const otpInputRefs = ref<(HTMLInputElement | null)[]>(
   Array(OTP_LENGTH).fill(null)
@@ -145,13 +160,14 @@ const handleOtpKeydown = (index: number, event: KeyboardEvent) => {
   if (event.key === "Backspace" && !otpDigits.value[index] && index > 0) {
     focusInput(index - 1);
   }
-  if (event.key === "ArrowLeft" && index < OTP_LENGTH - 1) {
-    event.preventDefault();
-    focusInput(index + 1);
-  }
-  if (event.key === "ArrowRight" && index > 0) {
+  // Keep arrow navigation intuitive in LTR input: left moves left, right moves right
+  if (event.key === "ArrowLeft" && index > 0) {
     event.preventDefault();
     focusInput(index - 1);
+  }
+  if (event.key === "ArrowRight" && index < OTP_LENGTH - 1) {
+    event.preventDefault();
+    focusInput(index + 1);
   }
 };
 
@@ -179,11 +195,39 @@ const isOtpComplete = computed(() =>
   otpDigits.value.every((digit) => digit !== "")
 );
 
+const { register } = useAuth();
+
 const handleSubmit = (event: Event) => {
   if (!isOtpComplete.value) return;
   const otpValue = otpDigits.value.join("");
   console.log("Submitted OTP:", otpValue);
-  navigateTo("/login");
+  
+  // Get pending registration data and complete registration
+  if (process.client) {
+    const pendingData = localStorage.getItem('pendingRegistration');
+    if (pendingData) {
+      try {
+        const userData = JSON.parse(pendingData);
+        // Mark as verified and register the user
+        userData.isVerified = true;
+        register(userData);
+        
+        // Clear pending registration
+        localStorage.removeItem('pendingRegistration');
+        
+        // Navigate to login page
+        navigateTo("/login");
+      } catch (e) {
+        console.error("Error completing registration:", e);
+        navigateTo("/login");
+      }
+    } else {
+      // No pending data, just go to login
+      navigateTo("/login");
+    }
+  } else {
+    navigateTo("/login");
+  }
 };
 
 const handleResend = () => {

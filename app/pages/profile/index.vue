@@ -47,12 +47,13 @@
               <div class="flex flex-col items-center mb-6 sm:mb-8">
                 <div class="relative">
                   <img
-                    src="/images/profile-avatar.png"
+                    :src="form.avatar || '/images/profile-avatar.png'"
                     alt="Profile Picture"
                     class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full object-cover border-2 sm:border-4 border-gray-100"
                   />
                   <button
                     type="button"
+                    @click="$refs.profileAvatarInput?.click()"
                     class="absolute bottom-0 right-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-[#15c472] rounded-full flex items-center justify-center shadow-lg hover:bg-[#12a866] transition-colors"
                     aria-label="Edit Profile Picture"
                   >
@@ -76,6 +77,13 @@
                       />
                     </svg>
                   </button>
+                  <input
+                    ref="profileAvatarInput"
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                    @change="handleProfileAvatarChange"
+                  />
                 </div>
               </div>
 
@@ -2539,6 +2547,7 @@ import {
   computed,
   watch,
   nextTick,
+  onMounted,
 } from "vue";
 import Paginator from "primevue/paginator";
 import { useToast } from "primevue/usetoast";
@@ -2558,6 +2567,7 @@ import { useUserStore } from "~/stores/user";
 
 const toast = useToast();
 const userStore = useUserStore();
+const { user, login } = useAuth();
 
 const activeTab = ref("profile");
 const isMobileMenuOpen = ref(false);
@@ -3466,6 +3476,24 @@ const form = reactive({
   email: "",
   city: "",
   location: "",
+  avatar: "",
+});
+
+// Load user data from auth on mount
+onMounted(() => {
+  // Redirect to login if not authenticated
+  if (!user.value) {
+    navigateTo("/login");
+    return;
+  }
+  
+  // Load user data into form
+  form.clientName = user.value.name || "";
+  form.mobileNumber = user.value.phone || "";
+  form.email = user.value.email || "";
+  form.city = user.value.city || "";
+  form.location = user.value.location || "";
+  form.avatar = user.value.avatar || "/images/profile-avatar.png";
 });
 
 const settingsForm = reactive({
@@ -3538,9 +3566,67 @@ const getTabTitle = () => {
   return tabTitles[activeTab.value] || "الملف الشخصي";
 };
 
+const profileAvatarInput = ref(null);
+
+const handleProfileAvatarChange = (event) => {
+  const file = event.target.files?.[0];
+  if (file) {
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: "الرجاء اختيار صورة",
+        life: 3000,
+      });
+      return;
+    }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: "حجم الصورة يجب أن يكون أقل من 5 ميجابايت",
+        life: 3000,
+      });
+      return;
+    }
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      form.avatar = e.target?.result;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
 const handleSubmit = () => {
   console.log("Form submitted:", form);
-  // Add your form submission logic here
+  
+  // Update user data in auth
+  if (user.value) {
+    const updatedUser = {
+      ...user.value,
+      name: form.clientName,
+      phone: form.mobileNumber,
+      email: form.email,
+      city: form.city,
+      location: form.location,
+      avatar: form.avatar,
+    };
+    
+    login(updatedUser);
+    
+    // Show success message
+    toast.add({
+      severity: "success",
+      summary: "تم التحديث",
+      detail: "تم تحديث البيانات بنجاح",
+      life: 3000,
+    });
+  }
 };
 
 const handleSettingsSubmit = () => {

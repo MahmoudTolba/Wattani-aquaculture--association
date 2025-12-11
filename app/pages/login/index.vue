@@ -107,12 +107,37 @@
               هل نسيت كلمة المرور
             </button>
 
+            <!-- Error Message -->
+            <div
+              v-if="errorMessage"
+              class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm text-right"
+            >
+              {{ errorMessage }}
+            </div>
+
             <!-- CTA -->
             <button
               type="submit"
-              class="w-full rounded-2xl bg-linear-to-l from-[#15C472] from-[0.05%] to-[#0A717E] to-[99.95%] py-4 text-white text-lg font-semibold shadow-[0_15px_30px_rgba(21,196,114,0.3)] transition-all duration-300 hover:translate-y-0.5"
+              :disabled="isLoading"
+              class="w-full rounded-2xl bg-linear-to-l from-[#15C472] from-[0.05%] to-[#0A717E] to-[99.95%] py-4 text-white text-lg font-semibold shadow-[0_15px_30px_rgba(21,196,114,0.3)] transition-all duration-300 hover:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              تسجيل
+              <span v-if="isLoading" class="animate-spin">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              </span>
+              <span>{{ isLoading ? "جاري تسجيل الدخول..." : "تسجيل" }}</span>
             </button>
           </form>
 
@@ -147,14 +172,18 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 definePageMeta({
   layout: 'auth-clean'
 });
 import { ref } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
+const { showToast} = useCustomToast();
 
 const showPassword = ref(false);
+const errorMessage = ref("");
+const isLoading = ref(false);
+
 const form = ref({
   countryCode: "+966",
   phone: "",
@@ -165,30 +194,85 @@ const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
 };
 
-const { login } = useAuth();
+// const { login } = useAuth();
 
-const handleSubmit = async (event: Event) => {
-  event.preventDefault();
+// const handleSubmit = async (event: Event) => {
+//   event.preventDefault();
   
-  // TODO: Replace with actual API call
-  // const response = await $fetch('/api/auth/login', {
-  //   method: 'POST',
-  //   body: {
-  //     phone: form.value.phone,
-  //     password: form.value.password
-  //   }
-  // });
+//   // Reset error message
+//   errorMessage.value = "";
+//   isLoading.value = true;
   
-  // For now, simulate successful login
-  // When API is ready, use the user data from the response
-  login({
-    name: "محمد عبدالعزيز",
-    phone: form.value.phone,
-    avatar: "/images/profile-avatar.png",
-  });
-  
-  // Navigate to home page after successful login
-  navigateTo("/");
+//   try {
+//     // Validate required fields
+//     if (!form.value.phone.trim()) {
+//       errorMessage.value = "الرجاء إدخال رقم الجوال";
+//       isLoading.value = false;
+//       return;
+//     }
+    
+//     if (!form.value.password.trim()) {
+//       errorMessage.value = "الرجاء إدخال كلمة المرور";
+//       isLoading.value = false;
+//       return;
+//     }
+    
+//     // Simulate API delay
+//     await new Promise(resolve => setTimeout(resolve, 800));
+    
+//     // Get stored user data
+//     if (typeof window !== "undefined") {
+//       const storedUser = localStorage.getItem('user');
+//       if (storedUser) {
+//         try {
+//           const userData = JSON.parse(storedUser);
+          
+//           // Verify credentials
+//           if (userData.phone === form.value.phone && userData.password === form.value.password) {
+//             // Successful login
+//             login(userData);
+//             navigateTo("/");
+//           } else {
+//             errorMessage.value = "رقم الجوال أو كلمة المرور غير صحيحة";
+//             isLoading.value = false;
+//           }
+//         } catch (e) {
+//           console.error("Error parsing user data:", e);
+//           errorMessage.value = "حدث خطأ. الرجاء المحاولة مرة أخرى.";
+//           isLoading.value = false;
+//         }
+//       } else {
+//         errorMessage.value = "لا يوجد حساب مسجل. الرجاء إنشاء حساب أولاً.";
+//         isLoading.value = false;
+//       }
+//     }
+//   } catch (error: any) {
+//     console.error("Login error:", error);
+//     errorMessage.value = error?.message || "حدث خطأ أثناء تسجيل الدخول. الرجاء المحاولة مرة أخرى.";
+//     isLoading.value = false;
+//   } finally {
+//     isLoading.value = false;
+//   }
+// };
+const handleSubmit = async () => {
+  const fd = new FormData();
+  fd.append("phone", form.value.phone);
+  fd.append("password", form.value.password);
+  fd.append("country_code", form.value.countryCode);
+  fd.append("device_type", "web");
+  fd.append("device_id", "11111111111");
+  fd.append("lang", "ar");
+  const { data, error } = await submitApiForm("sign-in", fd);
+  if ( error ) {
+    showToast("error", error.msg);
+    return;
+  }
+  if ( data.key === "success" ) {
+    showToast("success", data.msg);
+     // Updating the user data from store
+  } else {
+    showToast("error", data.msg);
+  }
 };
 </script>
 

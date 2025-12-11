@@ -131,16 +131,25 @@
               <div
                 class="flex  rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] border border-transparent overflow-hidden"
               >
-                <div
-                  class="flex items-center gap-2 border-l border-gray-100 px-4 py-3 bg-gray-50 text-sm text-dark/70"
+              <div
+                class="flex items-center gap-2 border-l border-gray-100 px-4 py-3 bg-gray-50 text-sm text-dark/70"
+              >
+                <select
+                  v-model="form.countryCode"
+                  class="bg-transparent focus:outline-none text-dark"
+                  aria-label="Country code"
                 >
-                  +966
-                  <img
-                    src="/images/Country Flags.png"
-                    alt="Country Flag"
-                    class="w-5 h-5"
-                  />
-                </div>
+                  <option value="+966">+966</option>
+                  <option value="+20">+20</option>
+                  <option value="+971">+971</option>
+                  <option value="+974">+974</option>
+                </select>
+                <img
+                  src="/images/Country Flags.png"
+                  alt="Country Flag"
+                  class="w-5 h-5"
+                />
+              </div>
                 <input
                   id="phone"
                   v-model="form.phone"
@@ -480,6 +489,7 @@ import LocationModal from "~/components/modals/LocationModal.vue";
 definePageMeta({
   layout: 'auth-clean'
 });
+const { showToast} = useCustomToast();
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const avatarPreview = ref<string | undefined>(undefined);
@@ -497,6 +507,7 @@ const form = ref({
   email: "",
   city: "riyadh",
   location: "",
+  countryCode: "+966",
   password: "",
   confirmPassword: "",
   acceptTerms: false,
@@ -558,119 +569,143 @@ const handleLocationConfirm = (locationData: any) => {
   isLocationModalOpen.value = false;
 };
 
-const handleSubmit = async (event: Event) => {
-  event.preventDefault();
+// const handleSubmit = async (event: Event) => {
+
+//   event.preventDefault();
   
-  // Reset messages
-  errorMessage.value = "";
-  successMessage.value = "";
-  isLoading.value = true;
+//   // Reset messages
+//   errorMessage.value = "";
+//   successMessage.value = "";
+//   isLoading.value = true;
   
-  try {
-    // Validate required fields
-    if (!form.value.clientName.trim()) {
-      errorMessage.value = "الرجاء إدخال اسم العميل";
-      isLoading.value = false;
-      clearMessages();
-      return;
-    }
+//   try {
+//     // Validate required fields
+//     if (!form.value.clientName.trim()) {
+//       errorMessage.value = "الرجاء إدخال اسم العميل";
+//       isLoading.value = false;
+//       clearMessages();
+//       return;
+//     }
     
-    if (!form.value.phone.trim()) {
-      errorMessage.value = "الرجاء إدخال رقم الجوال";
-      isLoading.value = false;
-      clearMessages();
-      return;
-    }
+//     if (!form.value.phone.trim()) {
+//       errorMessage.value = "الرجاء إدخال رقم الجوال";
+//       isLoading.value = false;
+//       clearMessages();
+//       return;
+//     }
     
-    // Validate password length
-    if (form.value.password.length < 6) {
-      errorMessage.value = "كلمة المرور يجب أن تكون 6 أحرف على الأقل";
-      isLoading.value = false;
-      clearMessages();
-      return;
-    }
+//     // Validate password length
+//     if (form.value.password.length < 6) {
+//       errorMessage.value = "كلمة المرور يجب أن تكون 6 أحرف على الأقل";
+//       isLoading.value = false;
+//       clearMessages();
+//       return;
+//     }
     
-    // Validate passwords match
-    if (form.value.password !== form.value.confirmPassword) {
-      errorMessage.value = "كلمات المرور غير متطابقة";
-      isLoading.value = false;
-      clearMessages();
-      return;
-    }
+//     // Validate passwords match
+//     if (form.value.password !== form.value.confirmPassword) {
+//       errorMessage.value = "كلمات المرور غير متطابقة";
+//       isLoading.value = false;
+//       clearMessages();
+//       return;
+//     }
     
-    // Validate terms acceptance
-    if (!form.value.acceptTerms) {
-      errorMessage.value = "يجب الموافقة على الشروط والأحكام";
-      isLoading.value = false;
-      clearMessages();
-      return;
-    }
+//     // Validate terms acceptance
+//     if (!form.value.acceptTerms) {
+//       errorMessage.value = "يجب الموافقة على الشروط والأحكام";
+//       isLoading.value = false;
+//       clearMessages();
+//       return;
+//     }
     
-    // TODO: Replace with actual API call
-    // When your API is ready, uncomment and use this:
-    /*
-    const formData = new FormData();
-    formData.append('clientName', form.value.clientName);
-    formData.append('phone', form.value.phone);
-    formData.append('email', form.value.email);
-    formData.append('city', form.value.city);
-    formData.append('location', form.value.location);
-    formData.append('password', form.value.password);
-    if (avatarFile.value) {
-      formData.append('avatar', avatarFile.value);
-    }
+//     // Simulate API call delay
+//     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    const response = await $fetch('/api/auth/register', {
-      method: 'POST',
-      body: formData
-    });
+//     // Store complete registration data including password for login verification
+//     const registrationData = {
+//       id: Date.now().toString(),
+//       name: form.value.clientName,
+//       phone: form.value.phone,
+//       countryCode: "+966", // Default country code
+//       email: form.value.email,
+//       city: form.value.city,
+//       location: form.value.location,
+//       password: form.value.password, // Store password for login verification
+//       avatar: avatarPreview.value || "/images/profile-avatar.png",
+//       isVerified: false, // Will be set to true after OTP verification
+//     };
     
-    // Use the user data from the API response
-    login({
-      id: response.user.id,
-      name: response.user.name || form.value.clientName,
-      phone: response.user.phone || form.value.phone,
-      email: response.user.email || form.value.email,
-      city: response.user.city || form.value.city,
-      location: response.user.location || form.value.location,
-      avatar: response.user.avatar || avatarPreview.value || "/images/profile-avatar.png",
-      token: response.token, // If your API returns a token
-    });
-    */
+//     // Store registration data in localStorage (temporary until OTP verification)
+//     if (process.client) {
+//       localStorage.setItem('pendingRegistration', JSON.stringify(registrationData));
+//     }
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+//     successMessage.value = "تم إنشاء الحساب بنجاح! جاري التوجيه...";
+//     clearMessages();
     
-    // For now, simulate successful registration
-    // This will be replaced with actual API call above
-    const userData = {
-      id: Date.now().toString(), // Temporary ID
-      name: form.value.clientName,
-      phone: form.value.phone,
-      email: form.value.email,
-      city: form.value.city,
-      location: form.value.location,
-      avatar: avatarPreview.value || "/images/profile-avatar.png",
-    };
+//     // Navigate to OTP verification page with phone number
+//     setTimeout(() => {
+//       navigateTo({
+//         path: "/register-otp",
+//         query: { phone: form.value.phone }
+//       });
+//     }, 500);
     
-    // Register and automatically log in the user
-    register(userData);
-    
-    successMessage.value = "تم إنشاء الحساب بنجاح! جاري التوجيه...";
-    clearMessages();
-    
-    // Navigate to OTP verification page after successful registration
-    setTimeout(() => {
-      navigateTo("/register-otp");
-    }, 500);
-    
-  } catch (error: any) {
-    console.error("Registration error:", error);
-    errorMessage.value = error?.message || "حدث خطأ أثناء إنشاء الحساب. الرجاء المحاولة مرة أخرى.";
-    isLoading.value = false;
-    clearMessages();
-  } finally {
-    isLoading.value = false;
+//   } catch (error: any) {
+//     console.error("Registration error:", error);
+//     errorMessage.value = error?.message || "حدث خطأ أثناء إنشاء الحساب. الرجاء المحاولة مرة أخرى.";
+//     isLoading.value = false;
+//     clearMessages();
+//   } finally {
+//     isLoading.value = false;
+//   }
+// };
+const handleSubmit = async () => {
+  if (!form.value.clientName.trim()) {
+    showToast("error", "الاسم مطلوب");
+    return;
+  }
+  if (!form.value.phone.trim()) {
+    showToast("error", "رقم الجوال مطلوب");
+    return;
+  }
+  if (!form.value.password || form.value.password.length < 6) {
+    showToast("error", "كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+    return;
+  }
+  if (form.value.password !== form.value.confirmPassword) {
+    showToast("error", "كلمتا المرور غير متطابقتين");
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append("name", form.value.clientName.trim());
+  fd.append("phone", form.value.phone);
+  if (form.value.email) {
+    fd.append("email", form.value.email);
+  }
+  fd.append("city", form.value.city || "");
+  fd.append("location", form.value.location || "");
+  fd.append("password", form.value.password);
+  fd.append("password_confirmation", form.value.confirmPassword);
+  fd.append("country_code", form.value.countryCode);
+  fd.append("device_id", "web");
+  fd.append("device_type", "web");
+  fd.append("lang", "ar");
+  fd.append("iso", "SA");
+  if (avatarFile.value) {
+    fd.append("avatar", avatarFile.value);
+  }
+  const { data, error }: any = await submitApiForm("sign-up", fd);
+  if ( error ) {
+    showToast("error", error.msg);
+    return;
+  }
+  if ( data.key === "success" ) {
+    showToast("success", data.msg);
+     // Updating the user data from store
+  } else {
+    showToast("error", data.msg);
   }
 };
 </script>

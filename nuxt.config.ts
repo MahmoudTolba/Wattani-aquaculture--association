@@ -9,11 +9,13 @@ export default defineNuxtConfig({
     "@nuxtjs/google-fonts",
     "@pinia/nuxt",
     "nuxt-swiper",
-    
   ],
-  components: [
-    { path: '~/components', global: true }
-  ],
+  runtimeConfig: {
+    public: {
+      apiBase: "https://backend.wattani-sa.com/api/v1/",
+    },
+  },
+  components: [{ path: "~/components", global: true }],
 
   app: {
     pageTransition: {

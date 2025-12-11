@@ -38,6 +38,7 @@ export const useUserStore = defineStore('user', {
                 email: payload.email,
                 phone: payload.phone,
                 avatar: payload.avatar || "",
+                
             };
         },
          // Visitor Mode
