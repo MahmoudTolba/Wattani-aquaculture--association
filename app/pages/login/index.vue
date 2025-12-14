@@ -182,6 +182,7 @@ import { ref } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
 const { showToast} = useCustomToast();
 const authStore = useAuthStore();
+const { login } = useAuth();
 
 const showPassword = ref(false);
 const errorMessage = ref("");
@@ -279,9 +280,11 @@ const handleSubmit = async () => {
   }
   if ( data.key === "success" ) {
     showToast("success", data.msg);
-    navigateTo("/");
-     // Updating the user data from store
+    // Updating the user data from store
     authStore.updateUserData(data.data);
+    // Also update useAuth() state so navbar can detect the login
+    login(data.data);
+    navigateTo("/");
   } else {
     showToast("error", data.msg);
   }

@@ -1,7 +1,7 @@
 <template>
   <Html :lang="head.htmlAttrs.lang" :dir="head.htmlAttrs.dir">
     <Head>
-      <Title>{{ title }}</Title>
+      <!-- <Title>{{ title }}</Title> -->
 
       <!-- i18n SEO -->
       <template v-for="link in head.link" :key="link.id">
@@ -38,9 +38,9 @@ const head = useLocaleHead({
 });
 
 // dynamic page title
-const title = computed(() => {
-  return t(route.meta.title ?? "") + " - " + t("site.title");
-});
+// const title = computed(() => {
+//   return t(route.meta.title ?? "") + " - " + t("site.title");
+// });
 </script>
 
 <style lang="scss" scoped>

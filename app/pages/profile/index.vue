@@ -1470,6 +1470,7 @@
                       v-model="commissionAmount"
                       type="number"
                       placeholder="ادخل المبلغ"
+                      @input="handleCommissionAmountChange"
                       class="w-full px-4 py-3 sm:py-4 border border-gray-300 rounded-xl text-right text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-[#15c472] focus:border-transparent placeholder:text-gray-400"
                     />
                   </div>
@@ -1477,7 +1478,7 @@
                   <!-- Display Amount -->
                   <div class="flex items-center justify-center gap-2">
                     <span class="text-green-600 text-3xl sm:text-4xl font-bold">
-                      {{ commissionAmount || "60" }}
+                      {{ calculatedFee !== null ? calculatedFee : (commissionAmount || "60") }}
                     </span>
                     <img
                       src="/icons/green-currency.svg"
@@ -1486,13 +1487,40 @@
                     />
                   </div>
 
+                  <!-- Loading State for Calculation -->
+                  <div v-if="isCalculatingFee" class="text-center">
+                    <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-[#15c472]"></div>
+                    <p class="text-gray-600 text-sm mt-2">جاري حساب الرسوم...</p>
+                  </div>
+
+                  <!-- Error State -->
+                  <div v-if="feeCalculationError" class="bg-red-50 border border-red-200 rounded-xl p-3 text-center">
+                    <p class="text-red-600 text-sm">{{ feeCalculationError }}</p>
+                  </div>
+
+                  <!-- Calculated Fee Info -->
+                  <div v-if="calculatedFee !== null && commissionAmount" class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center">
+                    <p class="text-blue-800 text-sm">
+                      المبلغ الأصلي: {{ commissionAmount }} ريال
+                    </p>
+                    <p class="text-blue-800 text-sm font-semibold">
+                      المبلغ الإجمالي بعد الرسوم: {{ calculatedFee }} ريال
+                    </p>
+                  </div>
+
                   <!-- Pay Button -->
                   <button
                     type="button"
                     @click="openCommissionPaymentModal"
-                    class="w-full bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300"
+                    :disabled="isCalculatingFee || isPayingFee || !commissionAmount || parseFloat(commissionAmount) <= 0"
+                    class="w-full bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    دفع
+                    <span v-if="isPayingFee" class="animate-spin">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                    </span>
+                    <span>{{ isPayingFee ? "جاري الدفع..." : "دفع" }}</span>
                   </button>
                 </div>
               </div>
@@ -2576,6 +2604,10 @@ const isMobileMenuOpen = ref(false);
 const isChargeModalOpen = ref(false);
 const chargeAmount = ref("");
 const commissionAmount = ref("");
+const calculatedFee = ref(null);
+const isCalculatingFee = ref(false);
+const isPayingFee = ref(false);
+const feeCalculationError = ref(null);
 
 // Settings Sub-tab State
 const settingsSubTab = ref("personal-info");
@@ -2817,12 +2849,39 @@ const fetchRatings = async (page = 1) => {
   ratingsError.value = null;
 
   try {
+    // Get token from multiple sources
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+    
+    // If no token found, try to get from localStorage
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error('Error getting token from localStorage:', e);
+      }
+    }
+
+    // If still no token, try authStore
+    if (!token) {
+      const authStore = useAuthStore();
+      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+        token = authStore.authUser.token;
+      } else if (authStore.token) {
+        token = authStore.token;
+      }
+    }
+
     const response = await $fetch(
       "https://backend.wattani-sa.com/api/v1/my-rate",
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         query: {
           page: page,
@@ -4142,7 +4201,89 @@ const handleCharge = (amount) => {
   chargeAmount.value = "";
 };
 
-const openCommissionPaymentModal = () => {
+// Calculate fee when amount changes
+const handleCommissionAmountChange = async () => {
+  const amount = commissionAmount.value;
+  
+  // Reset previous calculation
+  calculatedFee.value = null;
+  feeCalculationError.value = null;
+  
+  // Only calculate if amount is valid
+  if (!amount || parseFloat(amount) <= 0) {
+    return;
+  }
+
+  await calculateFee(amount);
+};
+
+// Calculate fee API call
+const calculateFee = async (amount) => {
+  isCalculatingFee.value = true;
+  feeCalculationError.value = null;
+
+  try {
+    // Get token from multiple sources
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+    
+    // If no token found, try to get from localStorage
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error('Error getting token from localStorage:', e);
+      }
+    }
+
+    // If still no token, try authStore
+    if (!token) {
+      const authStore = useAuthStore();
+      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+        token = authStore.authUser.token;
+      } else if (authStore.token) {
+        token = authStore.token;
+      }
+    }
+
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/calculate-fee",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: {
+          amount: amount,
+          lang: "ar",
+          iso: "SA",
+        },
+      }
+    );
+
+    if (response && response.key === "success") {
+      // Store the calculated fee (total amount including fees)
+      calculatedFee.value = response.data?.total_amount || response.data?.fee || amount;
+    } else {
+      throw new Error(response?.msg || "فشل في حساب الرسوم");
+    }
+  } catch (err) {
+    console.error("Error calculating fee:", err);
+    feeCalculationError.value =
+      err?.data?.msg ||
+      err?.message ||
+      err?.data?.message ||
+      "حدث خطأ أثناء حساب الرسوم. الرجاء المحاولة مرة أخرى.";
+  } finally {
+    isCalculatingFee.value = false;
+  }
+};
+
+const openCommissionPaymentModal = async () => {
   const amount = commissionAmount.value || "60";
   if (!amount || parseFloat(amount) <= 0) {
     toast.add({
@@ -4153,25 +4294,115 @@ const openCommissionPaymentModal = () => {
     });
     return;
   }
+
+  // Calculate fee if not already calculated
+  if (calculatedFee.value === null) {
+    await calculateFee(amount);
+  }
+
   isCommissionPaymentModalOpen.value = true;
 };
 
-
-const handleCommissionPaymentConfirm = (paymentMethod) => {
+const handleCommissionPaymentConfirm = async (paymentMethod) => {
   const amount = commissionAmount.value || "60";
+  const finalAmount = calculatedFee.value || amount;
+  
+  if (!amount || parseFloat(amount) <= 0) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى إدخال مبلغ صحيح",
+      life: 3000,
+    });
+    return;
+  }
+
+  isPayingFee.value = true;
   selectedCommissionPaymentMethod.value = paymentMethod;
-  console.log("Processing commission payment with amount:", amount);
-  console.log("Selected payment method:", paymentMethod);
-  // Add your payment processing logic here
 
-  // Close commission modal
-  isCommissionPaymentModalOpen.value = false;
-  selectedCommissionPaymentMethod.value = "wallet";
+  try {
+    // Get token from multiple sources
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+    
+    // If no token found, try to get from localStorage
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error('Error getting token from localStorage:', e);
+      }
+    }
 
-  // Open success modal after a delay
-  setTimeout(() => {
-    isSuccessModalOpen.value = true;
-  }, 200);
+    // If still no token, try authStore
+    if (!token) {
+      const authStore = useAuthStore();
+      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+        token = authStore.authUser.token;
+      } else if (authStore.token) {
+        token = authStore.token;
+      }
+    }
+
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/pay-fee",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: {
+          amount: amount,
+          payment_method: paymentMethod,
+          lang: "ar",
+          iso: "SA",
+        },
+      }
+    );
+
+    if (response && response.key === "success") {
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم الدفع بنجاح",
+        life: 3000,
+      });
+
+      // Close commission modal
+      isCommissionPaymentModalOpen.value = false;
+      selectedCommissionPaymentMethod.value = "wallet";
+      
+      // Reset form
+      commissionAmount.value = "";
+      calculatedFee.value = null;
+      feeCalculationError.value = null;
+
+      // Open success modal after a delay
+      setTimeout(() => {
+        isSuccessModalOpen.value = true;
+      }, 200);
+    } else {
+      throw new Error(response?.msg || "فشل في عملية الدفع");
+    }
+  } catch (err) {
+    console.error("Error paying fee:", err);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        err?.data?.msg ||
+        err?.message ||
+        err?.data?.message ||
+        "حدث خطأ أثناء عملية الدفع. الرجاء المحاولة مرة أخرى.",
+      life: 3000,
+    });
+  } finally {
+    isPayingFee.value = false;
+  }
 };
 
 
