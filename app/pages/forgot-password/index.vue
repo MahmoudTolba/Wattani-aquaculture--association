@@ -41,9 +41,11 @@
                 
                 <input
                   id="phone"
+                  v-model="phone"
                   type="tel"
                   placeholder="رقم الجوال"
                   required
+                  @input="handlePhoneInput"
                   class="flex-1 bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
                 />
                 <div
@@ -98,6 +100,13 @@ definePageMeta({
 });
 
 const countryCode = ref("+966");
+const phone = ref("");
+
+const handlePhoneInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  // Remove all non-numeric characters
+  phone.value = target.value.replace(/\D/g, '');
+};
 
 const handleSubmit = (event: Event) => {
   // const form = event.target as HTMLFormElement;

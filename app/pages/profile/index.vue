@@ -135,6 +135,7 @@
                       v-model="form.mobileNumber"
                       type="tel"
                       placeholder="رقم الجوال"
+                      @input="handleMobileNumberInput"
                       class="flex-1 w-full bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 text-right"
                     />
                   </div>
@@ -532,6 +533,7 @@
                         v-model="changeMobileForm.newMobile"
                         type="tel"
                         placeholder="رقم الجوال الجديد"
+                        @input="handleNewMobileInput"
                         class="flex-1 w-full bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 text-right"
                       />
                     </div>
@@ -2540,7 +2542,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   reactive,
   ref,
@@ -3600,6 +3602,18 @@ const handleProfileAvatarChange = (event) => {
     };
     reader.readAsDataURL(file);
   }
+};
+
+const handleMobileNumberInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  // Remove all non-numeric characters
+  form.mobileNumber = target.value.replace(/\D/g, '');
+};
+
+const handleNewMobileInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  // Remove all non-numeric characters
+  changeMobileForm.newMobile = target.value.replace(/\D/g, '');
 };
 
 const handleSubmit = () => {

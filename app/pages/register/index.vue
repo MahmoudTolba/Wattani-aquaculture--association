@@ -156,6 +156,7 @@
                   type="tel"
                   placeholder="رقم الجوال"
                   required
+                  @input="handlePhoneInput"
                   class="flex-1 bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
                 />
               </div>
@@ -569,6 +570,12 @@ const handleLocationConfirm = (locationData: any) => {
   isLocationModalOpen.value = false;
 };
 
+const handlePhoneInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  // Remove all non-numeric characters
+  form.value.phone = target.value.replace(/\D/g, '');
+};
+
 // const handleSubmit = async (event: Event) => {
 
 //   event.preventDefault();
@@ -669,6 +676,10 @@ const handleSubmit = async () => {
     showToast("error", "رقم الجوال مطلوب");
     return;
   }
+  if (!form.value.city || !form.value.city.trim()) {
+    showToast("error", "المدينة مطلوبة");
+    return;
+  }
   if (!form.value.password || form.value.password.length < 6) {
     showToast("error", "كلمة المرور يجب أن تكون 6 أحرف على الأقل");
     return;
@@ -684,7 +695,7 @@ const handleSubmit = async () => {
   if (form.value.email) {
     fd.append("email", form.value.email);
   }
-  fd.append("city", form.value.city || "");
+  fd.append("city", form.value.city.trim());
   fd.append("location", form.value.location || "");
   fd.append("password", form.value.password);
   fd.append("password_confirmation", form.value.confirmPassword);

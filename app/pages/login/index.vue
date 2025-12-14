@@ -45,6 +45,7 @@
                   type="tel"
                   placeholder="رقم الجوال"
                   required
+                  @input="handlePhoneInput"
                   class="flex-1 w-full bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
                 />
                 <div
@@ -194,6 +195,12 @@ const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
 };
 
+const handlePhoneInput = (event) => {
+  const target = event.target;
+  // Remove all non-numeric characters
+  form.value.phone = target.value.replace(/\D/g, '');
+};
+
 // const { login } = useAuth();
 
 // const handleSubmit = async (event: Event) => {
@@ -262,6 +269,7 @@ const handleSubmit = async () => {
   fd.append("device_type", "web");
   fd.append("device_id", "11111111111");
   fd.append("lang", "ar");
+  fd.append("iso", "SA");
   const { data, error } = await submitApiForm("sign-in", fd);
   if ( error ) {
     showToast("error", error.msg);

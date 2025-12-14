@@ -6,3 +6,6 @@
 // Clean auth layout - no nav, no footer, just the page content
 // This allows auth pages to maintain their original styling
 </script>
+<style scoped>
+
+</style>
