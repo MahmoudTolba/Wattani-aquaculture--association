@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     "@nuxtjs/google-fonts",
     "@pinia/nuxt",
     "nuxt-swiper",
+    "pinia-plugin-persistedstate/nuxt",
   ],
   runtimeConfig: {
     public: {

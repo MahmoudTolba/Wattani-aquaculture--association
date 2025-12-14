@@ -190,11 +190,12 @@ const showLocationDialog = ref(false);
 const selectedMarker = ref(null);
 const existingMarkers = ref([]);
 
-// Default center (Riyadh, Saudi Arabia)
-const defaultCenter = { lat: 24.7136, lng: 46.6753 };
+// Default center
+const defaultCenter = { lat: 31.222, lng: 34.5555 };
 
-// Existing pins on the map (like in the image - 9 pins)
+// Existing pins on the map (including the default location)
 const existingPins = ref([
+  { lat: 31.222, lng: 34.5555, name: "الموقع الافتراضي" },
   { lat: 24.75, lng: 46.60, name: "موقع 1" },
   { lat: 24.75, lng: 46.68, name: "موقع 2" },
   { lat: 24.75, lng: 46.76, name: "موقع 3" },
@@ -264,8 +265,20 @@ const initializeMap = async () => {
     maxZoom: 19,
   }).addTo(map.value);
 
-  // Add existing pins as markers
-  existingPins.value.forEach((pin) => {
+  // Add default marker at the specified coordinates (31.222, 34.5555)
+  const defaultPin = existingPins.value[0]; // First pin is the default location
+  const defaultMarker = Leaflet.marker([defaultPin.lat, defaultPin.lng], {
+    icon: createTealIcon(),
+  }).addTo(map.value);
+  
+  defaultMarker.on("click", () => {
+    selectExistingPin(defaultPin);
+  });
+  
+  existingMarkers.value.push(defaultMarker);
+
+  // Add remaining existing pins as markers
+  existingPins.value.slice(1).forEach((pin) => {
     const marker = Leaflet.marker([pin.lat, pin.lng], {
       icon: createTealIcon(),
     }).addTo(map.value);

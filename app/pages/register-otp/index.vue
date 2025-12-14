@@ -16,7 +16,9 @@
             <h1 class="text-4xl font-semibold text-[#00b16a]">كود التحقق</h1>
             <p class="text-lg leading-relaxed text-[#6b7280]">
               برجاء إدخال كود التفعيل المرسل لجوالك لتأكيد رقم
-              <span class="font-semibold text-[#0a717e]">{{ maskedPhone }}</span>
+              <span class="font-semibold text-[#0a717e]">{{
+                maskedPhone
+              }}</span>
             </p>
           </div>
 
@@ -96,7 +98,9 @@ const COUNTDOWN_START = 40;
 
 // Get phone from query params
 const route = useRoute();
-const phoneNumber = computed(() => route.query.phone as string || "");
+const phoneNumber = computed(() => (route.query.phone as string) || "");
+const { showToast } = useCustomToast();
+const authStore = useAuthStore();
 
 // Mask phone number for display
 const maskedPhone = computed(() => {
@@ -197,43 +201,47 @@ const isOtpComplete = computed(() =>
 
 const { register } = useAuth();
 
-const handleSubmit = (event: Event) => {
+const handleSubmit = async (event: Event) => {
   if (!isOtpComplete.value) return;
   const otpValue = otpDigits.value.join("");
-  console.log("Submitted OTP:", otpValue);
-  
-  // Get pending registration data and complete registration
-  if (process.client) {
-    const pendingData = localStorage.getItem('pendingRegistration');
-    if (pendingData) {
-      try {
-        const userData = JSON.parse(pendingData);
-        // Mark as verified and register the user
-        userData.isVerified = true;
-        register(userData);
-        
-        // Clear pending registration
-        localStorage.removeItem('pendingRegistration');
-        
-        // Navigate to login page
-        navigateTo("/login");
-      } catch (e) {
-        console.error("Error completing registration:", e);
-        navigateTo("/login");
-      }
-    } else {
-      // No pending data, just go to login
-      navigateTo("/login");
-    }
+  const fd = new FormData();
+  fd.append("phone", phoneNumber.value);
+  fd.append("code", otpValue);
+  fd.append("country_code", "966");
+  fd.append("device_id", "web");
+  fd.append("device_type", "web");
+  fd.append("lang", "ar");
+  fd.append("iso", "SA");
+  const { data, error }: any = await submitApiForm("check-code", fd);
+  if (error) {
+    showToast("error", error.msg);
+    return;
+  }
+  if (data.key === "not_exist") {
+    showToast("not_exist", data.msg);
+    navigateTo({ name: "login" });
   } else {
-    navigateTo("/login");
+    showToast("error", data.msg);
   }
 };
 
-const handleResend = () => {
-  otpDigits.value = Array(OTP_LENGTH).fill("");
-  focusInput(0);
-  startTimer();
+const handleResend = async () => {
+  const fd = new FormData();
+  fd.append("phone", phoneNumber.value);
+  fd.append("country_code", "966");
+  fd.append("iso", "SA");
+  const { data, error }: any = await submitApiForm("resend-code", fd);
+  if (error) {
+    showToast("error", error.msg);
+    return;
+  }
+  if (data.key === "success") {
+    otpDigits.value = Array(OTP_LENGTH).fill("");
+    focusInput(0);
+    startTimer();
+  } else {
+    showToast("error", data.msg);
+  }
 };
 
 onMounted(() => {

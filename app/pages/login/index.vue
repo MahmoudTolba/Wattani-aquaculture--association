@@ -38,17 +38,7 @@
               <div
                 class="flex flex-col sm:flex-row rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] overflow-hidden"
               >
-              
-                <input
-                  id="phone"
-                  v-model="form.phone"
-                  type="tel"
-                  placeholder="رقم الجوال"
-                  required
-                  @input="handlePhoneInput"
-                  class="flex-1 w-full bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
-                />
-                <div
+              <div
                   class="flex items-center justify-between sm:justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-2 sm:px-3 py-3 bg-gray-50 text-sm text-dark/70 min-w-[115px]"
                 >
                   <select
@@ -63,6 +53,17 @@
                   </select>
                   <img src="/images/Country Flags.png" alt="Country Flag" class="w-6 h-6" />
                 </div>
+              
+                <input
+                  id="phone"
+                  v-model="form.phone"
+                  type="tel"
+                  placeholder="رقم الجوال"
+                  required
+                  @input="handlePhoneInput"
+                  class="flex-1 w-full bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
+                />
+               
               </div>
             </div>
 
@@ -180,6 +181,7 @@ definePageMeta({
 import { ref } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
 const { showToast} = useCustomToast();
+const authStore = useAuthStore();
 
 const showPassword = ref(false);
 const errorMessage = ref("");
@@ -265,7 +267,7 @@ const handleSubmit = async () => {
   const fd = new FormData();
   fd.append("phone", form.value.phone);
   fd.append("password", form.value.password);
-  fd.append("country_code", form.value.countryCode);
+  fd.append("country_code", "966");
   fd.append("device_type", "web");
   fd.append("device_id", "11111111111");
   fd.append("lang", "ar");
@@ -277,7 +279,9 @@ const handleSubmit = async () => {
   }
   if ( data.key === "success" ) {
     showToast("success", data.msg);
+    navigateTo("/");
      // Updating the user data from store
+    authStore.updateUserData(data.data);
   } else {
     showToast("error", data.msg);
   }

@@ -193,15 +193,17 @@
                   id="city"
                   v-model="form.city"
                   required
-                  class="w-full rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] border border-transparent px-4 py-3 pr-10 focus:outline-none text-dark appearance-none text-right"
+                  :disabled="isLoadingCities"
+                  class="w-full rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] border border-transparent px-4 py-3 pr-10 focus:outline-none text-dark appearance-none text-right disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <option value="riyadh">الرياض</option>
-                  <option value="jeddah">جدة</option>
-                  <option value="dammam">الدمام</option>
-                  <option value="makkah">مكة المكرمة</option>
-                  <option value="medina">المدينة المنورة</option>
-                  <option value="khobar">الخبر</option>
-                  <option value="taif">الطائف</option>
+                  <option value="" disabled>{{ isLoadingCities ? "جاري التحميل..." : "اختر المدينة" }}</option>
+                  <option
+                    v-for="city in cities"
+                    :key="city.id"
+                    :value="city.id.toString()"
+                  >
+                    {{ city.name }}
+                  </option>
                 </select>
                 <div
                   class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
@@ -484,13 +486,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted, watch, nextTick } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
 import LocationModal from "~/components/modals/LocationModal.vue";
+import { fetchApiData } from "~/composables/useApiFetch";
 definePageMeta({
   layout: 'auth-clean'
 });
 const { showToast} = useCustomToast();
+const authStore = useAuthStore();
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const avatarPreview = ref<string | undefined>(undefined);
@@ -502,16 +506,61 @@ const errorMessage = ref("");
 const successMessage = ref("");
 const isLocationModalOpen = ref(false);
 
+// Fetch cities from API
+const cities = ref<any[]>([]);
+const isLoadingCities = ref(false);
+
+const fetchCities = async () => {
+  isLoadingCities.value = true;
+  try {
+    const { data, error } = await fetchApiData("cities");
+    if (error) {
+      console.error("Error fetching cities:", error);
+      return;
+    }
+    if (data?.key === "success" && data?.data) {
+      // Handle different response structures
+      let citiesList = [];
+      if (Array.isArray(data.data)) {
+        citiesList = data.data;
+      } else if (data.data.cities && Array.isArray(data.data.cities)) {
+        citiesList = data.data.cities;
+      } else if (data.data.city) {
+        // If single city object, wrap in array
+        citiesList = [data.data.city];
+      }
+      
+      cities.value = citiesList;
+      // Set default city to first city if available
+      if (cities.value.length > 0 && !form.value.city) {
+        form.value.city = cities.value[0].id.toString();
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching cities:", error);
+  } finally {
+    isLoadingCities.value = false;
+  }
+};
+
 const form = ref({
   clientName: "",
   phone: "",
   email: "",
-  city: "riyadh",
+  city: "",
   location: "",
+  lat: "31.22200000",
+  lng: "34.55550000",
+  map_desc: "",
   countryCode: "+966",
   password: "",
   confirmPassword: "",
   acceptTerms: false,
+});
+
+// Fetch cities on mount
+onMounted(() => {
+  fetchCities();
 });
 
 const triggerFileInput = () => {
@@ -566,6 +615,17 @@ const handleLocationConfirm = (locationData: any) => {
       locationData.address ||
       `${locationData.lat?.toFixed?.(5) || ""}, ${locationData.lng?.toFixed?.(5) || ""}`;
     form.value.location = address.trim();
+    
+    // Store lat and lng with 8 decimal places format
+    if (locationData.lat) {
+      form.value.lat = parseFloat(locationData.lat).toFixed(8);
+    }
+    if (locationData.lng) {
+      form.value.lng = parseFloat(locationData.lng).toFixed(8);
+    }
+    
+    // Store map description (address or location description)
+    form.value.map_desc = locationData.address || address || "";
   }
   isLocationModalOpen.value = false;
 };
@@ -575,6 +635,8 @@ const handlePhoneInput = (event: Event) => {
   // Remove all non-numeric characters
   form.value.phone = target.value.replace(/\D/g, '');
 };
+
+ 
 
 // const handleSubmit = async (event: Event) => {
 
@@ -689,6 +751,8 @@ const handleSubmit = async () => {
     return;
   }
 
+  isLoading.value = true;
+  
   const fd = new FormData();
   fd.append("name", form.value.clientName.trim());
   fd.append("phone", form.value.phone);
@@ -696,29 +760,51 @@ const handleSubmit = async () => {
     fd.append("email", form.value.email);
   }
   fd.append("city", form.value.city.trim());
+  fd.append("city_id", form.value.city);
   fd.append("location", form.value.location || "");
+  fd.append("lat", form.value.lat || "31.22200000");
+  fd.append("lng", form.value.lng || "34.55550000");
+  fd.append("map_desc", form.value.map_desc || form.value.location || "");
   fd.append("password", form.value.password);
   fd.append("password_confirmation", form.value.confirmPassword);
   fd.append("country_code", form.value.countryCode);
-  fd.append("device_id", "web");
+  fd.append("device_id", "514789632");
   fd.append("device_type", "web");
   fd.append("lang", "ar");
-  fd.append("iso", "SA");
+  fd.append("iso", "SA"); 
   if (avatarFile.value) {
     fd.append("avatar", avatarFile.value);
   }
-  const { data, error }: any = await submitApiForm("sign-up", fd);
-  if ( error ) {
-    showToast("error", error.msg);
+  
+  try {
+    const { data, error }: any = await submitApiForm("sign-up", fd);
+    if ( error ) {
+      console.error("Registration error:", error);
+      showToast("error", error.msg || error.message || "حدث خطأ أثناء إنشاء الحساب");
+      isLoading.value = false;
+      return;
+    }
+    if ( data.key === "needActive" ) {
+      showToast("success", data.msg);
+      // Updating the user data from store
+      authStore.updateUserData(data.data);
+      navigateTo({
+        name: "register-otp",
+        query: { phone: form.value.phone }
+      });
+    } else {
+      showToast("error", data.msg);
+      isLoading.value = false;
+      return;
+    }
+  } catch (err) {
+    console.error("Registration exception:", err);
+    showToast("error", "حدث خطأ أثناء إنشاء الحساب. الرجاء المحاولة مرة أخرى.");
+    isLoading.value = false;
     return;
   }
-  if ( data.key === "success" ) {
-    showToast("success", data.msg);
-     // Updating the user data from store
-  } else {
-    showToast("error", data.msg);
-  }
-};
+  isLoading.value = false;
+}
 </script>
 
 <style scoped></style>
