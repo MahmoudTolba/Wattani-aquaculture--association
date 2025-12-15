@@ -1528,55 +1528,78 @@
 
             <!-- Packages Tab Content -->
             <div v-if="activeTab === 'packages'" class="space-y-6">
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Golden Package Card -->
-                <div
-                  v-for="(packageItem, index) in packages"
-                  :key="index"
-                  class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow"
+              <div v-if="isLoadingPackages" class="flex justify-center items-center py-12">
+                <div class="text-center">
+                  <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"></div>
+                  <p class="text-gray-600 text-sm">جاري تحميل الباقات...</p>
+                </div>
+              </div>
+
+              <div v-else-if="packagesError" class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                <p class="text-red-600 text-sm">{{ packagesError }}</p>
+                <button
+                  @click="fetchPackages"
+                  class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
                 >
-                  <!-- Header Section -->
-                  <div class="flex items-start justify-between mb-6">
-                    <!-- Price -->
-                    <div class="flex items-center gap-1">
-                      <span
-                        class="text-3xl sm:text-4xl font-bold text-[#15c472]"
-                      >
-                        {{ packageItem.price }}
-                      </span>
-                      <img
-                        src="/icons/green-currency.svg"
-                        alt="currency"
-                        class="w-6 h-6 sm:w-8 sm:h-8"
-                      />
-                    </div>
-                    <!-- Title with Icon -->
-                    <div class="flex items-center gap-2">
-                      <span>🥇 </span>
-                      <span class="text-lg sm:text-xl font-bold text-[#FE9B0E]">
-                        {{ packageItem.title }}
-                      </span>
-                    </div>
-                  </div>
+                  إعادة المحاولة
+                </button>
+              </div>
 
-                  <!-- Features List -->
-                  <ul class="space-y-3 mb-6 text-right list-disc">
-                    <li
-                      v-for="(feature, featureIndex) in packageItem.features"
-                      :key="featureIndex"
-                      class="text-gray-700 text-sm sm:text-base"
-                    >
-                      {{ feature }}
-                    </li>
-                  </ul>
+              <div v-else>
+                <div v-if="packages.length === 0" class="text-center py-12">
+                  <p class="text-gray-500 text-lg">لا توجد باقات متاحة حالياً</p>
+                </div>
 
-                  <!-- Subscribe Button -->
-                  <button
-                    @click="handlePackageSubscribe(packageItem)"
-                    class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
+                <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-6">
+                  <!-- Golden Package Card -->
+                  <div
+                    v-for="(packageItem, index) in packages"
+                    :key="index"
+                    class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow"
                   >
-                    اشتراك
-                  </button>
+                    <!-- Header Section -->
+                    <div class="flex items-start justify-between mb-6">
+                      <!-- Price -->
+                      <div class="flex items-center gap-1">
+                        <span
+                          class="text-3xl sm:text-4xl font-bold text-[#15c472]"
+                        >
+                          {{ packageItem.price }}
+                        </span>
+                        <img
+                          src="/icons/green-currency.svg"
+                          alt="currency"
+                          class="w-6 h-6 sm:w-8 sm:h-8"
+                        />
+                      </div>
+                      <!-- Title with Icon -->
+                      <div class="flex items-center gap-2">
+                        <span>🥇 </span>
+                        <span class="text-lg sm:text-xl font-bold text-[#FE9B0E]">
+                          {{ packageItem.title }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Features List -->
+                    <ul class="space-y-3 mb-6 text-right list-disc">
+                      <li
+                        v-for="(feature, featureIndex) in packageItem.features"
+                        :key="featureIndex"
+                        class="text-gray-700 text-sm sm:text-base"
+                      >
+                        {{ feature }}
+                      </li>
+                    </ul>
+
+                    <!-- Subscribe Button -->
+                    <button
+                      @click="handlePackageSubscribe(packageItem)"
+                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
+                    >
+                      اشتراك
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -3198,12 +3221,33 @@ const fetchFollowers = async (page = 1) => {
   followingError.value = null;
 
   try {
+    // Get token from multiple sources
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+    
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    if (!token) {
+      followingError.value = "يرجى تسجيل الدخول لعرض المتابعين.";
+      return;
+    }
+
     const response = await $fetch(
       "https://backend.wattani-sa.com/api/v1/users/followers",
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         query: {
           page: page,
@@ -3211,6 +3255,11 @@ const fetchFollowers = async (page = 1) => {
         },
       }
     );
+
+    if (response?.key === "unauthenticated") {
+      followingError.value = response?.msg || "يرجى تسجيل الدخول لعرض المتابعين.";
+      return;
+    }
 
     if (response && response.key === "success" && response.data) {
       followingUsers.value = response.data.data.map((user) => ({
@@ -3274,6 +3323,8 @@ watch(activeTab, (newTab) => {
     fetchRatings(ratingsCurrentPage.value || 1);
   } else if (newTab === "faq") {
     fetchFAQContent();
+  } else if (newTab === "packages" && !hasFetchedPackages.value) {
+    fetchPackages();
   }
 });
 
@@ -3298,45 +3349,93 @@ const handleUnfollow = async (userId) => {
   }
 };
 
-// Packages Data
-const packages = ref([
-  {
-    id: 1,
-    price: "70",
-    title: "الباقة الذهبية",
-    features: [
-      "إعلانك في أعلى النتائج دائما",
-      "يظهر في خانة الإعلانات المميزة",
-      'شعار "مميز" ظاهر للمستخدمين',
-      "تثبيت الإعلان لمدة 7 أيام",
-      "5 أضعاف فرص البيع",
-    ],
-  },
-  {
-    id: 2,
-    price: "70",
-    title: "الباقة الذهبية",
-    features: [
-      "إعلانك في أعلى النتائج دائما",
-      "يظهر في خانة الإعلانات المميزة",
-      'شعار "مميز" ظاهر للمستخدمين',
-      "تثبيت الإعلان لمدة 7 أيام",
-      "5 أضعاف فرص البيع",
-    ],
-  },
-  {
-    id: 3,
-    price: "70",
-    title: "الباقة الذهبية",
-    features: [
-      "إعلانك في أعلى النتائج دائما",
-      "يظهر في خانة الإعلانات المميزة",
-      'شعار "مميز" ظاهر للمستخدمين',
-      "تثبيت الإعلان لمدة 7 أيام",
-      "5 أضعاف فرص البيع",
-    ],
-  },
-]);
+// Consultant packages (fetched from API)
+const packages = ref([]);
+const isLoadingPackages = ref(false);
+const packagesError = ref(null);
+const hasFetchedPackages = ref(false);
+
+const mapConsultantPackage = (item, index = 0) => {
+  const rawFeatures = Array.isArray(item?.features)
+    ? item.features
+    : (item?.description || item?.details || "")
+        .split(/<br\s*\/?>|\r?\n/g)
+        .map((feature) => feature.replace(/<\/?[^>]+(>|$)/g, "").trim())
+        .filter(Boolean);
+
+  return {
+    id: item?.id ?? item?.package_id ?? `pkg-${index + 1}`,
+    price: String(
+      item?.price ??
+      item?.price_after_discount ??
+      item?.package_price ??
+      item?.amount ??
+      0
+    ),
+    title: item?.title ?? item?.name ?? item?.name_ar ?? "باقات استشارية",
+    features: rawFeatures.length ? rawFeatures : ["لا توجد مميزات متاحة لهذه الباقة"],
+  };
+};
+
+const fetchPackages = async () => {
+  isLoadingPackages.value = true;
+  packagesError.value = null;
+
+  try {
+    // Try to get auth token (API requires authentication)
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    if (!token) {
+      packagesError.value = "يرجى تسجيل الدخول لعرض الباقات.";
+      return;
+    }
+
+    const response = await $fetch("https://backend.wattani-sa.com/api/v1/consultant-packages", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+
+    if (response?.key === "unauthenticated") {
+      packagesError.value = response?.msg || "يرجى تسجيل الدخول لعرض الباقات.";
+      return;
+    }
+
+    const apiPackages =
+      (Array.isArray(response?.data) && response.data) ||
+      (Array.isArray(response?.data?.packages) && response.data.packages) ||
+      (Array.isArray(response?.packages) && response.packages) ||
+      (Array.isArray(response) && response) ||
+      [];
+
+    packages.value = apiPackages.map((pkg, index) => mapConsultantPackage(pkg, index));
+    hasFetchedPackages.value = true;
+  } catch (error) {
+    console.error("Error fetching consultant packages:", error);
+    packagesError.value =
+      error?.data?.msg ||
+      error?.message ||
+      "تعذر تحميل الباقات في الوقت الحالي، حاول مرة أخرى لاحقاً.";
+  } finally {
+    isLoadingPackages.value = false;
+  }
+};
 
 // Subscription Data
 const subscriptions = ref([
@@ -4057,6 +4156,31 @@ const handleJoinConsultantSubmit = async () => {
   isSubmittingConsultant.value = true;
 
   try {
+    // Get token for authenticated request
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    if (!token) {
+      toast.add({
+        severity: "warn",
+        summary: "تنبيه",
+        detail: "يرجى تسجيل الدخول قبل إرسال الطلب.",
+        life: 3000,
+      });
+      return;
+    }
+
     // Create FormData for file upload
     const formData = new FormData();
     formData.append("cv", cvFile.value);
@@ -4068,6 +4192,9 @@ const handleJoinConsultantSubmit = async () => {
       "https://backend.wattani-sa.com/api/v1/consultant-application",
       {
         method: "POST",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: formData,
       }
     );
@@ -4142,13 +4269,28 @@ const confirmLogout = async () => {
     (process.client && localStorage.getItem("device_id")) || "11111111111";
 
   try {
+    // Prepare token from multiple sources
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+    
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
     const response = await $fetch(
       "https://backend.wattani-sa.com/api/v1/sign-out",
       {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          ...(userStore.token ? { Authorization: `Bearer ${userStore.token}` } : {}),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         query: {
           device_id: deviceId,
