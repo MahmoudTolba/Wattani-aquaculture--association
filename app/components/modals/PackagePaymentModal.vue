@@ -94,10 +94,16 @@
         <div class="px-6 pb-6">
           <button
             type="button"
-            class="w-full bg-gradient-to-r from-[#0A717E] to-[#15C472] text-white font-semibold py-3 rounded-lg shadow-sm hover:opacity-90 transition-all duration-200"
+            :disabled="loading"
+            class="w-full bg-gradient-to-r from-[#0A717E] to-[#15C472] text-white font-semibold py-3 rounded-lg shadow-sm hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             @click="handleConfirm"
           >
-            تأكيد
+            <span v-if="loading" class="animate-spin">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </span>
+            <span>{{ loading ? "جاري المعالجة..." : "تأكيد" }}</span>
           </button>
         </div>
       </div>
@@ -116,6 +122,10 @@ const props = defineProps({
   paymentMethod: {
     type: String,
     default: "wallet",
+  },
+  loading: {
+    type: Boolean,
+    default: false,
   },
 });
 

@@ -1119,7 +1119,7 @@
               <!-- Ads Grid -->
               <div v-else>
                 <div
-                  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
+                  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 md:grid-cols-2 gap-4 sm:gap-6"
                 >
                   <article
                     v-for="ad in myAds"
@@ -1606,78 +1606,102 @@
 
             <!-- Subscription Tab Content -->
             <div v-if="activeTab === 'subscription'" class="space-y-6">
-              <div
-                class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-3 2xl:grid-cols-3 gap-6"
-              >
-                <!-- Subscription Cards -->
-                <div
-                  v-for="(subscription, index) in subscriptions"
-                  :key="index"
-                  class="bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow"
+              <div v-if="isLoadingSubscriptions" class="flex justify-center items-center py-12">
+                <div class="text-center">
+                  <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"></div>
+                  <p class="text-gray-600 text-sm">جاري تحميل الاشتراكات...</p>
+                </div>
+              </div>
+
+              <div v-else-if="subscriptionsError" class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                <p class="text-red-600 text-sm">{{ subscriptionsError }}</p>
+                <button
+                  @click="fetchSubscriptions"
+                  class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
                 >
-                  <!-- Header Section -->
-                  <div class="flex items-start justify-between mb-6">
-                    <!-- Price -->
-                    <div class="flex items-center gap-1">
-                      <span
-                        class="text-3xl sm:text-4xl font-bold text-[#15c472]"
-                      >
-                        {{ subscription.price }}
-                      </span>
-                      <img
-                        src="/icons/green-currency.svg"
-                        alt="currency"
-                        class="w-6 h-6 sm:w-8 sm:h-8"
-                      />
-                    </div>
-                    <!-- Title with Medal Icon -->
-                    <div class="flex items-center gap-2">
-                      <span
-                        class="text-xl sm:text-2xl font-bold text-orange-500"
-                      >
-                        {{ subscription.title }}
-                      </span>
-                      <div class="relative">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="w-6 h-6 sm:w-7 sm:h-7 text-orange-500"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 2.18l8 4v8.82c0 4.54-3.07 8.83-8 9.81-4.93-.98-8-5.27-8-9.81V8.18l8-4z"
-                          />
-                          <path
-                            d="M5 16L3 5l5.5 3L12 4l3.5 4L21 5l-2 11H5zm2.7-1h8.6l1.1-7.4-3.5 4.5L12 8l-1.9 4.1-3.5-4.5L7.7 15z"
-                          />
-                        </svg>
+                  إعادة المحاولة
+                </button>
+              </div>
+
+              <div v-else>
+                <div v-if="subscriptions.length === 0" class="text-center py-12">
+                  <p class="text-gray-500 text-lg">لا توجد اشتراكات حالياً</p>
+                </div>
+
+                <div
+                  v-else
+                  class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-3 2xl:grid-cols-3 gap-6"
+                >
+                  <!-- Subscription Cards -->
+                  <div
+                    v-for="(subscription, index) in subscriptions"
+                    :key="index"
+                    class="bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <!-- Header Section -->
+                    <div class="flex items-start justify-between mb-6">
+                      <!-- Price -->
+                      <div class="flex items-center gap-1">
                         <span
-                          class="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center text-[10px] sm:text-xs font-bold text-orange-500"
+                          class="text-3xl sm:text-4xl font-bold text-[#15c472]"
                         >
-                          {{ subscription.medalNumber }}
+                          {{ subscription.price }}
                         </span>
+                        <img
+                          src="/icons/green-currency.svg"
+                          alt="currency"
+                          class="w-6 h-6 sm:w-8 sm:h-8"
+                        />
+                      </div>
+                      <!-- Title with Medal Icon -->
+                      <div class="flex items-center gap-2">
+                        <span
+                          class="text-xl sm:text-2xl font-bold text-orange-500"
+                        >
+                          {{ subscription.title }}
+                        </span>
+                        <div class="relative">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-6 h-6 sm:w-7 sm:h-7 text-orange-500"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 2.18l8 4v8.82c0 4.54-3.07 8.83-8 9.81-4.93-.98-8-5.27-8-9.81V8.18l8-4z"
+                            />
+                            <path
+                              d="M5 16L3 5l5.5 3L12 4l3.5 4L21 5l-2 11H5zm2.7-1h8.6l1.1-7.4-3.5 4.5L12 8l-1.9 4.1-3.5-4.5L7.7 15z"
+                            />
+                          </svg>
+                          <span
+                            class="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center text-[10px] sm:text-xs font-bold text-orange-500"
+                          >
+                            {{ subscription.medalNumber || subscription.id }}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <!-- Features List -->
-                  <ul class="space-y-3 mb-6 text-right list-disc pr-6">
-                    <li
-                      v-for="(feature, featureIndex) in subscription.features"
-                      :key="featureIndex"
-                      class="text-gray-700 text-sm sm:text-base"
+                    <!-- Features List -->
+                    <ul class="space-y-3 mb-6 text-right list-disc pr-6">
+                      <li
+                        v-for="(feature, featureIndex) in subscription.features"
+                        :key="featureIndex"
+                        class="text-gray-700 text-sm sm:text-base"
+                      >
+                        {{ feature }}
+                      </li>
+                    </ul>
+
+                    <!-- Renew Button -->
+                    <button
+                      @click="handleRenewSubscription(subscription)"
+                      class="w-full bg-gradient-to-r from-[#0A717E] to-[#15C472] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
                     >
-                      {{ feature }}
-                    </li>
-                  </ul>
-
-                  <!-- Renew Button -->
-                  <button
-                    @click="handleRenewSubscription(subscription)"
-                    class="w-full bg-gradient-to-r from-[#0A717E] to-[#15C472] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
-                  >
-                    تجديد
-                  </button>
+                      تجديد
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2564,6 +2588,7 @@
     <PackagePaymentModal
       v-model="isPackagePaymentModalOpen"
       :payment-method="selectedPackagePaymentMethod"
+      :loading="isSubscribingPackage"
       @confirm="handlePackagePaymentConfirm"
     />
 
@@ -2651,6 +2676,7 @@ const isSuccessModalOpen = ref(false);
 const isPackagePaymentModalOpen = ref(false);
 const selectedPackagePaymentMethod = ref("wallet");
 const selectedPackage = ref(null);
+const isSubscribingPackage = ref(false);
 
 // Logout Modal State
 const isLogoutModalOpen = ref(false);
@@ -3325,6 +3351,8 @@ watch(activeTab, (newTab) => {
     fetchFAQContent();
   } else if (newTab === "packages" && !hasFetchedPackages.value) {
     fetchPackages();
+  } else if (newTab === "subscription" && !hasFetchedSubscriptions.value) {
+    fetchSubscriptions();
   }
 });
 
@@ -3437,48 +3465,95 @@ const fetchPackages = async () => {
   }
 };
 
-// Subscription Data
-const subscriptions = ref([
-  {
-    id: 1,
-    price: "70",
-    title: "الباقة الذهبية",
-    medalNumber: "1",
-    features: [
-      "إعلانك في أعلى النتائج دائما",
-      "يظهر في خانة الإعلانات المميزة",
-      'شعار "مميز" ظاهر للمستخدمين',
-      "تثبيت الإعلان لمدة 7 أيام",
-      "٥ أضعاف فرص البيع",
-    ],
-  },
-  {
-    id: 2,
-    price: "70",
-    title: "الباقة الذهبية",
-    medalNumber: "1",
-    features: [
-      "إعلانك في أعلى النتائج دائما",
-      "يظهر في خانة الإعلانات المميزة",
-      'شعار "مميز" ظاهر للمستخدمين',
-      "تثبيت الإعلان لمدة 7 أيام",
-      "٥ أضعاف فرص البيع",
-    ],
-  },
-  {
-    id: 3,
-    price: "70",
-    title: "الباقة الذهبية",
-    medalNumber: "1",
-    features: [
-      "إعلانك في أعلى النتائج دائما",
-      "يظهر في خانة الإعلانات المميزة",
-      'شعار "مميز" ظاهر للمستخدمين',
-      "تثبيت الإعلان لمدة 7 أيام",
-      "٥ أضعاف فرص البيع",
-    ],
-  },
-]);
+// Subscription Data (fetched from API)
+const subscriptions = ref([]);
+const isLoadingSubscriptions = ref(false);
+const subscriptionsError = ref(null);
+const hasFetchedSubscriptions = ref(false);
+
+const mapSubscription = (item, index = 0) => {
+  const rawFeatures = Array.isArray(item?.features)
+    ? item.features
+    : (item?.description || item?.details || "")
+        .split(/<br\s*\/?>|\r?\n/g)
+        .map((feature) => feature.replace(/<\/?[^>]+(>|$)/g, "").trim())
+        .filter(Boolean);
+
+  return {
+    id: item?.id ?? item?.subscription_id ?? `sub-${index + 1}`,
+    packageId: item?.package_id ?? item?.packageId ?? item?.id ?? item?.subscription_id ?? `sub-${index + 1}`,
+    price: String(
+      item?.price ??
+      item?.price_after_discount ??
+      item?.subscription_price ??
+      item?.amount ??
+      0
+    ),
+    title: item?.title ?? item?.name ?? item?.name_ar ?? "اشتراك",
+    medalNumber: item?.medalNumber ?? item?.rank ?? item?.order ?? index + 1,
+    features: rawFeatures.length ? rawFeatures : ["لا توجد مميزات متاحة لهذا الاشتراك"],
+  };
+};
+
+const fetchSubscriptions = async () => {
+  isLoadingSubscriptions.value = true;
+  subscriptionsError.value = null;
+
+  try {
+    // Get token
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    if (!token) {
+      subscriptionsError.value = "يرجى تسجيل الدخول لعرض الاشتراكات.";
+      return;
+    }
+
+    const response = await $fetch("https://backend.wattani-sa.com/api/v1/my-consultant-subscriptions", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+
+    if (response?.key === "unauthenticated") {
+      subscriptionsError.value = response?.msg || "يرجى تسجيل الدخول لعرض الاشتراكات.";
+      return;
+    }
+
+    const apiSubs =
+      (Array.isArray(response?.data) && response.data) ||
+      (Array.isArray(response?.data?.subscriptions) && response.data.subscriptions) ||
+      (Array.isArray(response?.subscriptions) && response.subscriptions) ||
+      (Array.isArray(response) && response) ||
+      [];
+
+    subscriptions.value = apiSubs.map((sub, index) => mapSubscription(sub, index));
+    hasFetchedSubscriptions.value = true;
+  } catch (error) {
+    console.error("Error fetching consultant subscriptions:", error);
+    subscriptionsError.value =
+      error?.data?.msg ||
+      error?.message ||
+      "تعذر تحميل الاشتراكات حالياً، حاول مرة أخرى لاحقاً.";
+  } finally {
+    isLoadingSubscriptions.value = false;
+  }
+};
 
 // Complaints Data
 const complaints = ref([
@@ -3902,31 +3977,142 @@ const openPackagePaymentModal = () => {
 };
 
 
-const handlePackagePaymentConfirm = (paymentMethod) => {
+const handlePackagePaymentConfirm = async (paymentMethod) => {
   if (!selectedPackage.value) {
     return;
   }
+
+  const packageId = selectedPackage.value.id;
+  if (!packageId) {
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: "معرف الباقة غير موجود",
+      life: 3000,
+    });
+    return;
+  }
+
+  isSubscribingPackage.value = true;
   selectedPackagePaymentMethod.value = paymentMethod;
-  console.log("Processing package payment:", selectedPackage.value);
-  console.log("Selected payment method:", paymentMethod);
-  // Add your payment processing logic here
 
-  // Close package payment modal
-  isPackagePaymentModalOpen.value = false;
-  selectedPackagePaymentMethod.value = "wallet";
-  selectedPackage.value = null;
+  try {
+    // Get token from multiple sources
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+    
+    // If no token found, try to get from localStorage
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error('Error getting token from localStorage:', e);
+      }
+    }
 
-  // Open success modal after a delay
-  setTimeout(() => {
-    isSuccessModalOpen.value = true;
-  }, 200);
+    // If still no token, try authStore
+    if (!token) {
+      const authStore = useAuthStore();
+      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+        token = authStore.authUser.token;
+      } else if (authStore.token) {
+        token = authStore.token;
+      }
+    }
+
+    if (!token) {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: "يرجى تسجيل الدخول أولاً",
+        life: 3000,
+      });
+      return;
+    }
+
+    const response = await $fetch(
+      `https://backend.wattani-sa.com/api/v1/consultant-packages/${packageId}/subscribe-with-payment`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: {
+          payment_method: paymentMethod,
+          lang: "ar",
+          iso: "SA",
+        },
+      }
+    );
+
+    if (response && response.key === "success") {
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم الاشتراك في الباقة بنجاح",
+        life: 3000,
+      });
+
+      // Close package payment modal
+      isPackagePaymentModalOpen.value = false;
+      selectedPackagePaymentMethod.value = "wallet";
+      selectedPackage.value = null;
+
+      // Refresh packages list to show updated subscription status
+      if (hasFetchedPackages.value) {
+        await fetchPackages();
+      }
+
+      // Refresh subscriptions list if it was fetched (for renewals)
+      if (hasFetchedSubscriptions.value) {
+        await fetchSubscriptions();
+      }
+
+      // Open success modal after a delay
+      setTimeout(() => {
+        isSuccessModalOpen.value = true;
+      }, 200);
+    } else {
+      throw new Error(response?.msg || "فشل في الاشتراك في الباقة");
+    }
+  } catch (err) {
+    console.error("Error subscribing to package:", err);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        err?.data?.msg ||
+        err?.message ||
+        err?.data?.message ||
+        "حدث خطأ أثناء الاشتراك في الباقة. الرجاء المحاولة مرة أخرى.",
+      life: 3000,
+    });
+  } finally {
+    isSubscribingPackage.value = false;
+  }
 };
 
 const handleRenewSubscription = (subscription) => {
-  console.log("Renewing subscription:", subscription);
   // Open the package payment modal with the subscription data
+  // Use packageId if available, otherwise fall back to id
+  const packageId = subscription.packageId || subscription.id;
+  
+  if (!packageId) {
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: "معرف الباقة غير موجود",
+      life: 3000,
+    });
+    return;
+  }
+
   selectedPackage.value = {
-    id: subscription.id,
+    id: packageId,
     price: subscription.price,
     title: subscription.title,
     features: subscription.features,
