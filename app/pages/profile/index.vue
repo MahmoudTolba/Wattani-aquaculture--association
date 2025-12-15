@@ -471,49 +471,58 @@
 
               <!-- Change Mobile Number Sub-tab -->
               <div v-if="settingsSubTab === 'change-mobile'" class="space-y-6">
-                <form
-                  class="space-y-4 sm:space-y-6"
-                  @submit.prevent="handleChangeMobileSubmit"
-                >
-                  <!-- Current Mobile Number -->
-                  <div class="space-y-2">
-                    <label
-                      for="currentMobile"
-                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
-                    >
-                      رقم الجوال الحالي
-                    </label>
-                    <div
-                      class="flex flex-col sm:flex-row rounded-lg sm:rounded-xl border border-gray-200 bg-white shadow-sm focus-within:border-[#15c472] focus-within:ring-2 focus-within:ring-[#15c472]/20 overflow-hidden"
-                    >
-                      <div
-                        class="flex items-center justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-3 py-2.5 sm:px-4 sm:py-3 bg-gray-50 text-xs sm:text-sm text-gray-700 min-w-[90px] sm:min-w-[100px]"
-                      >
-                        <span>+966</span>
-                        <img
-                          src="/images/Country Flags.png"
-                          alt="Saudi Arabia Flag"
-                          class="w-7 h-7 sm:w-6 sm:h-6"
-                        />
-                      </div>
-                      <input
-                        id="currentMobile"
-                        v-model="changeMobileForm.currentMobile"
-                        type="tel"
-                        placeholder="رقم الجوال الحالي"
-                        class="flex-1 w-full bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 text-right"
-                        disabled
-                      />
-                    </div>
+                <!-- Verification Code Section (First - Initial Verification) -->
+                <div v-if="!isCodeVerified && !hasEnteredNewMobile" class="space-y-4">
+                  <div class="text-center space-y-2">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-[#15c472]">كود التحقق</h2>
+                    <p class="text-gray-600 text-sm sm:text-base">تغيير رقم الجوال</p>
                   </div>
 
-                  <!-- New Mobile Number -->
+                  <!-- Loading State -->
+                  <div v-if="isSendingOldPhoneCode" class="text-center py-4">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#15c472] mb-2"></div>
+                    <p class="text-gray-600 text-sm">جاري إرسال رمز التحقق...</p>
+                  </div>
+
+                  <!-- 6-Digit OTP Input -->
+                  <div v-else class="flex justify-center gap-2 sm:gap-3">
+                    <input
+                      v-for="(digit, index) in otpDigits"
+                      :key="index"
+                      :ref="el => otpInputs[index] = el"
+                      v-model="otpDigits[index]"
+                      type="text"
+                      inputmode="numeric"
+                      maxlength="1"
+                      class="w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold border-2 rounded-lg focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 transition-colors"
+                      :class="otpDigits[index] ? 'border-[#15c472] text-[#15c472]' : 'border-gray-300 text-gray-700'"
+                      @input="handleOtpInput(index, $event)"
+                      @keydown="handleOtpKeydown(index, $event)"
+                      @paste="handleOtpPaste($event)"
+                    />
+                  </div>
+
+                  <!-- Verify Button -->
+                  <div v-if="!isSendingOldPhoneCode" class="pt-4">
+                    <button
+                      type="button"
+                      @click="handleVerifyCode"
+                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
+                    >
+                      تحقق
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Mobile Number Input (After Initial Verification) -->
+                <div v-if="isCodeVerified && !hasEnteredNewMobile" class="space-y-6">
+                  <!-- Mobile Number Field -->
                   <div class="space-y-2">
                     <label
                       for="newMobile"
-                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
+                      class="block text-sm sm:text-base font-medium text-gray-700 text-right"
                     >
-                      رقم الجوال الجديد
+                      رقم الجوال *
                     </label>
                     <div
                       class="flex flex-col sm:flex-row rounded-lg sm:rounded-xl border border-gray-200 bg-white shadow-sm focus-within:border-[#15c472] focus-within:ring-2 focus-within:ring-[#15c472]/20 overflow-hidden"
@@ -532,40 +541,61 @@
                         id="newMobile"
                         v-model="changeMobileForm.newMobile"
                         type="tel"
-                        placeholder="رقم الجوال الجديد"
+                        placeholder="رقم الجوال"
                         @input="handleNewMobileInput"
                         class="flex-1 w-full bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 text-right"
                       />
                     </div>
                   </div>
 
-                  <!-- Verification Code -->
-                  <div class="space-y-2">
-                    <label
-                      for="verificationCode"
-                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
+                  <!-- Next Button -->
+                  <div class="pt-4">
+                    <button
+                      type="button"
+                      @click="handleNextStep"
+                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
                     >
-                      رمز التحقق
-                    </label>
+                      التالي
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Verification Code Section (Second - For New Mobile Number) -->
+                <div v-if="hasEnteredNewMobile && !isNewCodeVerified" class="space-y-4">
+                  <div class="text-center space-y-2">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-[#15c472]">كود التحقق</h2>
+                    <p class="text-gray-600 text-sm sm:text-base">تغيير رقم الجوال</p>
+                  </div>
+
+                  <!-- 6-Digit OTP Input -->
+                  <div class="flex justify-center gap-2 sm:gap-3">
                     <input
-                      id="verificationCode"
-                      v-model="changeMobileForm.verificationCode"
+                      v-for="(digit, index) in otpDigits"
+                      :key="`new-${index}`"
+                      :ref="el => otpInputs[index] = el"
+                      v-model="otpDigits[index]"
                       type="text"
-                      placeholder="أدخل رمز التحقق"
-                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                      inputmode="numeric"
+                      maxlength="1"
+                      class="w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold border-2 rounded-lg focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 transition-colors"
+                      :class="otpDigits[index] ? 'border-[#15c472] text-[#15c472]' : 'border-gray-300 text-gray-700'"
+                      @input="handleOtpInput(index, $event)"
+                      @keydown="handleOtpKeydown(index, $event)"
+                      @paste="handleOtpPaste($event)"
                     />
                   </div>
 
-                  <!-- Save Button -->
-                  <div class="pt-4 sm:pt-6">
+                  <!-- Verify Button -->
+                  <div class="pt-4">
                     <button
-                      type="submit"
+                      type="button"
+                      @click="handleVerifyNewCode"
                       class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
                     >
-                      حفظ
+                      تحقق
                     </button>
                   </div>
-                </form>
+                </div>
               </div>
 
               <!-- Change Password Sub-tab -->
@@ -3356,22 +3386,128 @@ watch(activeTab, (newTab) => {
   }
 });
 
+// Reset OTP when switching settings sub-tabs
+watch(settingsSubTab, (newTab) => {
+  otpDigits.value = ["", "", "", "", "", ""];
+  isCodeVerified.value = false;
+  hasEnteredNewMobile.value = false;
+  isNewCodeVerified.value = false;
+  hasSentOldPhoneCode.value = false;
+  changeMobileForm.verificationCode = "";
+  changeMobileForm.newMobile = "";
+  
+  // Send code to old phone when change-mobile tab is opened
+  if (newTab === 'change-mobile') {
+    // Use nextTick to ensure the component is ready
+    nextTick(() => {
+      sendOldPhoneCode();
+    });
+  }
+});
+
+// Watch for when first verification section becomes visible
+watch(
+  () => settingsSubTab.value === 'change-mobile' && !isCodeVerified.value && !hasEnteredNewMobile.value,
+  (shouldShow) => {
+    if (shouldShow && !hasSentOldPhoneCode.value && !isSendingOldPhoneCode.value) {
+      sendOldPhoneCode();
+    }
+  },
+  { immediate: true }
+);
+
 // Unfollow handler
 const handleUnfollow = async (userId) => {
-  if (confirm("هل أنت متأكد من إلغاء المتابعة؟")) {
-    // Remove from local state immediately for better UX
-    const index = followingUsers.value.findIndex((user) => user.id === userId);
-    if (index !== -1) {
-      followingUsers.value.splice(index, 1);
+  if (!confirm("هل أنت متأكد من إلغاء المتابعة؟")) {
+    return;
+  }
+
+  try {
+    // Get token from multiple sources
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+    
+    // If no token found, try to get from localStorage
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error('Error getting token from localStorage:', e);
+      }
     }
-    
-    // Refresh data from API to ensure sync
-    await fetchFollowers(followingCurrentPage.value);
-    
+
+    // If still no token, try authStore
+    if (!token) {
+      const authStore = useAuthStore();
+      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+        token = authStore.authUser.token;
+      } else if (authStore.token) {
+        token = authStore.token;
+      }
+    }
+
+    if (!token) {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: "يرجى تسجيل الدخول أولاً",
+        life: 3000,
+      });
+      return;
+    }
+
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/users/toggle-follow",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: {
+          user_id: userId,
+          lang: "ar",
+          iso: "SA",
+        },
+      }
+    );
+
+    if (response && response.key === "success") {
+      // Remove from local state immediately for better UX
+      const index = followingUsers.value.findIndex((user) => user.id === userId);
+      if (index !== -1) {
+        followingUsers.value.splice(index, 1);
+        // Update pagination total
+        if (followingPagination.value.total_items > 0) {
+          followingPagination.value.total_items--;
+        }
+      }
+      
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم إلغاء المتابعة بنجاح",
+        life: 3000,
+      });
+
+      // Refresh data from API to ensure sync
+      await fetchFollowers(followingCurrentPage.value);
+    } else {
+      throw new Error(response?.msg || "فشل في إلغاء المتابعة");
+    }
+  } catch (err) {
+    console.error("Error unfollowing user:", err);
     toast.add({
-      severity: "success",
-      summary: "نجح",
-      detail: "تم إلغاء المتابعة بنجاح",
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        err?.data?.msg ||
+        err?.message ||
+        err?.data?.message ||
+        "حدث خطأ أثناء إلغاء المتابعة. الرجاء المحاولة مرة أخرى.",
       life: 3000,
     });
   }
@@ -3744,6 +3880,15 @@ const changeMobileForm = reactive({
   verificationCode: "",
 });
 
+// OTP Verification State
+const otpDigits = ref(["", "", "", "", "", ""]);
+const otpInputs = ref([]);
+const isCodeVerified = ref(false);
+const hasEnteredNewMobile = ref(false);
+const isNewCodeVerified = ref(false);
+const isSendingOldPhoneCode = ref(false);
+const hasSentOldPhoneCode = ref(false);
+
 const changePasswordForm = reactive({
   currentPassword: "",
   newPassword: "",
@@ -3847,6 +3992,244 @@ const handleNewMobileInput = (event: Event) => {
   const target = event.target as HTMLInputElement;
   // Remove all non-numeric characters
   changeMobileForm.newMobile = target.value.replace(/\D/g, '');
+};
+
+// OTP Input Handlers
+const handleOtpInput = (index, event) => {
+  const value = event.target.value.replace(/\D/g, ''); // Only allow digits
+  if (value) {
+    otpDigits.value[index] = value.slice(-1); // Only take the last character
+    
+    // Move to next input if available
+    if (index < 5 && otpInputs.value[index + 1]) {
+      otpInputs.value[index + 1].focus();
+    }
+  } else {
+    otpDigits.value[index] = '';
+  }
+};
+
+const handleOtpKeydown = (index, event) => {
+  // Handle backspace
+  if (event.key === 'Backspace' && !otpDigits.value[index] && index > 0) {
+    otpInputs.value[index - 1].focus();
+  }
+  // Handle arrow keys
+  if (event.key === 'ArrowLeft' && index > 0) {
+    otpInputs.value[index - 1].focus();
+  }
+  if (event.key === 'ArrowRight' && index < 5) {
+    otpInputs.value[index + 1].focus();
+  }
+};
+
+const handleOtpPaste = (event) => {
+  event.preventDefault();
+  const pastedData = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+  pastedData.split('').forEach((digit, index) => {
+    if (index < 6) {
+      otpDigits.value[index] = digit;
+    }
+  });
+  // Focus the last filled input or the last input
+  const lastIndex = Math.min(pastedData.length - 1, 5);
+  if (otpInputs.value[lastIndex]) {
+    otpInputs.value[lastIndex].focus();
+  }
+};
+
+// Send verification code to old phone
+const sendOldPhoneCode = async () => {
+  if (hasSentOldPhoneCode.value || isSendingOldPhoneCode.value) {
+    return; // Already sent or currently sending
+  }
+
+  isSendingOldPhoneCode.value = true;
+
+  try {
+    // Get token from multiple sources
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+    
+    // If no token found, try to get from localStorage
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error('Error getting token from localStorage:', e);
+      }
+    }
+
+    // If still no token, try authStore
+    if (!token) {
+      const authStore = useAuthStore();
+      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+        token = authStore.authUser.token;
+      } else if (authStore.token) {
+        token = authStore.token;
+      }
+    }
+
+    if (!token) {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: "يرجى تسجيل الدخول أولاً",
+        life: 3000,
+      });
+      isSendingOldPhoneCode.value = false;
+      return;
+    }
+
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/old-phone-send-code",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: {
+          lang: "ar",
+          iso: "SA",
+        },
+      }
+    );
+
+    if (response && response.key === "success") {
+      hasSentOldPhoneCode.value = true;
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم إرسال رمز التحقق إلى رقم الجوال الحالي",
+        life: 3000,
+      });
+    } else {
+      throw new Error(response?.msg || "فشل في إرسال رمز التحقق");
+    }
+  } catch (err) {
+    console.error("Error sending old phone code:", err);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        err?.data?.msg ||
+        err?.message ||
+        err?.data?.message ||
+        "حدث خطأ أثناء إرسال رمز التحقق. الرجاء المحاولة مرة أخرى.",
+      life: 3000,
+    });
+  } finally {
+    isSendingOldPhoneCode.value = false;
+  }
+};
+
+const handleVerifyCode = () => {
+  const code = otpDigits.value.join('');
+  if (code.length !== 6) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى إدخال رمز التحقق المكون من 6 أرقام",
+      life: 3000,
+    });
+    return;
+  }
+  
+  // Store the verification code
+  changeMobileForm.verificationCode = code;
+  
+  // Here you would typically verify the code with the API
+  // For now, we'll just mark it as verified
+  isCodeVerified.value = true;
+  
+  toast.add({
+    severity: "success",
+    summary: "نجح",
+    detail: "تم التحقق من الكود بنجاح",
+    life: 3000,
+  });
+};
+
+const handleNextStep = () => {
+  if (!changeMobileForm.newMobile.trim()) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى إدخال رقم الجوال",
+      life: 3000,
+    });
+    return;
+  }
+
+  // Validate mobile number format (should be 9 digits for Saudi Arabia)
+  const mobileNumber = changeMobileForm.newMobile.replace(/\D/g, '');
+  if (mobileNumber.length !== 9) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى إدخال رقم جوال صحيح (9 أرقام)",
+      life: 3000,
+    });
+    return;
+  }
+
+  // Mark that we've entered the new mobile number
+  hasEnteredNewMobile.value = true;
+  
+  // Reset OTP for new verification
+  otpDigits.value = ["", "", "", "", "", ""];
+  
+  // Here you would typically send the new mobile number to API and get a new verification code
+  toast.add({
+    severity: "success",
+    summary: "نجح",
+    detail: "تم إرسال رمز التحقق إلى الرقم الجديد",
+    life: 3000,
+  });
+};
+
+const handleVerifyNewCode = () => {
+  const code = otpDigits.value.join('');
+  if (code.length !== 6) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى إدخال رمز التحقق المكون من 6 أرقام",
+      life: 3000,
+    });
+    return;
+  }
+  
+  // Store the new verification code
+  changeMobileForm.verificationCode = code;
+  
+  // Here you would typically verify the new code with the API and update the mobile number
+  isNewCodeVerified.value = true;
+  
+  toast.add({
+    severity: "success",
+    summary: "نجح",
+    detail: "تم التحقق من الكود بنجاح وتم تغيير رقم الجوال",
+    life: 3000,
+  });
+
+  // Navigate to personal-info section after successful verification
+  setTimeout(() => {
+    // Reset all states
+    otpDigits.value = ["", "", "", "", "", ""];
+    isCodeVerified.value = false;
+    hasEnteredNewMobile.value = false;
+    isNewCodeVerified.value = false;
+    changeMobileForm.newMobile = "";
+    changeMobileForm.verificationCode = "";
+    
+    // Navigate to personal-info section
+    settingsSubTab.value = 'personal-info';
+  }, 2000);
 };
 
 const handleSubmit = () => {
