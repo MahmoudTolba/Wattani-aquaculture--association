@@ -53,7 +53,7 @@
                   />
                   <button
                     type="button"
-                    @click="$refs.profileAvatarInput?.click()"
+                    @click="(profileAvatarInput as any)?.click()"
                     class="absolute bottom-0 right-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-[#15c472] rounded-full flex items-center justify-center shadow-lg hover:bg-[#12a866] transition-colors"
                     aria-label="Edit Profile Picture"
                   >
@@ -500,7 +500,7 @@
                     <input
                       v-for="(digit, index) in otpDigits"
                       :key="index"
-                      :ref="(el) => (otpInputs[index] = el)"
+                      :ref="(el) => { if (el) otpInputs[index] = el as HTMLElement; }"
                       v-model="otpDigits[index]"
                       type="text"
                       inputmode="numeric"
@@ -674,7 +674,7 @@
                     <input
                       v-for="(digit, index) in otpDigits"
                       :key="`new-${index}`"
-                      :ref="(el) => (otpInputs[index] = el)"
+                      :ref="(el) => { if (el) otpInputs[index] = el as HTMLElement; }"
                       v-model="otpDigits[index]"
                       type="text"
                       inputmode="numeric"
@@ -2862,7 +2862,7 @@
     <!-- Commission Payment Modal -->
     <CommissionPaymentModal
       v-model="isCommissionPaymentModalOpen"
-      :payment-method="selectedCommissionPaymentMethod"
+      :payment-method="typeof selectedCommissionPaymentMethod === 'string' ? selectedCommissionPaymentMethod : (selectedCommissionPaymentMethod as any)"
       @confirm="handleCommissionPaymentConfirm"
     />
 
@@ -2872,7 +2872,7 @@
     <!-- Package Payment Modal -->
     <PackagePaymentModal
       v-model="isPackagePaymentModalOpen"
-      :payment-method="selectedPackagePaymentMethod"
+      :payment-method="typeof selectedPackagePaymentMethod === 'string' ? selectedPackagePaymentMethod : (selectedPackagePaymentMethod as any)"
       :loading="isSubscribingPackage"
       @confirm="handlePackagePaymentConfirm"
     />
@@ -2912,6 +2912,88 @@ import DeleteAdModal from "~/components/modals/DeleteAdModal.vue";
 import LocationModal from "~/components/modals/LocationModal.vue";
 import { useUserStore } from "~/stores/user";
 
+// Type definitions
+interface ApiResponse<T = any> {
+  key?: string;
+  msg?: string;
+  message?: string;
+  data?: T;
+}
+
+interface FAQItem {
+  id: number;
+  question: string;
+  answer: string;
+}
+
+interface Review {
+  id: number;
+  rating: number;
+  comment: string;
+  name?: string;
+  text?: string;
+  user?: {
+    name: string;
+    avatar: string;
+  };
+  created_at?: string;
+}
+
+interface User {
+  id: number;
+  name: string;
+  avatar: string;
+  token?: string;
+  access_token?: string;
+}
+
+interface Package {
+  id: number;
+  title: string;
+  price: string;
+  features: string[];
+}
+
+interface Subscription {
+  id: number;
+  title: string;
+  price: string;
+  features: string[];
+  status?: string;
+  packageId?: number;
+  medalNumber?: number;
+}
+
+interface Complaint {
+  id: number;
+  number: string;
+  date: string;
+  address: string;
+  status: string;
+  description: string;
+}
+
+interface Ad {
+  id: number;
+  title: string;
+  image: string;
+  rating: number;
+  price: string;
+  location: string;
+  timeAgo: string;
+  seller: {
+    name: string;
+    avatar: string;
+  };
+}
+
+interface PaginationEvent {
+  first: number;
+  rows: number;
+}
+
+type PaymentMethod = string | { id: number; name: string };
+
 const toast = useToast();
 const userStore = useUserStore();
 const { user, login } = useAuth();
@@ -2937,15 +3019,15 @@ const isChangingPassword = ref(false);
 
 // Commission Payment Modal State
 const isCommissionPaymentModalOpen = ref(false);
-const selectedCommissionPaymentMethod = ref("wallet");
+const selectedCommissionPaymentMethod = ref<PaymentMethod>("wallet");
 
 // Success Modal State
 const isSuccessModalOpen = ref(false);
 
 // Package Payment Modal State
 const isPackagePaymentModalOpen = ref(false);
-const selectedPackagePaymentMethod = ref("wallet");
-const selectedPackage = ref(null);
+const selectedPackagePaymentMethod = ref<PaymentMethod>("wallet");
+const selectedPackage = ref<Package | null>(null);
 const isSubscribingPackage = ref(false);
 
 // Logout Modal State
@@ -2957,12 +3039,12 @@ const isDeleteAccountModalOpen = ref(false);
 
 // Delete Ad Modal State
 const isDeleteAdModalOpen = ref(false);
-const selectedAdToDelete = ref(null);
+const selectedAdToDelete = ref<number | null>(null);
 
 // Add Ad Form State
 const isAddAdFormOpen = ref(false);
 const isLocationModalOpen = ref(false);
-const selectedAdToEdit = ref(null);
+const selectedAdToEdit = ref<number | null>(null);
 
 // Departments and Cities
 const departments = [
@@ -2987,13 +3069,13 @@ const adForm = reactive({
   location: "",
   descriptionAr: "",
   descriptionEn: "",
-  adImage: null,
-  galleryImages: [],
+  adImage: null as File | null,
+  galleryImages: [] as File[],
 });
 
 // Image Previews
 const adImagePreview = ref("");
-const galleryPreviews = ref([]);
+const galleryPreviews = ref<string[]>([]);
 
 // FAQ State
 const openFaqIndex = ref(null);
@@ -3005,19 +3087,19 @@ const faqError = ref(null);
 // Complaints Pagination State
 const complaintsPerPage = ref(4); // Items per page
 const complaintsFirst = ref(0); // First item index
-const selectedComplaint = ref(null);
+const selectedComplaint = ref<Complaint | null>(null);
 
 // FAQ Data
-const faqs = ref([]);
+const faqs = ref<FAQItem[]>([]);
 
 // Parse HTML content to extract Q&A pairs
-const parseFAQHTML = (htmlString) => {
+const parseFAQHTML = (htmlString: string): FAQItem[] => {
   if (!htmlString) return [];
 
-  const items = [];
+  const items: FAQItem[] = [];
 
   // Check if we're in browser environment
-  if (process.client && typeof document !== "undefined") {
+  if (import.meta.client && typeof document !== "undefined") {
     // Create a temporary DOM element to parse HTML
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = htmlString;
@@ -3052,11 +3134,11 @@ const parseFAQHTML = (htmlString) => {
     // Fallback: use regex parsing for SSR
     const parts = htmlString.split(/<h3>/);
 
-    parts.forEach((part, index) => {
+    parts.forEach((part: string, index: number) => {
       if (index === 0) return; // Skip first empty part
 
       const h3Match = part.match(/^(.*?)<\/h3>/);
-      if (h3Match) {
+      if (h3Match && h3Match[1]) {
         const question = h3Match[1].trim();
         const rest = part.substring(h3Match[0].length);
 
@@ -3087,7 +3169,7 @@ const fetchFAQContent = async () => {
   faqError.value = null;
 
   try {
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse<string>>(
       "https://backend.wattani-sa.com/api/v1/frequently_asked_questions",
       {
         method: "GET",
@@ -3103,7 +3185,7 @@ const fetchFAQContent = async () => {
     } else {
       throw new Error(response?.msg || "فشل في تحميل الأسئلة المتكررة");
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error fetching FAQ content:", err);
     faqError.value =
       err?.data?.message ||
@@ -3132,13 +3214,13 @@ const paginatedFaqs = computed(() => {
 });
 
 // Pagination handler
-const onFaqPageChange = (event) => {
+const onFaqPageChange = (event: PaginationEvent) => {
   faqFirst.value = event.first;
   faqPerPage.value = event.rows;
   // Reset open accordion when page changes
   openFaqIndex.value = null;
   // Scroll to top when page changes
-  if (process.client) {
+  if (import.meta.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 };
@@ -3151,7 +3233,7 @@ const isLoadingRatings = ref(false);
 const ratingsError = ref(null);
 
 // Reviews Data
-const reviews = ref([]);
+const reviews = ref<Review[]>([]);
 const ratingsPagination = ref({
   total_items: 0,
   count_items: 0,
@@ -3163,7 +3245,7 @@ const ratingsPagination = ref({
 });
 
 // Fetch ratings from API
-const fetchRatings = async (page = 1) => {
+const fetchRatings = async (page: number = 1) => {
   isLoadingRatings.value = true;
   ratingsError.value = null;
 
@@ -3173,7 +3255,7 @@ const fetchRatings = async (page = 1) => {
       userStore.token || user.value?.token || user.value?.access_token;
 
     // If no token found, try to get from localStorage
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -3193,13 +3275,13 @@ const fetchRatings = async (page = 1) => {
         typeof authStore.authUser === "object" &&
         "token" in authStore.authUser
       ) {
-        token = authStore.authUser.token;
+        token = (authStore.authUser as any).token;
       } else if (authStore.token) {
-        token = authStore.token;
+        token = (authStore.token as any);
       }
     }
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse<any>>(
       "https://backend.wattani-sa.com/api/v1/my-rate",
       {
         method: "GET",
@@ -3219,7 +3301,7 @@ const fetchRatings = async (page = 1) => {
       // Try different possible response structures
       const ratesData =
         response.data.rates || response.data.data || response.data || [];
-      reviews.value = ratesData.map((rate) => ({
+      reviews.value = ratesData.map((rate: any) => ({
         id: rate.id || rate.rate_id,
         name: rate.user?.name || rate.name || rate.user_name || "مستخدم",
         rating: rate.rate || rate.rating || rate.stars || 0,
@@ -3241,7 +3323,7 @@ const fetchRatings = async (page = 1) => {
     } else {
       throw new Error(response?.msg || "فشل في تحميل التقييمات");
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error fetching ratings:", err);
     ratingsError.value =
       err?.data?.message ||
@@ -3268,7 +3350,7 @@ const totalReviews = computed(
 const paginatedReviews = computed(() => reviews.value);
 
 // Pagination handler
-const onReviewsPageChange = async (event) => {
+const onReviewsPageChange = async (event: PaginationEvent) => {
   reviewsFirst.value = event.first;
   reviewsPerPage.value = event.rows;
   const newPage = Math.floor(event.first / event.rows) + 1;
@@ -3279,13 +3361,13 @@ const onReviewsPageChange = async (event) => {
   }
 
   // Scroll to top when page changes
-  if (process.client) {
+  if (import.meta.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 };
 
 // My Ads Data
-const myAds = ref([
+const myAds = ref<Ad[]>([
   {
     id: 1,
     title: "سنارة سمك كبيرة",
@@ -3328,7 +3410,7 @@ const myAds = ref([
 ]);
 
 // My Ads Methods
-const editAd = (adId) => {
+const editAd = (adId: number) => {
   const ad = myAds.value.find((a) => a.id === adId);
   if (!ad) {
     console.error("Ad not found:", adId);
@@ -3336,7 +3418,7 @@ const editAd = (adId) => {
   }
 
   // Set the ad to edit
-  selectedAdToEdit.value = adId;
+  selectedAdToEdit.value = adId as any;
 
   // Populate form with ad data
   // Note: The ad structure might not have all form fields, so we map what we can
@@ -3354,12 +3436,12 @@ const editAd = (adId) => {
   isAddAdFormOpen.value = true;
 
   // Scroll to top when opening form
-  if (process.client) {
+  if (import.meta.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 };
 
-const openDeleteAdModal = (adId) => {
+const openDeleteAdModal = (adId: number) => {
   selectedAdToDelete.value = adId;
   isDeleteAdModalOpen.value = true;
 };
@@ -3383,7 +3465,7 @@ const confirmDeleteAd = () => {
 const addAdvertisement = () => {
   isAddAdFormOpen.value = true;
   // Scroll to top when opening form
-  if (process.client) {
+  if (import.meta.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 };
@@ -3413,12 +3495,13 @@ const closeAddAdForm = () => {
   galleryPreviews.value = [];
 };
 
-const revokePreview = (url) => {
+const revokePreview = (url: string) => {
   if (url?.startsWith("blob:")) URL.revokeObjectURL(url);
 };
 
-const handleAdImageChange = (event) => {
-  const [file] = event.target.files || [];
+const handleAdImageChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const [file] = target.files || [];
   adForm.adImage = file || null;
   if (adImagePreview.value) {
     revokePreview(adImagePreview.value);
@@ -3429,11 +3512,12 @@ const handleAdImageChange = (event) => {
   }
 };
 
-const handleGalleryImagesChange = (event) => {
-  const files = Array.from(event.target.files || []).slice(0, 5);
-  adForm.galleryImages = files;
+const handleGalleryImagesChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const files = Array.from(target.files || []).slice(0, 5);
+  adForm.galleryImages = files as any;
   galleryPreviews.value.forEach(revokePreview);
-  galleryPreviews.value = files.map((file) => URL.createObjectURL(file));
+  galleryPreviews.value = files.map((file: File) => URL.createObjectURL(file));
 };
 
 const openLocationModal = () => {
@@ -3459,19 +3543,22 @@ const handleAdSubmit = () => {
     );
     if (adIndex > -1) {
       // Determine image: use new uploaded image if available, otherwise keep original
+      const currentAd = myAds.value[adIndex];
+      if (!currentAd) return;
+      
       const imageToUse = adForm.adImage
         ? adImagePreview.value // New file uploaded, use blob preview (in real app, upload file first)
-        : myAds.value[adIndex].image; // Keep original image
+        : currentAd.image; // Keep original image
 
       // Update the ad
       myAds.value[adIndex] = {
-        ...myAds.value[adIndex],
+        ...currentAd,
         title: adForm.titleAr,
-        price: adForm.cost || myAds.value[adIndex].price,
+        price: adForm.cost || currentAd.price,
         location:
           cities.find((c) => c.value === adForm.city)?.label ||
           adForm.location ||
-          myAds.value[adIndex].location,
+          currentAd.location,
         image: imageToUse,
       };
       // Add your API call here to update the ad
@@ -3506,10 +3593,10 @@ const followingPerPage = ref(15); // Items per page (matching API default)
 const followingFirst = ref(0); // First item index
 const followingCurrentPage = ref(1); // Current page for API
 const isLoadingFollowing = ref(false);
-const followingError = ref(null);
+const followingError = ref<string | null>(null);
 
 // Following Users Data
-const followingUsers = ref([]);
+const followingUsers = ref<User[]>([]);
 const followingPagination = ref({
   total_items: 0,
   count_items: 0,
@@ -3521,7 +3608,7 @@ const followingPagination = ref({
 });
 
 // Fetch followers from API
-const fetchFollowers = async (page = 1) => {
+const fetchFollowers = async (page: number = 1) => {
   isLoadingFollowing.value = true;
   followingError.value = null;
 
@@ -3530,7 +3617,7 @@ const fetchFollowers = async (page = 1) => {
     let token =
       userStore.token || user.value?.token || user.value?.access_token;
 
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -3547,7 +3634,7 @@ const fetchFollowers = async (page = 1) => {
       return;
     }
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse<any>>(
       "https://backend.wattani-sa.com/api/v1/users/followers",
       {
         method: "GET",
@@ -3569,7 +3656,7 @@ const fetchFollowers = async (page = 1) => {
     }
 
     if (response && response.key === "success" && response.data) {
-      followingUsers.value = response.data.data.map((user) => ({
+      followingUsers.value = response.data.data.map((user: any) => ({
         id: user.id,
         name: user.name || "مستخدم",
         avatar: user.avatar || user.image || "/images/following-avatar2.svg",
@@ -3582,7 +3669,7 @@ const fetchFollowers = async (page = 1) => {
     } else {
       throw new Error(response?.msg || "فشل في تحميل المتابعين");
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error fetching followers:", err);
     followingError.value =
       err?.data?.message ||
@@ -3607,7 +3694,7 @@ const totalFollowing = computed(() => followingPagination.value.total_items);
 const paginatedFollowing = computed(() => followingUsers.value);
 
 // Pagination handler
-const onFollowingPageChange = async (event) => {
+const onFollowingPageChange = async (event: PaginationEvent) => {
   followingFirst.value = event.first;
   followingPerPage.value = event.rows;
   const newPage = Math.floor(event.first / event.rows) + 1;
@@ -3618,7 +3705,7 @@ const onFollowingPageChange = async (event) => {
   }
 
   // Scroll to top when page changes
-  if (process.client) {
+  if (import.meta.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 };
@@ -3677,7 +3764,7 @@ watch(
 );
 
 // Unfollow handler
-const handleUnfollow = async (userId) => {
+const handleUnfollow = async (userId: number) => {
   if (!confirm("هل أنت متأكد من إلغاء المتابعة؟")) {
     return;
   }
@@ -3688,7 +3775,7 @@ const handleUnfollow = async (userId) => {
       userStore.token || user.value?.token || user.value?.access_token;
 
     // If no token found, try to get from localStorage
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -3708,9 +3795,9 @@ const handleUnfollow = async (userId) => {
         typeof authStore.authUser === "object" &&
         "token" in authStore.authUser
       ) {
-        token = authStore.authUser.token;
+        token = (authStore.authUser as any).token;
       } else if (authStore.token) {
-        token = authStore.token;
+        token = (authStore.token as any);
       }
     }
 
@@ -3724,7 +3811,7 @@ const handleUnfollow = async (userId) => {
       return;
     }
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse>(
       "https://backend.wattani-sa.com/api/v1/users/toggle-follow",
       {
         method: "POST",
@@ -3765,15 +3852,15 @@ const handleUnfollow = async (userId) => {
     } else {
       throw new Error(response?.msg || "فشل في إلغاء المتابعة");
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error unfollowing user:", err);
     toast.add({
       severity: "error",
       summary: "خطأ",
-      detail:
-        err?.data?.msg ||
-        err?.message ||
-        err?.data?.message ||
+        detail:
+        (err as any)?.data?.msg ||
+        (err as any)?.message ||
+        (err as any)?.data?.message ||
         "حدث خطأ أثناء إلغاء المتابعة. الرجاء المحاولة مرة أخرى.",
       life: 3000,
     });
@@ -3781,18 +3868,18 @@ const handleUnfollow = async (userId) => {
 };
 
 // Consultant packages (fetched from API)
-const packages = ref([]);
+const packages = ref<Package[]>([]);
 const isLoadingPackages = ref(false);
-const packagesError = ref(null);
+const packagesError = ref<string | null>(null);
 const hasFetchedPackages = ref(false);
 
-const mapConsultantPackage = (item, index = 0) => {
+const mapConsultantPackage = (item: any, index: number = 0): Package => {
   const rawFeatures = Array.isArray(item?.features)
     ? item.features
     : (item?.description || item?.details || "")
         .split(/<br\s*\/?>|\r?\n/g)
-        .map((feature) => feature.replace(/<\/?[^>]+(>|$)/g, "").trim())
-        .filter(Boolean);
+        .map((feature: string) => feature.replace(/<\/?[^>]+(>|$)/g, "").trim())
+        .filter((f: string) => Boolean(f));
 
   return {
     id: item?.id ?? item?.package_id ?? `pkg-${index + 1}`,
@@ -3819,7 +3906,7 @@ const fetchPackages = async () => {
     let token =
       userStore.token || user.value?.token || user.value?.access_token;
 
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -3836,7 +3923,7 @@ const fetchPackages = async () => {
       return;
     }
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse<any>>(
       "https://backend.wattani-sa.com/api/v1/consultant-packages",
       {
         method: "GET",
@@ -3856,20 +3943,20 @@ const fetchPackages = async () => {
 
     const apiPackages =
       (Array.isArray(response?.data) && response.data) ||
-      (Array.isArray(response?.data?.packages) && response.data.packages) ||
-      (Array.isArray(response?.packages) && response.packages) ||
+      (Array.isArray((response?.data as any)?.packages) && (response.data as any).packages) ||
+      (Array.isArray((response as any)?.packages) && (response as any).packages) ||
       (Array.isArray(response) && response) ||
       [];
 
-    packages.value = apiPackages.map((pkg, index) =>
+    packages.value = apiPackages.map((pkg: any, index: number) =>
       mapConsultantPackage(pkg, index)
     );
     hasFetchedPackages.value = true;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching consultant packages:", error);
     packagesError.value =
-      error?.data?.msg ||
-      error?.message ||
+      (error as any)?.data?.msg ||
+      (error as any)?.message ||
       "تعذر تحميل الباقات في الوقت الحالي، حاول مرة أخرى لاحقاً.";
   } finally {
     isLoadingPackages.value = false;
@@ -3877,18 +3964,18 @@ const fetchPackages = async () => {
 };
 
 // Subscription Data (fetched from API)
-const subscriptions = ref([]);
+const subscriptions = ref<Subscription[]>([]);
 const isLoadingSubscriptions = ref(false);
-const subscriptionsError = ref(null);
+const subscriptionsError = ref<string | null>(null);
 const hasFetchedSubscriptions = ref(false);
 
-const mapSubscription = (item, index = 0) => {
+const mapSubscription = (item: any, index: number = 0): Subscription => {
   const rawFeatures = Array.isArray(item?.features)
     ? item.features
     : (item?.description || item?.details || "")
         .split(/<br\s*\/?>|\r?\n/g)
-        .map((feature) => feature.replace(/<\/?[^>]+(>|$)/g, "").trim())
-        .filter(Boolean);
+        .map((feature: string) => feature.replace(/<\/?[^>]+(>|$)/g, "").trim())
+        .filter((f: string) => Boolean(f));
 
   return {
     id: item?.id ?? item?.subscription_id ?? `sub-${index + 1}`,
@@ -3922,7 +4009,7 @@ const fetchSubscriptions = async () => {
     let token =
       userStore.token || user.value?.token || user.value?.access_token;
 
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -3939,7 +4026,7 @@ const fetchSubscriptions = async () => {
       return;
     }
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse<any>>(
       "https://backend.wattani-sa.com/api/v1/my-consultant-subscriptions",
       {
         method: "GET",
@@ -3960,21 +4047,21 @@ const fetchSubscriptions = async () => {
 
     const apiSubs =
       (Array.isArray(response?.data) && response.data) ||
-      (Array.isArray(response?.data?.subscriptions) &&
-        response.data.subscriptions) ||
-      (Array.isArray(response?.subscriptions) && response.subscriptions) ||
+      (Array.isArray((response?.data as any)?.subscriptions) &&
+        (response.data as any).subscriptions) ||
+      (Array.isArray((response as any)?.subscriptions) && (response as any).subscriptions) ||
       (Array.isArray(response) && response) ||
       [];
 
-    subscriptions.value = apiSubs.map((sub, index) =>
+    subscriptions.value = apiSubs.map((sub: any, index: number) =>
       mapSubscription(sub, index)
     );
     hasFetchedSubscriptions.value = true;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching consultant subscriptions:", error);
     subscriptionsError.value =
-      error?.data?.msg ||
-      error?.message ||
+      (error as any)?.data?.msg ||
+      (error as any)?.message ||
       "تعذر تحميل الاشتراكات حالياً، حاول مرة أخرى لاحقاً.";
   } finally {
     isLoadingSubscriptions.value = false;
@@ -4086,30 +4173,30 @@ const paginatedComplaints = computed(() => {
 });
 
 // Pagination handler
-const onComplaintsPageChange = (event) => {
+const onComplaintsPageChange = (event: PaginationEvent) => {
   complaintsFirst.value = event.first;
   complaintsPerPage.value = event.rows;
   // Scroll to top when page changes
-  if (process.client) {
+  if (import.meta.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 };
 
 // View complaint details
-const viewComplaintDetails = (complaintId) => {
+const viewComplaintDetails = (complaintId: number) => {
   const complaint = complaints.value.find((c) => c.id === complaintId);
   if (complaint) {
     selectedComplaint.value = complaint;
     // Scroll to top when viewing details
-    if (process.client) {
+    if (import.meta.client) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
 };
 
 // Get status class for styling
-const getStatusClass = (status) => {
-  const statusClasses = {
+const getStatusClass = (status: string) => {
+  const statusClasses: Record<string, string> = {
     جديدة: "bg-orange-100 text-orange-800",
     "جاري المعالجة": "bg-yellow-100 text-yellow-800",
     منتهية: "bg-green-100 text-green-800",
@@ -4117,7 +4204,7 @@ const getStatusClass = (status) => {
   return statusClasses[status] || "bg-gray-100 text-gray-800";
 };
 
-const setActiveTab = (tab) => {
+const setActiveTab = (tab: string) => {
   activeTab.value = tab;
   // Reset selected complaint when switching tabs
   selectedComplaint.value = null;
@@ -4126,7 +4213,7 @@ const setActiveTab = (tab) => {
     settingsSubTab.value = "personal-info";
   }
   // Close mobile menu on small screens after selecting a tab
-  if (process.client && window.innerWidth < 1024) {
+  if (import.meta.client && window.innerWidth < 1024) {
     isMobileMenuOpen.value = false;
   }
 };
@@ -4172,8 +4259,8 @@ const changeMobileForm = reactive({
 });
 
 // OTP Verification State
-const otpDigits = ref(["", "", "", ""]);
-const otpInputs = ref([]);
+const otpDigits = ref<string[]>(["", "", "", ""]);
+const otpInputs = ref<HTMLElement[]>([]);
 const isCodeVerified = ref(false);
 const hasEnteredNewMobile = ref(false);
 const isNewCodeVerified = ref(false);
@@ -4213,8 +4300,8 @@ const joinConsultantForm = reactive({
 
 const cvFileName = ref("");
 const proofFileName = ref("");
-const cvFile = ref(null);
-const proofFile = ref(null);
+const cvFile = ref<File | null>(null);
+const proofFile = ref<File | null>(null);
 const isSubmittingConsultant = ref(false);
 
 const tabTitles = {
@@ -4236,14 +4323,15 @@ const tabTitles = {
   "about-us": "عن المنصة",
 };
 
-const getTabTitle = () => {
-  return tabTitles[activeTab.value] || "الملف الشخصي";
+const getTabTitle = (): string => {
+  return (tabTitles as Record<string, string>)[activeTab.value] || "الملف الشخصي";
 };
 
 const profileAvatarInput = ref(null);
 
-const handleProfileAvatarChange = (event) => {
-  const file = event.target.files?.[0];
+const handleProfileAvatarChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
   if (file) {
     // Validate file type
     if (!file.type.startsWith("image/")) {
@@ -4269,8 +4357,8 @@ const handleProfileAvatarChange = (event) => {
 
     // Create preview
     const reader = new FileReader();
-    reader.onload = (e) => {
-      form.avatar = e.target?.result;
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      form.avatar = (e.target?.result as string) || "";
     };
     reader.readAsDataURL(file);
   }
@@ -4289,50 +4377,51 @@ const handleNewMobileInput = (event: Event) => {
 };
 
 // OTP Input Handlers
-const handleOtpInput = (index, event) => {
-  const value = event.target.value.replace(/\D/g, ""); // Only allow digits
+const handleOtpInput = (index: number, event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const value = target.value.replace(/\D/g, ""); // Only allow digits
   if (value) {
     otpDigits.value[index] = value.slice(-1); // Only take the last character
 
     // Move to next input if available
     if (index < 3 && otpInputs.value[index + 1]) {
-      otpInputs.value[index + 1].focus();
+      otpInputs.value[index + 1]?.focus();
     }
   } else {
     otpDigits.value[index] = "";
   }
 };
 
-const handleOtpKeydown = (index, event) => {
+const handleOtpKeydown = (index: number, event: KeyboardEvent) => {
   // Handle backspace
   if (event.key === "Backspace" && !otpDigits.value[index] && index > 0) {
-    otpInputs.value[index - 1].focus();
+    otpInputs.value[index - 1]?.focus();
   }
   // Handle arrow keys
-  if (event.key === "ArrowLeft" && index > 0) {
-    otpInputs.value[index - 1].focus();
+  if (event.key === "ArrowLeft" && index > 0 && otpInputs.value[index - 1]) {
+    otpInputs.value[index - 1]?.focus();
   }
-  if (event.key === "ArrowRight" && index < 3) {
-    otpInputs.value[index + 1].focus();
+  if (event.key === "ArrowRight" && index < 3 && otpInputs.value[index + 1]) {
+    otpInputs.value[index + 1]?.focus();
   }
 };
 
-const handleOtpPaste = (event) => {
+const handleOtpPaste = (event: ClipboardEvent) => {
   event.preventDefault();
-  const pastedData = event.clipboardData
+  const clipboardData = event.clipboardData || (window as any).clipboardData;
+  if (!clipboardData) return;
+  const pastedData = clipboardData
     .getData("text")
     .replace(/\D/g, "")
     .slice(0, 4);
-  pastedData.split("").forEach((digit, index) => {
+  pastedData.split("").forEach((digit: string, index: number) => {
     if (index < 4) {
       otpDigits.value[index] = digit;
     }
   });
   // Focus the last filled input or the last input
   const lastIndex = Math.min(pastedData.length - 1, 3);
-  if (otpInputs.value[lastIndex]) {
-    otpInputs.value[lastIndex].focus();
-  }
+  otpInputs.value[lastIndex]?.focus();
 };
 
 // Send verification code to old phone
@@ -4349,7 +4438,7 @@ const sendOldPhoneCode = async () => {
       userStore.token || user.value?.token || user.value?.access_token;
 
     // If no token found, try to get from localStorage
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -4369,9 +4458,9 @@ const sendOldPhoneCode = async () => {
         typeof authStore.authUser === "object" &&
         "token" in authStore.authUser
       ) {
-        token = authStore.authUser.token;
+        token = (authStore.authUser as any).token;
       } else if (authStore.token) {
-        token = authStore.token;
+        token = (authStore.token as any);
       }
     }
 
@@ -4386,7 +4475,7 @@ const sendOldPhoneCode = async () => {
       return;
     }
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse>(
       "https://backend.wattani-sa.com/api/v1/old-phone-send-code",
       {
         method: "POST",
@@ -4412,15 +4501,15 @@ const sendOldPhoneCode = async () => {
     } else {
       throw new Error(response?.msg || "فشل في إرسال رمز التحقق");
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error sending old phone code:", err);
     toast.add({
       severity: "error",
       summary: "خطأ",
-      detail:
-        err?.data?.msg ||
-        err?.message ||
-        err?.data?.message ||
+        detail:
+        (err as any)?.data?.msg ||
+        (err as any)?.message ||
+        (err as any)?.data?.message ||
         "حدث خطأ أثناء إرسال رمز التحقق. الرجاء المحاولة مرة أخرى.",
       life: 3000,
     });
@@ -4449,7 +4538,7 @@ const handleVerifyCode = async () => {
       userStore.token || user.value?.token || user.value?.access_token;
 
     // If no token found, try to get from localStorage
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -4469,9 +4558,9 @@ const handleVerifyCode = async () => {
         typeof authStore.authUser === "object" &&
         "token" in authStore.authUser
       ) {
-        token = authStore.authUser.token;
+        token = (authStore.authUser as any).token;
       } else if (authStore.token) {
-        token = authStore.token;
+        token = (authStore.token as any);
       }
     }
 
@@ -4486,7 +4575,7 @@ const handleVerifyCode = async () => {
       return;
     }
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse>(
       "https://backend.wattani-sa.com/api/v1/old-phone-check-code",
       {
         method: "POST",
@@ -4523,10 +4612,10 @@ const handleVerifyCode = async () => {
     toast.add({
       severity: "error",
       summary: "خطأ",
-      detail:
-        err?.data?.msg ||
-        err?.message ||
-        err?.data?.message ||
+        detail:
+        (err as any)?.data?.msg ||
+        (err as any)?.message ||
+        (err as any)?.data?.message ||
         "رمز التحقق غير صحيح. الرجاء المحاولة مرة أخرى.",
       life: 3000,
     });
@@ -4566,7 +4655,7 @@ const handleNextStep = async () => {
       userStore.token || user.value?.token || user.value?.access_token;
 
     // If no token found, try to get from localStorage
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -4586,9 +4675,9 @@ const handleNextStep = async () => {
         typeof authStore.authUser === "object" &&
         "token" in authStore.authUser
       ) {
-        token = authStore.authUser.token;
+        token = (authStore.authUser as any).token;
       } else if (authStore.token) {
-        token = authStore.token;
+        token = (authStore.token as any);
       }
     }
 
@@ -4603,7 +4692,7 @@ const handleNextStep = async () => {
       return;
     }
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse>(
       "https://backend.wattani-sa.com/api/v1/change-phone-send-code",
       {
         method: "POST",
@@ -4641,10 +4730,10 @@ const handleNextStep = async () => {
     toast.add({
       severity: "error",
       summary: "خطأ",
-      detail:
-        err?.data?.msg ||
-        err?.message ||
-        err?.data?.message ||
+        detail:
+        (err as any)?.data?.msg ||
+        (err as any)?.message ||
+        (err as any)?.data?.message ||
         "حدث خطأ أثناء إرسال رمز التحقق. الرجاء المحاولة مرة أخرى.",
       life: 3000,
     });
@@ -4673,7 +4762,7 @@ const handleVerifyNewCode = async () => {
       userStore.token || user.value?.token || user.value?.access_token;
 
     // If no token found, try to get from localStorage
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -4693,9 +4782,9 @@ const handleVerifyNewCode = async () => {
         typeof authStore.authUser === "object" &&
         "token" in authStore.authUser
       ) {
-        token = authStore.authUser.token;
+        token = (authStore.authUser as any).token;
       } else if (authStore.token) {
-        token = authStore.token;
+        token = (authStore.token as any);
       }
     }
 
@@ -4710,7 +4799,7 @@ const handleVerifyNewCode = async () => {
       return;
     }
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse>(
       "https://backend.wattani-sa.com/api/v1/change-phone-check-code",
       {
         method: "POST",
@@ -4761,10 +4850,10 @@ const handleVerifyNewCode = async () => {
     toast.add({
       severity: "error",
       summary: "خطأ",
-      detail:
-        err?.data?.msg ||
-        err?.message ||
-        err?.data?.message ||
+        detail:
+        (err as any)?.data?.msg ||
+        (err as any)?.message ||
+        (err as any)?.data?.message ||
         "رمز التحقق غير صحيح. الرجاء المحاولة مرة أخرى.",
       life: 3000,
     });
@@ -4889,7 +4978,7 @@ const handleChangePasswordSubmit = async () => {
   let token = userStore.token || user.value?.token || user.value?.access_token;
 
   // If no token found, try to get from localStorage
-  if (!token && process.client) {
+  if (!token && import.meta.client) {
     try {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
@@ -4909,7 +4998,7 @@ const handleChangePasswordSubmit = async () => {
       typeof authStore.authUser === "object" &&
       "token" in authStore.authUser
     ) {
-      token = authStore.authUser.token;
+      token = (authStore.authUser as any).token;
     } else if (authStore.token) {
       token = authStore.token;
     }
@@ -4945,7 +5034,7 @@ const handleChangePasswordSubmit = async () => {
       changePasswordForm.confirmPassword
     );
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse>(
       "https://backend.wattani-sa.com/api/v1/update-passward",
       {
         method: "POST",
@@ -4978,12 +5067,12 @@ const handleChangePasswordSubmit = async () => {
     } else {
       throw new Error(response?.msg || "فشل في تغيير كلمة المرور");
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error changing password:", error);
     const errorMessage =
       error?.data?.message ||
-      error?.data?.msg ||
-      error?.message ||
+      (error as any)?.data?.msg ||
+      (error as any)?.message ||
       "حدث خطأ أثناء تغيير كلمة المرور. الرجاء المحاولة مرة أخرى.";
 
     toast.add({
@@ -4997,7 +5086,7 @@ const handleChangePasswordSubmit = async () => {
   }
 };
 
-const handlePackageSubscribe = (packageItem) => {
+const handlePackageSubscribe = (packageItem: Package) => {
   selectedPackage.value = packageItem;
   openPackagePaymentModal();
 };
@@ -5006,12 +5095,12 @@ const openPackagePaymentModal = () => {
   isPackagePaymentModalOpen.value = true;
 };
 
-const handlePackagePaymentConfirm = async (paymentMethod) => {
+const handlePackagePaymentConfirm = async (paymentMethod: PaymentMethod) => {
   if (!selectedPackage.value) {
     return;
   }
 
-  const packageId = selectedPackage.value.id;
+  const packageId = (selectedPackage.value as any)?.id;
   if (!packageId) {
     toast.add({
       severity: "error",
@@ -5023,7 +5112,7 @@ const handlePackagePaymentConfirm = async (paymentMethod) => {
   }
 
   isSubscribingPackage.value = true;
-  selectedPackagePaymentMethod.value = paymentMethod;
+  selectedPackagePaymentMethod.value = typeof paymentMethod === 'string' ? paymentMethod : paymentMethod;
 
   try {
     // Get token from multiple sources
@@ -5031,7 +5120,7 @@ const handlePackagePaymentConfirm = async (paymentMethod) => {
       userStore.token || user.value?.token || user.value?.access_token;
 
     // If no token found, try to get from localStorage
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -5051,9 +5140,9 @@ const handlePackagePaymentConfirm = async (paymentMethod) => {
         typeof authStore.authUser === "object" &&
         "token" in authStore.authUser
       ) {
-        token = authStore.authUser.token;
+        token = (authStore.authUser as any).token;
       } else if (authStore.token) {
-        token = authStore.token;
+        token = (authStore.token as any);
       }
     }
 
@@ -5067,7 +5156,7 @@ const handlePackagePaymentConfirm = async (paymentMethod) => {
       return;
     }
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse>(
       `https://backend.wattani-sa.com/api/v1/consultant-packages/${packageId}/subscribe-with-payment`,
       {
         method: "POST",
@@ -5076,7 +5165,7 @@ const handlePackagePaymentConfirm = async (paymentMethod) => {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: {
-          payment_method: paymentMethod,
+          payment_method: typeof paymentMethod === 'string' ? paymentMethod : paymentMethod.id,
           lang: "ar",
           iso: "SA",
         },
@@ -5118,10 +5207,10 @@ const handlePackagePaymentConfirm = async (paymentMethod) => {
     toast.add({
       severity: "error",
       summary: "خطأ",
-      detail:
-        err?.data?.msg ||
-        err?.message ||
-        err?.data?.message ||
+        detail:
+        (err as any)?.data?.msg ||
+        (err as any)?.message ||
+        (err as any)?.data?.message ||
         "حدث خطأ أثناء الاشتراك في الباقة. الرجاء المحاولة مرة أخرى.",
       life: 3000,
     });
@@ -5130,10 +5219,10 @@ const handlePackagePaymentConfirm = async (paymentMethod) => {
   }
 };
 
-const handleRenewSubscription = (subscription) => {
+const handleRenewSubscription = (subscription: Subscription) => {
   // Open the package payment modal with the subscription data
   // Use packageId if available, otherwise fall back to id
-  const packageId = subscription.packageId || subscription.id;
+      const packageId = (subscription as any).packageId || subscription.id;
 
   if (!packageId) {
     toast.add({
@@ -5150,7 +5239,7 @@ const handleRenewSubscription = (subscription) => {
     price: subscription.price,
     title: subscription.title,
     features: subscription.features,
-  };
+  } as Package;
   openPackagePaymentModal();
 };
 
@@ -5166,7 +5255,7 @@ const handleContactUsSubmit = async () => {
   }
   isSendingContact.value = true;
   try {
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse>(
       "https://backend.wattani-sa.com/api/v1/contact-us-send-message",
       {
         method: "POST",
@@ -5194,14 +5283,14 @@ const handleContactUsSubmit = async () => {
     } else {
       throw new Error(response?.msg || "فشل في إرسال الرسالة");
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error sending contact message:", error);
     toast.add({
       severity: "error",
       summary: "خطأ",
       detail:
-        error?.data?.msg ||
-        error?.message ||
+      (error as any)?.data?.msg ||
+      (error as any)?.message ||
         "حدث خطأ أثناء إرسال الرسالة. الرجاء المحاولة مرة أخرى.",
       life: 3000,
     });
@@ -5214,7 +5303,7 @@ const fetchAboutContent = async () => {
   isLoadingAbout.value = true;
   aboutError.value = null;
   try {
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse<string>>(
       "https://backend.wattani-sa.com/api/v1/about",
       {
         method: "GET",
@@ -5233,8 +5322,8 @@ const fetchAboutContent = async () => {
   } catch (error) {
     console.error("Error fetching about content:", error);
     aboutError.value =
-      error?.data?.msg ||
-      error?.message ||
+      (error as any)?.data?.msg ||
+      (error as any)?.message ||
       "حدث خطأ أثناء تحميل صفحة من نحن. الرجاء المحاولة مرة أخرى.";
     toast.add({
       severity: "error",
@@ -5251,7 +5340,7 @@ const fetchTermsContent = async () => {
   isLoadingTerms.value = true;
   termsError.value = null;
   try {
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse<string>>(
       "https://backend.wattani-sa.com/api/v1/terms",
       {
         method: "GET",
@@ -5270,8 +5359,8 @@ const fetchTermsContent = async () => {
   } catch (error) {
     console.error("Error fetching terms content:", error);
     termsError.value =
-      error?.data?.msg ||
-      error?.message ||
+      (error as any)?.data?.msg ||
+      (error as any)?.message ||
       "حدث خطأ أثناء تحميل الشروط والأحكام. الرجاء المحاولة مرة أخرى.";
     toast.add({
       severity: "error",
@@ -5288,7 +5377,7 @@ const fetchPrivacyContent = async () => {
   isLoadingPrivacy.value = true;
   privacyError.value = null;
   try {
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse<string>>(
       "https://backend.wattani-sa.com/api/v1/privacy",
       {
         method: "GET",
@@ -5307,8 +5396,8 @@ const fetchPrivacyContent = async () => {
   } catch (error) {
     console.error("Error fetching privacy content:", error);
     privacyError.value =
-      error?.data?.msg ||
-      error?.message ||
+      (error as any)?.data?.msg ||
+      (error as any)?.message ||
       "حدث خطأ أثناء تحميل سياسة الخصوصية. الرجاء المحاولة مرة أخرى.";
     toast.add({
       severity: "error",
@@ -5341,16 +5430,18 @@ watch(
   { immediate: true }
 );
 
-const handleCvFileChange = (event) => {
-  const file = event.target.files[0];
+const handleCvFileChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
   if (file) {
     cvFileName.value = file.name;
     cvFile.value = file;
   }
 };
 
-const handleProofFileChange = (event) => {
-  const file = event.target.files[0];
+const handleProofFileChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
   if (file) {
     proofFileName.value = file.name;
     proofFile.value = file;
@@ -5380,7 +5471,7 @@ const handleJoinConsultantSubmit = async () => {
     let token =
       userStore.token || user.value?.token || user.value?.access_token;
 
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -5412,7 +5503,7 @@ const handleJoinConsultantSubmit = async () => {
     );
 
     // Make API call
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse>(
       "https://backend.wattani-sa.com/api/v1/consultant-application",
       {
         method: "POST",
@@ -5433,8 +5524,8 @@ const handleJoinConsultantSubmit = async () => {
       joinConsultantForm.consultationCost = "";
 
       // Reset file inputs
-      const cvInput = document.getElementById("cvFile");
-      const proofInput = document.getElementById("proofFile");
+      const cvInput = document.getElementById("cvFile") as HTMLInputElement;
+      const proofInput = document.getElementById("proofFile") as HTMLInputElement;
       if (cvInput) cvInput.value = "";
       if (proofInput) proofInput.value = "";
 
@@ -5448,7 +5539,7 @@ const handleJoinConsultantSubmit = async () => {
     } else {
       throw new Error(response?.msg || "فشل في إرسال الطلب");
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error submitting consultant application:", error);
     const errorMessage =
       error?.data?.message ||
@@ -5490,14 +5581,14 @@ const confirmLogout = async () => {
   isLoggingOut.value = true;
 
   const deviceId =
-    (process.client && localStorage.getItem("device_id")) || "11111111111";
+    (import.meta.client && localStorage.getItem("device_id")) || "11111111111";
 
   try {
     // Prepare token from multiple sources
     let token =
       userStore.token || user.value?.token || user.value?.access_token;
 
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -5509,7 +5600,7 @@ const confirmLogout = async () => {
       }
     }
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse>(
       "https://backend.wattani-sa.com/api/v1/sign-out",
       {
         method: "DELETE",
@@ -5542,8 +5633,8 @@ const confirmLogout = async () => {
       severity: "error",
       summary: "خطأ",
       detail:
-        error?.data?.msg ||
-        error?.message ||
+      (error as any)?.data?.msg ||
+      (error as any)?.message ||
         "حدث خطأ أثناء تسجيل الخروج. الرجاء المحاولة مرة أخرى.",
       life: 3000,
     });
@@ -5556,7 +5647,7 @@ const openChargeModal = () => {
   isChargeModalOpen.value = true;
 };
 
-const handleCharge = (amount) => {
+const handleCharge = (amount: string) => {
   if (!amount || parseFloat(amount) <= 0) {
     // You can add validation feedback here
     return;
@@ -5584,7 +5675,7 @@ const handleCommissionAmountChange = async () => {
 };
 
 // Calculate fee API call
-const calculateFee = async (amount) => {
+const calculateFee = async (amount: string) => {
   isCalculatingFee.value = true;
   feeCalculationError.value = null;
 
@@ -5594,7 +5685,7 @@ const calculateFee = async (amount) => {
       userStore.token || user.value?.token || user.value?.access_token;
 
     // If no token found, try to get from localStorage
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -5614,13 +5705,13 @@ const calculateFee = async (amount) => {
         typeof authStore.authUser === "object" &&
         "token" in authStore.authUser
       ) {
-        token = authStore.authUser.token;
+        token = (authStore.authUser as any).token;
       } else if (authStore.token) {
-        token = authStore.token;
+        token = (authStore.token as any);
       }
     }
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse<any>>(
       "https://backend.wattani-sa.com/api/v1/calculate-fee",
       {
         method: "POST",
@@ -5643,7 +5734,7 @@ const calculateFee = async (amount) => {
     } else {
       throw new Error(response?.msg || "فشل في حساب الرسوم");
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error calculating fee:", err);
     feeCalculationError.value =
       err?.data?.msg ||
@@ -5675,7 +5766,7 @@ const openCommissionPaymentModal = async () => {
   isCommissionPaymentModalOpen.value = true;
 };
 
-const handleCommissionPaymentConfirm = async (paymentMethod) => {
+const handleCommissionPaymentConfirm = async (paymentMethod: PaymentMethod) => {
   const amount = commissionAmount.value || "60";
   const finalAmount = calculatedFee.value || amount;
 
@@ -5690,7 +5781,7 @@ const handleCommissionPaymentConfirm = async (paymentMethod) => {
   }
 
   isPayingFee.value = true;
-  selectedCommissionPaymentMethod.value = paymentMethod;
+  selectedCommissionPaymentMethod.value = typeof paymentMethod === 'string' ? paymentMethod : paymentMethod;
 
   try {
     // Get token from multiple sources
@@ -5698,7 +5789,7 @@ const handleCommissionPaymentConfirm = async (paymentMethod) => {
       userStore.token || user.value?.token || user.value?.access_token;
 
     // If no token found, try to get from localStorage
-    if (!token && process.client) {
+    if (!token && import.meta.client) {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -5718,13 +5809,13 @@ const handleCommissionPaymentConfirm = async (paymentMethod) => {
         typeof authStore.authUser === "object" &&
         "token" in authStore.authUser
       ) {
-        token = authStore.authUser.token;
+        token = (authStore.authUser as any).token;
       } else if (authStore.token) {
-        token = authStore.token;
+        token = (authStore.token as any);
       }
     }
 
-    const response = await $fetch(
+    const response = await $fetch<ApiResponse>(
       "https://backend.wattani-sa.com/api/v1/pay-fee",
       {
         method: "POST",
@@ -5770,10 +5861,10 @@ const handleCommissionPaymentConfirm = async (paymentMethod) => {
     toast.add({
       severity: "error",
       summary: "خطأ",
-      detail:
-        err?.data?.msg ||
-        err?.message ||
-        err?.data?.message ||
+        detail:
+        (err as any)?.data?.msg ||
+        (err as any)?.message ||
+        (err as any)?.data?.message ||
         "حدث خطأ أثناء عملية الدفع. الرجاء المحاولة مرة أخرى.",
       life: 3000,
     });
