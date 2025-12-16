@@ -484,7 +484,7 @@
                     <p class="text-gray-600 text-sm">جاري إرسال رمز التحقق...</p>
                   </div>
 
-                  <!-- 6-Digit OTP Input -->
+                  <!-- 4-Digit OTP Input -->
                   <div v-else class="flex justify-center gap-2 sm:gap-3">
                     <input
                       v-for="(digit, index) in otpDigits"
@@ -494,7 +494,8 @@
                       type="text"
                       inputmode="numeric"
                       maxlength="1"
-                      class="w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold border-2 rounded-lg focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 transition-colors"
+                      :disabled="isVerifyingOldPhoneCode"
+                      class="w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold border-2 rounded-lg focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       :class="otpDigits[index] ? 'border-[#15c472] text-[#15c472]' : 'border-gray-300 text-gray-700'"
                       @input="handleOtpInput(index, $event)"
                       @keydown="handleOtpKeydown(index, $event)"
@@ -507,9 +508,17 @@
                     <button
                       type="button"
                       @click="handleVerifyCode"
-                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
+                      :disabled="isVerifyingOldPhoneCode"
+                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      تحقق
+                      <span v-if="isVerifyingOldPhoneCode" class="flex items-center justify-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        جاري التحقق...
+                      </span>
+                      <span v-else>تحقق</span>
                     </button>
                   </div>
                 </div>
@@ -530,10 +539,31 @@
                       <div
                         class="flex items-center justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-3 py-2.5 sm:px-4 sm:py-3 bg-gray-50 text-xs sm:text-sm text-gray-700 min-w-[90px] sm:min-w-[100px]"
                       >
-                        <span>+966</span>
+                        <select
+                          v-model="changeMobileForm.countryCode"
+                          class="bg-transparent outline-none text-right appearance-none cursor-pointer focus:outline-none"
+                          style="background-image: none;"
+                        >
+                          <option value="+966">+966</option>
+                          <option value="+971">+971</option>
+                          <option value="+965">+965</option>
+                          <option value="+974">+974</option>
+                          <option value="+973">+973</option>
+                          <option value="+968">+968</option>
+                          <option value="+961">+961</option>
+                          <option value="+962">+962</option>
+                          <option value="+20">+20</option>
+                          <option value="+212">+212</option>
+                          <option value="+213">+213</option>
+                          <option value="+216">+216</option>
+                          <option value="+1">+1</option>
+                          <option value="+44">+44</option>
+                          <option value="+33">+33</option>
+                          <option value="+49">+49</option>
+                        </select>
                         <img
                           src="/images/Country Flags.png"
-                          alt="Saudi Arabia Flag"
+                          alt="Country Flag"
                           class="w-7 h-7 sm:w-6 sm:h-6"
                         />
                       </div>
@@ -543,7 +573,8 @@
                         type="tel"
                         placeholder="رقم الجوال"
                         @input="handleNewMobileInput"
-                        class="flex-1 w-full bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 text-right"
+                        :disabled="isSendingNewPhoneCode"
+                        class="flex-1 w-full bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 text-right disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -553,9 +584,17 @@
                     <button
                       type="button"
                       @click="handleNextStep"
-                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
+                      :disabled="isSendingNewPhoneCode"
+                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      التالي
+                      <span v-if="isSendingNewPhoneCode" class="flex items-center justify-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        جاري الإرسال...
+                      </span>
+                      <span v-else>التالي</span>
                     </button>
                   </div>
                 </div>
@@ -567,7 +606,7 @@
                     <p class="text-gray-600 text-sm sm:text-base">تغيير رقم الجوال</p>
                   </div>
 
-                  <!-- 6-Digit OTP Input -->
+                  <!-- 4-Digit OTP Input -->
                   <div class="flex justify-center gap-2 sm:gap-3">
                     <input
                       v-for="(digit, index) in otpDigits"
@@ -577,7 +616,8 @@
                       type="text"
                       inputmode="numeric"
                       maxlength="1"
-                      class="w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold border-2 rounded-lg focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 transition-colors"
+                      :disabled="isVerifyingNewPhoneCode"
+                      class="w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold border-2 rounded-lg focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       :class="otpDigits[index] ? 'border-[#15c472] text-[#15c472]' : 'border-gray-300 text-gray-700'"
                       @input="handleOtpInput(index, $event)"
                       @keydown="handleOtpKeydown(index, $event)"
@@ -590,9 +630,17 @@
                     <button
                       type="button"
                       @click="handleVerifyNewCode"
-                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
+                      :disabled="isVerifyingNewPhoneCode"
+                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      تحقق
+                      <span v-if="isVerifyingNewPhoneCode" class="flex items-center justify-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        جاري التحقق...
+                      </span>
+                      <span v-else>تحقق</span>
                     </button>
                   </div>
                 </div>
@@ -794,9 +842,26 @@
                   <div class="pt-4 sm:pt-6">
                     <button
                       type="submit"
-                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
+                      :disabled="isChangingPassword"
+                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                      حفظ
+                      <span v-if="isChangingPassword" class="animate-spin">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-5 h-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                          />
+                        </svg>
+                      </span>
+                      <span>{{ isChangingPassword ? "جاري التحديث..." : "حفظ" }}</span>
                     </button>
                   </div>
                 </form>
@@ -2694,6 +2759,7 @@ const settingsSubTab = ref("personal-info");
 const showCurrentPassword = ref(false);
 const showNewPassword = ref(false);
 const showConfirmPassword = ref(false);
+const isChangingPassword = ref(false);
 
 // Commission Payment Modal State
 const isCommissionPaymentModalOpen = ref(false);
@@ -3388,13 +3454,14 @@ watch(activeTab, (newTab) => {
 
 // Reset OTP when switching settings sub-tabs
 watch(settingsSubTab, (newTab) => {
-  otpDigits.value = ["", "", "", "", "", ""];
+  otpDigits.value = ["", "", "", ""];
   isCodeVerified.value = false;
   hasEnteredNewMobile.value = false;
   isNewCodeVerified.value = false;
   hasSentOldPhoneCode.value = false;
   changeMobileForm.verificationCode = "";
   changeMobileForm.newMobile = "";
+  changeMobileForm.countryCode = "+966";
   
   // Send code to old phone when change-mobile tab is opened
   if (newTab === 'change-mobile') {
@@ -3878,16 +3945,20 @@ const changeMobileForm = reactive({
   currentMobile: "",
   newMobile: "",
   verificationCode: "",
+  countryCode: "+966",
 });
 
 // OTP Verification State
-const otpDigits = ref(["", "", "", "", "", ""]);
+const otpDigits = ref(["", "", "", ""]);
 const otpInputs = ref([]);
 const isCodeVerified = ref(false);
 const hasEnteredNewMobile = ref(false);
 const isNewCodeVerified = ref(false);
 const isSendingOldPhoneCode = ref(false);
 const hasSentOldPhoneCode = ref(false);
+const isVerifyingOldPhoneCode = ref(false);
+const isSendingNewPhoneCode = ref(false);
+const isVerifyingNewPhoneCode = ref(false);
 
 const changePasswordForm = reactive({
   currentPassword: "",
@@ -4001,7 +4072,7 @@ const handleOtpInput = (index, event) => {
     otpDigits.value[index] = value.slice(-1); // Only take the last character
     
     // Move to next input if available
-    if (index < 5 && otpInputs.value[index + 1]) {
+    if (index < 3 && otpInputs.value[index + 1]) {
       otpInputs.value[index + 1].focus();
     }
   } else {
@@ -4018,21 +4089,21 @@ const handleOtpKeydown = (index, event) => {
   if (event.key === 'ArrowLeft' && index > 0) {
     otpInputs.value[index - 1].focus();
   }
-  if (event.key === 'ArrowRight' && index < 5) {
+  if (event.key === 'ArrowRight' && index < 3) {
     otpInputs.value[index + 1].focus();
   }
 };
 
 const handleOtpPaste = (event) => {
   event.preventDefault();
-  const pastedData = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+  const pastedData = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 4);
   pastedData.split('').forEach((digit, index) => {
-    if (index < 6) {
+    if (index < 4) {
       otpDigits.value[index] = digit;
     }
   });
   // Focus the last filled input or the last input
-  const lastIndex = Math.min(pastedData.length - 1, 5);
+  const lastIndex = Math.min(pastedData.length - 1, 3);
   if (otpInputs.value[lastIndex]) {
     otpInputs.value[lastIndex].focus();
   }
@@ -4127,34 +4198,108 @@ const sendOldPhoneCode = async () => {
   }
 };
 
-const handleVerifyCode = () => {
+const handleVerifyCode = async () => {
   const code = otpDigits.value.join('');
-  if (code.length !== 6) {
+  if (code.length !== 4) {
     toast.add({
       severity: "warn",
       summary: "تحذير",
-      detail: "يرجى إدخال رمز التحقق المكون من 6 أرقام",
+      detail: "يرجى إدخال رمز التحقق المكون من 4 أرقام",
       life: 3000,
     });
     return;
   }
-  
-  // Store the verification code
-  changeMobileForm.verificationCode = code;
-  
-  // Here you would typically verify the code with the API
-  // For now, we'll just mark it as verified
-  isCodeVerified.value = true;
-  
-  toast.add({
-    severity: "success",
-    summary: "نجح",
-    detail: "تم التحقق من الكود بنجاح",
-    life: 3000,
-  });
+
+  isVerifyingOldPhoneCode.value = true;
+
+  try {
+    // Get token from multiple sources
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+    
+    // If no token found, try to get from localStorage
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error('Error getting token from localStorage:', e);
+      }
+    }
+
+    // If still no token, try authStore
+    if (!token) {
+      const authStore = useAuthStore();
+      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+        token = authStore.authUser.token;
+      } else if (authStore.token) {
+        token = authStore.token;
+      }
+    }
+
+    if (!token) {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: "يرجى تسجيل الدخول أولاً",
+        life: 3000,
+      });
+      isVerifyingOldPhoneCode.value = false;
+      return;
+    }
+
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/old-phone-check-code",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: {
+          code: code,
+          lang: "ar",
+          iso: "SA",
+        },
+      }
+    );
+
+    if (response && response.key === "success") {
+      // Store the verification code
+      changeMobileForm.verificationCode = code;
+      
+      // Mark as verified only after successful API response
+      isCodeVerified.value = true;
+      
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم التحقق من الكود بنجاح",
+        life: 3000,
+      });
+    } else {
+      throw new Error(response?.msg || "رمز التحقق غير صحيح");
+    }
+  } catch (err) {
+    console.error("Error verifying old phone code:", err);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        err?.data?.msg ||
+        err?.message ||
+        err?.data?.message ||
+        "رمز التحقق غير صحيح. الرجاء المحاولة مرة أخرى.",
+      life: 3000,
+    });
+  } finally {
+    isVerifyingOldPhoneCode.value = false;
+  }
 };
 
-const handleNextStep = () => {
+const handleNextStep = async () => {
   if (!changeMobileForm.newMobile.trim()) {
     toast.add({
       severity: "warn",
@@ -4177,59 +4322,209 @@ const handleNextStep = () => {
     return;
   }
 
-  // Mark that we've entered the new mobile number
-  hasEnteredNewMobile.value = true;
-  
-  // Reset OTP for new verification
-  otpDigits.value = ["", "", "", "", "", ""];
-  
-  // Here you would typically send the new mobile number to API and get a new verification code
-  toast.add({
-    severity: "success",
-    summary: "نجح",
-    detail: "تم إرسال رمز التحقق إلى الرقم الجديد",
-    life: 3000,
-  });
+  isSendingNewPhoneCode.value = true;
+
+  try {
+    // Get token from multiple sources
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+    
+    // If no token found, try to get from localStorage
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error('Error getting token from localStorage:', e);
+      }
+    }
+
+    // If still no token, try authStore
+    if (!token) {
+      const authStore = useAuthStore();
+      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+        token = authStore.authUser.token;
+      } else if (authStore.token) {
+        token = authStore.token;
+      }
+    }
+
+    if (!token) {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: "يرجى تسجيل الدخول أولاً",
+        life: 3000,
+      });
+      isSendingNewPhoneCode.value = false;
+      return;
+    }
+
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/change-phone-send-code",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: {
+          phone: mobileNumber,
+          country_code: changeMobileForm.countryCode.replace('+', ''),
+          lang: "ar",
+          iso: "SA",
+        },
+      }
+    );
+
+    if (response && response.key === "success") {
+      // Mark that we've entered the new mobile number
+      hasEnteredNewMobile.value = true;
+      
+      // Reset OTP for new verification
+      otpDigits.value = ["", "", "", ""];
+      
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم إرسال رمز التحقق إلى الرقم الجديد",
+        life: 3000,
+      });
+    } else {
+      throw new Error(response?.msg || "فشل في إرسال رمز التحقق");
+    }
+  } catch (err) {
+    console.error("Error sending new phone code:", err);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        err?.data?.msg ||
+        err?.message ||
+        err?.data?.message ||
+        "حدث خطأ أثناء إرسال رمز التحقق. الرجاء المحاولة مرة أخرى.",
+      life: 3000,
+    });
+  } finally {
+    isSendingNewPhoneCode.value = false;
+  }
 };
 
-const handleVerifyNewCode = () => {
+const handleVerifyNewCode = async () => {
   const code = otpDigits.value.join('');
-  if (code.length !== 6) {
+  if (code.length !== 4) {
     toast.add({
       severity: "warn",
       summary: "تحذير",
-      detail: "يرجى إدخال رمز التحقق المكون من 6 أرقام",
+      detail: "يرجى إدخال رمز التحقق المكون من 4 أرقام",
       life: 3000,
     });
     return;
   }
-  
-  // Store the new verification code
-  changeMobileForm.verificationCode = code;
-  
-  // Here you would typically verify the new code with the API and update the mobile number
-  isNewCodeVerified.value = true;
-  
-  toast.add({
-    severity: "success",
-    summary: "نجح",
-    detail: "تم التحقق من الكود بنجاح وتم تغيير رقم الجوال",
-    life: 3000,
-  });
 
-  // Navigate to personal-info section after successful verification
-  setTimeout(() => {
-    // Reset all states
-    otpDigits.value = ["", "", "", "", "", ""];
-    isCodeVerified.value = false;
-    hasEnteredNewMobile.value = false;
-    isNewCodeVerified.value = false;
-    changeMobileForm.newMobile = "";
-    changeMobileForm.verificationCode = "";
+  isVerifyingNewPhoneCode.value = true;
+
+  try {
+    // Get token from multiple sources
+    let token = userStore.token || user.value?.token || user.value?.access_token;
     
-    // Navigate to personal-info section
-    settingsSubTab.value = 'personal-info';
-  }, 2000);
+    // If no token found, try to get from localStorage
+    if (!token && process.client) {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error('Error getting token from localStorage:', e);
+      }
+    }
+
+    // If still no token, try authStore
+    if (!token) {
+      const authStore = useAuthStore();
+      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+        token = authStore.authUser.token;
+      } else if (authStore.token) {
+        token = authStore.token;
+      }
+    }
+
+    if (!token) {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: "يرجى تسجيل الدخول أولاً",
+        life: 3000,
+      });
+      isVerifyingNewPhoneCode.value = false;
+      return;
+    }
+
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/change-phone-check-code",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: {
+          code: code,
+          lang: "ar",
+          iso: "SA",
+        },
+      }
+    );
+
+    if (response && response.key === "success") {
+      // Store the new verification code
+      changeMobileForm.verificationCode = code;
+      
+      // Mark as verified only after successful API response
+      isNewCodeVerified.value = true;
+      
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم التحقق من الكود بنجاح وتم تغيير رقم الجوال",
+        life: 3000,
+      });
+
+      // Navigate to personal-info section after successful verification
+      setTimeout(() => {
+        // Reset all states
+        otpDigits.value = ["", "", "", ""];
+        isCodeVerified.value = false;
+        hasEnteredNewMobile.value = false;
+        isNewCodeVerified.value = false;
+        changeMobileForm.newMobile = "";
+        changeMobileForm.verificationCode = "";
+        
+        // Navigate to personal-info section
+        settingsSubTab.value = 'personal-info';
+      }, 2000);
+    } else {
+      throw new Error(response?.msg || "رمز التحقق غير صحيح");
+    }
+  } catch (err) {
+    console.error("Error verifying new phone code:", err);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        err?.data?.msg ||
+        err?.message ||
+        err?.data?.message ||
+        "رمز التحقق غير صحيح. الرجاء المحاولة مرة أخرى.",
+      life: 3000,
+    });
+  } finally {
+    isVerifyingNewPhoneCode.value = false;
+  }
 };
 
 const handleSubmit = () => {
@@ -4309,7 +4604,7 @@ const handleChangeMobileSubmit = () => {
   changeMobileForm.verificationCode = "";
 };
 
-const handleChangePasswordSubmit = () => {
+const handleChangePasswordSubmit = async () => {
   if (
     !changePasswordForm.currentPassword.trim() ||
     !changePasswordForm.newPassword.trim() ||
@@ -4332,22 +4627,112 @@ const handleChangePasswordSubmit = () => {
     });
     return;
   }
-  console.log("Change password form submitted:", changePasswordForm);
-  // Add your form submission logic here
-  toast.add({
-    severity: "success",
-    summary: "نجح",
-    detail: "تم تغيير كلمة المرور بنجاح",
-    life: 3000,
-  });
-  // Reset form
-  changePasswordForm.currentPassword = "";
-  changePasswordForm.newPassword = "";
-  changePasswordForm.confirmPassword = "";
-  // Reset password visibility
-  showCurrentPassword.value = false;
-  showNewPassword.value = false;
-  showConfirmPassword.value = false;
+  
+  // Validate password length
+  if (changePasswordForm.newPassword.length < 6) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+      life: 3000,
+    });
+    return;
+  }
+
+  // Get token from multiple sources
+  let token = userStore.token || user.value?.token || user.value?.access_token;
+
+  // If no token found, try to get from localStorage
+  if (!token && process.client) {
+    try {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        token = parsedUser?.token || parsedUser?.access_token;
+      }
+    } catch (e) {
+      console.error("Error getting token from localStorage:", e);
+    }
+  }
+
+  // If still no token, try authStore
+  if (!token) {
+    const authStore = useAuthStore();
+    if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+      token = authStore.authUser.token;
+    } else if (authStore.token) {
+      token = authStore.token;
+    }
+  }
+
+  if (!token) {
+    toast.add({
+      severity: "warn",
+      summary: "تنبيه",
+      detail: "يرجى تسجيل الدخول قبل تغيير كلمة المرور.",
+      life: 3000,
+    });
+    return;
+  }
+
+  // Show loading state
+  isChangingPassword.value = true;
+
+  try {
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/update-passward",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: {
+          old_password: changePasswordForm.currentPassword,
+          new_password: changePasswordForm.newPassword,
+          new_password_confirmation: changePasswordForm.confirmPassword,
+        },
+      }
+    );
+
+    // Check if response indicates success
+    if (response && response.key === "success") {
+      // Reset form after successful submission
+      changePasswordForm.currentPassword = "";
+      changePasswordForm.newPassword = "";
+      changePasswordForm.confirmPassword = "";
+      // Reset password visibility
+      showCurrentPassword.value = false;
+      showNewPassword.value = false;
+      showConfirmPassword.value = false;
+
+      // Show success message
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم تغيير كلمة المرور بنجاح",
+        life: 3000,
+      });
+    } else {
+      throw new Error(response?.msg || "فشل في تغيير كلمة المرور");
+    }
+  } catch (error) {
+    console.error("Error changing password:", error);
+    const errorMessage =
+      error?.data?.message ||
+      error?.data?.msg ||
+      error?.message ||
+      "حدث خطأ أثناء تغيير كلمة المرور. الرجاء المحاولة مرة أخرى.";
+    
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: errorMessage,
+      life: 3000,
+    });
+  } finally {
+    isChangingPassword.value = false;
+  }
 };
 
 const handlePackageSubscribe = (packageItem) => {
