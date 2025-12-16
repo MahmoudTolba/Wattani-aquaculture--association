@@ -2139,8 +2139,85 @@
 
             <!-- Complaints Tab Content -->
             <div v-if="activeTab === 'complaints'" class="space-y-6">
+              <!-- New Complaint Form View -->
+              <div v-if="isShowingNewComplaintForm" class="space-y-6">
+                <!-- Back Button -->
+                <button
+                  @click="isShowingNewComplaintForm = false"
+                  class="flex items-center gap-2 text-gray-700 hover:text-[#15c472] transition-colors text-sm sm:text-base"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                  <span>العودة</span>
+                </button>
+
+                <!-- New Complaint Form -->
+                <form
+                  @submit.prevent="handleNewComplaintSubmit"
+                  class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 space-y-6"
+                >
+                  <!-- Message Title -->
+                  <div class="space-y-2">
+                    <label
+                      for="complaintTitle"
+                      class="block text-sm sm:text-base font-bold text-gray-800 text-right"
+                    >
+                      عنوان الرسالة
+                    </label>
+                    <input
+                      id="complaintTitle"
+                      v-model="newComplaintForm.title"
+                      type="text"
+                      placeholder="عنوان"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#15c472] focus:border-transparent text-right"
+                      required
+                    />
+                  </div>
+
+                  <!-- Message Body -->
+                  <div class="space-y-2">
+                    <label
+                      for="complaintMessage"
+                      class="block text-sm sm:text-base font-bold text-gray-800 text-right"
+                    >
+                      نص الرسالة
+                    </label>
+                    <textarea
+                      id="complaintMessage"
+                      v-model="newComplaintForm.message"
+                      placeholder="نص الرسالة"
+                      rows="6"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#15c472] focus:border-transparent text-right resize-none"
+                      required
+                    ></textarea>
+                  </div>
+
+                  <!-- Submit Button -->
+                  <div class="flex justify-center pt-4">
+                    <button
+                      type="submit"
+                      class="bg-gradient-to-r w-full max-w-2xl mx-auto from-teal-600 to-[#15c472] text-white font-bold py-4 px-8 sm:px-12 rounded-xl hover:from-teal-700 hover:to-[#12a866] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-base sm:text-lg"
+                    >
+                      ارسال
+                    </button>
+                  </div>
+                </form>
+              </div>
+
               <!-- Complaint Detail View -->
-              <div v-if="selectedComplaint" class="space-y-6">
+              <div v-else-if="selectedComplaint" class="space-y-6">
                 <!-- Back Button -->
                 <button
                   @click="selectedComplaint = null"
@@ -2269,8 +2346,19 @@
 
               <!-- Complaints List View -->
               <div v-else class="space-y-6">
+                <!-- Loading State -->
+                <div v-if="isLoadingComplaints" class="flex justify-center items-center py-12">
+                  <div class="text-gray-600 text-lg">جاري التحميل...</div>
+                </div>
+
+                <!-- Error State -->
+                <div v-else-if="complaintsError" class="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-6">
+                  <p class="text-red-800 text-center">{{ complaintsError }}</p>
+                </div>
+
                 <!-- Complaints Grid -->
                 <div
+                  v-else-if="complaints.length > 0"
                   class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 md:grid-cols-1 gap-4 sm:gap-6"
                 >
                   <div
@@ -2339,8 +2427,13 @@
                   </div>
                 </div>
 
+                <!-- Empty State -->
+                <div v-else class="text-center py-12">
+                  <p class="text-gray-600 text-lg">لا توجد شكاوى متاحة</p>
+                </div>
+
                 <!-- Pagination -->
-                <div class="flex justify-center pt-4">
+                <div v-if="!isLoadingComplaints && !complaintsError && complaints.length > 0" class="flex justify-center pt-4">
                   <Paginator
                     :rows="complaintsPerPage"
                     :total-records="totalComplaints"
@@ -2350,6 +2443,17 @@
                     class="p-paginator"
                   />
                 </div>
+
+                <!-- New Complaint Button -->
+                <div class="flex justify-center pt-6">
+                  <button
+                    @click="isShowingNewComplaintForm = true"
+                    class="bg-gradient-to-r w-full max-w-2xl mx-auto from-teal-600 to-[#15c472] text-white font-bold py-4 px-8 sm:px-12 rounded-xl hover:from-teal-700 hover:to-[#12a866] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-base sm:text-lg"
+                  >
+                    شكوي جديدة
+                  </button>
+                </div>
+                
               </div>
             </div>
 
@@ -3088,6 +3192,16 @@ const faqError = ref(null);
 const complaintsPerPage = ref(4); // Items per page
 const complaintsFirst = ref(0); // First item index
 const selectedComplaint = ref<Complaint | null>(null);
+const isShowingNewComplaintForm = ref(false);
+const isLoadingComplaints = ref(false);
+const complaintsError = ref<string | null>(null);
+const hasFetchedComplaints = ref(false);
+
+// New Complaint Form
+const newComplaintForm = reactive({
+  title: "",
+  message: "",
+});
 
 // FAQ Data
 const faqs = ref<FAQItem[]>([]);
@@ -3722,6 +3836,8 @@ watch(activeTab, (newTab) => {
     fetchPackages();
   } else if (newTab === "subscription" && !hasFetchedSubscriptions.value) {
     fetchSubscriptions();
+  } else if (newTab === "complaints" && !hasFetchedComplaints.value && !isLoadingComplaints.value) {
+    fetchComplaints();
   }
 });
 
@@ -4069,98 +4185,7 @@ const fetchSubscriptions = async () => {
 };
 
 // Complaints Data
-const complaints = ref([
-  {
-    id: 1,
-    number: "٨٤٥١",
-    date: "٢٠٢٥ / ١٠ / ١٠",
-    address: "الرياض",
-    status: "جديدة",
-    description:
-      "هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر. هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر.",
-  },
-  {
-    id: 2,
-    number: "٥٤٨٧٦",
-    date: "٢٠٢٥ / ١٠ / ٠٩",
-    address: "الرياض",
-    status: "جاري المعالجة",
-    description:
-      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
-  },
-  {
-    id: 3,
-    number: "٥٤٨٧٧",
-    date: "٢٠٢٥ / ١٠ / ٠٨",
-    address: "الرياض",
-    status: "منتهية",
-    description:
-      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
-  },
-  {
-    id: 4,
-    number: "٥٤٨٧٨",
-    date: "٢٠٢٥ / ١٠ / ٠٧",
-    address: "الرياض",
-    status: "منتهية",
-    description:
-      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
-  },
-  {
-    id: 5,
-    number: "٥٤٨٧٩",
-    date: "٢٠٢٥ / ١٠ / ٠٦",
-    address: "جدة",
-    status: "جديدة",
-    description:
-      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
-  },
-  {
-    id: 6,
-    number: "٥٤٨٨٠",
-    date: "٢٠٢٥ / ١٠ / ٠٥",
-    address: "الدمام",
-    status: "جاري المعالجة",
-    description:
-      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
-  },
-  {
-    id: 7,
-    number: "٥٤٨٨١",
-    date: "٢٠٢٥ / ١٠ / ٠٤",
-    address: "الرياض",
-    status: "منتهية",
-    description:
-      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
-  },
-  {
-    id: 8,
-    number: "٥٤٨٨٢",
-    date: "٢٠٢٥ / ١٠ / ٠٣",
-    address: "مكة المكرمة",
-    status: "جديدة",
-    description:
-      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
-  },
-  {
-    id: 9,
-    number: "٥٤٨٨٣",
-    date: "٢٠٢٥ / ١٠ / ٠٢",
-    address: "الرياض",
-    status: "جاري المعالجة",
-    description:
-      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
-  },
-  {
-    id: 10,
-    number: "٥٤٨٨٤",
-    date: "٢٠٢٥ / ١٠ / ٠١",
-    address: "المدينة المنورة",
-    status: "منتهية",
-    description:
-      "لوريم إيبسوم هو ببساطة نص شكلي ويُستخدم في صناعات المطابع ودور النشر. لوريم إيبسوم كان النص الوهمي القياسي في الصناعة منذ القرن الخامس عشر الميلادي.",
-  },
-]);
+const complaints = ref<Complaint[]>([]);
 
 // Total complaints count
 const totalComplaints = computed(() => complaints.value.length);
@@ -4182,6 +4207,88 @@ const onComplaintsPageChange = (event: PaginationEvent) => {
   }
 };
 
+// Fetch complaints from API
+const fetchComplaints = async () => {
+  isLoadingComplaints.value = true;
+  complaintsError.value = null;
+
+  try {
+    // Get token for authenticated request
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    if (!token) {
+      complaintsError.value = "يرجى تسجيل الدخول لعرض الشكاوى.";
+      return;
+    }
+
+    const response = await $fetch<ApiResponse<any>>(
+      "https://backend.wattani-sa.com/api/v1/complaints",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      }
+    );
+
+    if (response?.key === "unauthenticated") {
+      complaintsError.value =
+        response?.msg || "يرجى تسجيل الدخول لعرض الشكاوى.";
+      return;
+    }
+
+    if (response && response.key === "success" && response.data) {
+      // Map API response to complaint structure
+      const apiComplaints =
+        (Array.isArray(response.data) && response.data) ||
+        (Array.isArray(response.data.complaints) && response.data.complaints) ||
+        (Array.isArray((response.data as any)?.data) && (response.data as any).data) ||
+        [];
+
+      complaints.value = apiComplaints.map((item: any) => ({
+        id: item.id || item.complaint_id || 0,
+        number: item.number || item.complaint_number || item.id?.toString() || "",
+        date: item.date || item.created_at || item.created_date || "",
+        address: item.address || item.location || "",
+        status: item.status || "جديدة",
+        description: item.description || item.message || item.complaint || "",
+      }));
+      hasFetchedComplaints.value = true;
+    } else {
+      throw new Error(response?.msg || "فشل في تحميل الشكاوى");
+    }
+  } catch (error: any) {
+    console.error("Error fetching complaints:", error);
+    complaintsError.value =
+      (error as any)?.data?.msg ||
+      (error as any)?.message ||
+      "حدث خطأ أثناء تحميل الشكاوى. الرجاء المحاولة مرة أخرى.";
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: complaintsError.value,
+      life: 3000,
+    });
+  } finally {
+    isLoadingComplaints.value = false;
+  }
+};
+
 // View complaint details
 const viewComplaintDetails = (complaintId: number) => {
   const complaint = complaints.value.find((c) => c.id === complaintId);
@@ -4191,6 +4298,96 @@ const viewComplaintDetails = (complaintId: number) => {
     if (import.meta.client) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  }
+};
+
+// Handle new complaint form submission
+const handleNewComplaintSubmit = async () => {
+  if (!newComplaintForm.title.trim() || !newComplaintForm.message.trim()) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى ملء جميع الحقول المطلوبة",
+      life: 3000,
+    });
+    return;
+  }
+
+  try {
+    // Get token for authenticated request
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    if (!token) {
+      toast.add({
+        severity: "warn",
+        summary: "تنبيه",
+        detail: "يرجى تسجيل الدخول قبل إرسال الشكوى",
+        life: 3000,
+      });
+      return;
+    }
+
+    // Make API call to submit complaint
+    // Create FormData for form-data request
+    const formData = new FormData();
+    formData.append("subject", newComplaintForm.title);
+    formData.append("complaint", newComplaintForm.message);
+    formData.append("lang", "ar");
+    formData.append("iso", "SA");
+
+    const response = await $fetch<ApiResponse>(
+      "https://backend.wattani-sa.com/api/v1/new-complaint",
+      {
+        method: "POST",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      }
+    );
+
+    if (response && response.key === "success") {
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم إرسال الشكوى بنجاح",
+        life: 3000,
+      });
+
+      // Reset form
+      newComplaintForm.title = "";
+      newComplaintForm.message = "";
+      isShowingNewComplaintForm.value = false;
+
+      // Refresh complaints list
+      await fetchComplaints();
+    } else {
+      throw new Error(response?.msg || "فشل في إرسال الشكوى");
+    }
+  } catch (error: any) {
+    console.error("Error submitting complaint:", error);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        error?.data?.msg ||
+        error?.message ||
+        "حدث خطأ أثناء إرسال الشكوى. الرجاء المحاولة مرة أخرى.",
+      life: 3000,
+    });
   }
 };
 
