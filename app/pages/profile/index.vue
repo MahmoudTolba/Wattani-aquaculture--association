@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <div
       class="min-h-screen bg-white-50 py-4 px-3 sm:py-6 sm:px-4 md:py-8 md:px-8 lg:px-12"
     >
@@ -472,16 +472,27 @@
               <!-- Change Mobile Number Sub-tab -->
               <div v-if="settingsSubTab === 'change-mobile'" class="space-y-6">
                 <!-- Verification Code Section (First - Initial Verification) -->
-                <div v-if="!isCodeVerified && !hasEnteredNewMobile" class="space-y-4">
+                <div
+                  v-if="!isCodeVerified && !hasEnteredNewMobile"
+                  class="space-y-4"
+                >
                   <div class="text-center space-y-2">
-                    <h2 class="text-2xl sm:text-3xl font-bold text-[#15c472]">كود التحقق</h2>
-                    <p class="text-gray-600 text-sm sm:text-base">تغيير رقم الجوال</p>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-[#15c472]">
+                      كود التحقق
+                    </h2>
+                    <p class="text-gray-600 text-sm sm:text-base">
+                      تغيير رقم الجوال
+                    </p>
                   </div>
 
                   <!-- Loading State -->
                   <div v-if="isSendingOldPhoneCode" class="text-center py-4">
-                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#15c472] mb-2"></div>
-                    <p class="text-gray-600 text-sm">جاري إرسال رمز التحقق...</p>
+                    <div
+                      class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#15c472] mb-2"
+                    ></div>
+                    <p class="text-gray-600 text-sm">
+                      جاري إرسال رمز التحقق...
+                    </p>
                   </div>
 
                   <!-- 4-Digit OTP Input -->
@@ -489,14 +500,18 @@
                     <input
                       v-for="(digit, index) in otpDigits"
                       :key="index"
-                      :ref="el => otpInputs[index] = el"
+                      :ref="(el) => (otpInputs[index] = el)"
                       v-model="otpDigits[index]"
                       type="text"
                       inputmode="numeric"
                       maxlength="1"
                       :disabled="isVerifyingOldPhoneCode"
                       class="w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold border-2 rounded-lg focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      :class="otpDigits[index] ? 'border-[#15c472] text-[#15c472]' : 'border-gray-300 text-gray-700'"
+                      :class="
+                        otpDigits[index]
+                          ? 'border-[#15c472] text-[#15c472]'
+                          : 'border-gray-300 text-gray-700'
+                      "
                       @input="handleOtpInput(index, $event)"
                       @keydown="handleOtpKeydown(index, $event)"
                       @paste="handleOtpPaste($event)"
@@ -511,10 +526,29 @@
                       :disabled="isVerifyingOldPhoneCode"
                       class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <span v-if="isVerifyingOldPhoneCode" class="flex items-center justify-center">
-                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <span
+                        v-if="isVerifyingOldPhoneCode"
+                        class="flex items-center justify-center"
+                      >
+                        <svg
+                          class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          ></circle>
+                          <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
                         </svg>
                         جاري التحقق...
                       </span>
@@ -524,7 +558,10 @@
                 </div>
 
                 <!-- Mobile Number Input (After Initial Verification) -->
-                <div v-if="isCodeVerified && !hasEnteredNewMobile" class="space-y-6">
+                <div
+                  v-if="isCodeVerified && !hasEnteredNewMobile"
+                  class="space-y-6"
+                >
                   <!-- Mobile Number Field -->
                   <div class="space-y-2">
                     <label
@@ -542,7 +579,7 @@
                         <select
                           v-model="changeMobileForm.countryCode"
                           class="bg-transparent outline-none text-right appearance-none cursor-pointer focus:outline-none"
-                          style="background-image: none;"
+                          style="background-image: none"
                         >
                           <option value="+966">+966</option>
                           <option value="+971">+971</option>
@@ -587,10 +624,29 @@
                       :disabled="isSendingNewPhoneCode"
                       class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <span v-if="isSendingNewPhoneCode" class="flex items-center justify-center">
-                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <span
+                        v-if="isSendingNewPhoneCode"
+                        class="flex items-center justify-center"
+                      >
+                        <svg
+                          class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          ></circle>
+                          <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
                         </svg>
                         جاري الإرسال...
                       </span>
@@ -600,10 +656,17 @@
                 </div>
 
                 <!-- Verification Code Section (Second - For New Mobile Number) -->
-                <div v-if="hasEnteredNewMobile && !isNewCodeVerified" class="space-y-4">
+                <div
+                  v-if="hasEnteredNewMobile && !isNewCodeVerified"
+                  class="space-y-4"
+                >
                   <div class="text-center space-y-2">
-                    <h2 class="text-2xl sm:text-3xl font-bold text-[#15c472]">كود التحقق</h2>
-                    <p class="text-gray-600 text-sm sm:text-base">تغيير رقم الجوال</p>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-[#15c472]">
+                      كود التحقق
+                    </h2>
+                    <p class="text-gray-600 text-sm sm:text-base">
+                      تغيير رقم الجوال
+                    </p>
                   </div>
 
                   <!-- 4-Digit OTP Input -->
@@ -611,14 +674,18 @@
                     <input
                       v-for="(digit, index) in otpDigits"
                       :key="`new-${index}`"
-                      :ref="el => otpInputs[index] = el"
+                      :ref="(el) => (otpInputs[index] = el)"
                       v-model="otpDigits[index]"
                       type="text"
                       inputmode="numeric"
                       maxlength="1"
                       :disabled="isVerifyingNewPhoneCode"
                       class="w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold border-2 rounded-lg focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      :class="otpDigits[index] ? 'border-[#15c472] text-[#15c472]' : 'border-gray-300 text-gray-700'"
+                      :class="
+                        otpDigits[index]
+                          ? 'border-[#15c472] text-[#15c472]'
+                          : 'border-gray-300 text-gray-700'
+                      "
                       @input="handleOtpInput(index, $event)"
                       @keydown="handleOtpKeydown(index, $event)"
                       @paste="handleOtpPaste($event)"
@@ -633,10 +700,29 @@
                       :disabled="isVerifyingNewPhoneCode"
                       class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <span v-if="isVerifyingNewPhoneCode" class="flex items-center justify-center">
-                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <span
+                        v-if="isVerifyingNewPhoneCode"
+                        class="flex items-center justify-center"
+                      >
+                        <svg
+                          class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          ></circle>
+                          <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
                         </svg>
                         جاري التحقق...
                       </span>
@@ -861,7 +947,9 @@
                           />
                         </svg>
                       </span>
-                      <span>{{ isChangingPassword ? "جاري التحديث..." : "حفظ" }}</span>
+                      <span>{{
+                        isChangingPassword ? "جاري التحديث..." : "حفظ"
+                      }}</span>
                     </button>
                   </div>
                 </form>
@@ -1363,15 +1451,23 @@
             <!-- Ratings Tab Content -->
             <div v-if="activeTab === 'ratings'" class="space-y-6">
               <!-- Loading State -->
-              <div v-if="isLoadingRatings" class="flex justify-center items-center py-12">
+              <div
+                v-if="isLoadingRatings"
+                class="flex justify-center items-center py-12"
+              >
                 <div class="text-center">
-                  <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"></div>
+                  <div
+                    class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"
+                  ></div>
                   <p class="text-gray-600 text-sm">جاري التحميل...</p>
                 </div>
               </div>
 
               <!-- Error State -->
-              <div v-else-if="ratingsError" class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+              <div
+                v-else-if="ratingsError"
+                class="bg-red-50 border border-red-200 rounded-xl p-4 text-center"
+              >
                 <p class="text-red-600 text-sm">{{ ratingsError }}</p>
                 <button
                   @click="fetchRatings(ratingsCurrentPage)"
@@ -1384,7 +1480,10 @@
               <!-- Reviews List -->
               <div v-else class="space-y-4">
                 <!-- Empty State -->
-                <div v-if="paginatedReviews.length === 0" class="text-center py-12">
+                <div
+                  v-if="paginatedReviews.length === 0"
+                  class="text-center py-12"
+                >
                   <p class="text-gray-500 text-lg">لا توجد تقييمات حالياً</p>
                 </div>
 
@@ -1438,7 +1537,10 @@
               </div>
 
               <!-- Pagination -->
-              <div v-if="!isLoadingRatings && !ratingsError && totalReviews > 0" class="flex justify-center pt-4">
+              <div
+                v-if="!isLoadingRatings && !ratingsError && totalReviews > 0"
+                class="flex justify-center pt-4"
+              >
                 <Paginator
                   :rows="reviewsPerPage"
                   :total-records="totalReviews"
@@ -1453,15 +1555,23 @@
             <!-- Following Tab Content -->
             <div v-if="activeTab === 'following'" class="space-y-6">
               <!-- Loading State -->
-              <div v-if="isLoadingFollowing" class="flex justify-center items-center py-12">
+              <div
+                v-if="isLoadingFollowing"
+                class="flex justify-center items-center py-12"
+              >
                 <div class="text-center">
-                  <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"></div>
+                  <div
+                    class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"
+                  ></div>
                   <p class="text-gray-600 text-sm">جاري التحميل...</p>
                 </div>
               </div>
 
               <!-- Error State -->
-              <div v-else-if="followingError" class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+              <div
+                v-else-if="followingError"
+                class="bg-red-50 border border-red-200 rounded-xl p-4 text-center"
+              >
                 <p class="text-red-600 text-sm">{{ followingError }}</p>
                 <button
                   @click="fetchFollowers(followingCurrentPage)"
@@ -1474,7 +1584,10 @@
               <!-- Following Users List -->
               <div v-else class="space-y-3 sm:space-y-4">
                 <!-- Empty State -->
-                <div v-if="paginatedFollowing.length === 0" class="text-center py-12">
+                <div
+                  v-if="paginatedFollowing.length === 0"
+                  class="text-center py-12"
+                >
                   <p class="text-gray-500 text-lg">لا يوجد متابعين حالياً</p>
                 </div>
 
@@ -1517,7 +1630,12 @@
               </div>
 
               <!-- Pagination -->
-              <div v-if="!isLoadingFollowing && !followingError && totalFollowing > 0" class="flex justify-center pt-4">
+              <div
+                v-if="
+                  !isLoadingFollowing && !followingError && totalFollowing > 0
+                "
+                class="flex justify-center pt-4"
+              >
                 <Paginator
                   :rows="followingPerPage"
                   :total-records="totalFollowing"
@@ -1573,7 +1691,11 @@
                   <!-- Display Amount -->
                   <div class="flex items-center justify-center gap-2">
                     <span class="text-green-600 text-3xl sm:text-4xl font-bold">
-                      {{ calculatedFee !== null ? calculatedFee : (commissionAmount || "60") }}
+                      {{
+                        calculatedFee !== null
+                          ? calculatedFee
+                          : commissionAmount || "60"
+                      }}
                     </span>
                     <img
                       src="/icons/green-currency.svg"
@@ -1584,17 +1706,29 @@
 
                   <!-- Loading State for Calculation -->
                   <div v-if="isCalculatingFee" class="text-center">
-                    <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-[#15c472]"></div>
-                    <p class="text-gray-600 text-sm mt-2">جاري حساب الرسوم...</p>
+                    <div
+                      class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-[#15c472]"
+                    ></div>
+                    <p class="text-gray-600 text-sm mt-2">
+                      جاري حساب الرسوم...
+                    </p>
                   </div>
 
                   <!-- Error State -->
-                  <div v-if="feeCalculationError" class="bg-red-50 border border-red-200 rounded-xl p-3 text-center">
-                    <p class="text-red-600 text-sm">{{ feeCalculationError }}</p>
+                  <div
+                    v-if="feeCalculationError"
+                    class="bg-red-50 border border-red-200 rounded-xl p-3 text-center"
+                  >
+                    <p class="text-red-600 text-sm">
+                      {{ feeCalculationError }}
+                    </p>
                   </div>
 
                   <!-- Calculated Fee Info -->
-                  <div v-if="calculatedFee !== null && commissionAmount" class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center">
+                  <div
+                    v-if="calculatedFee !== null && commissionAmount"
+                    class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center"
+                  >
                     <p class="text-blue-800 text-sm">
                       المبلغ الأصلي: {{ commissionAmount }} ريال
                     </p>
@@ -1607,12 +1741,28 @@
                   <button
                     type="button"
                     @click="openCommissionPaymentModal"
-                    :disabled="isCalculatingFee || isPayingFee || !commissionAmount || parseFloat(commissionAmount) <= 0"
+                    :disabled="
+                      isCalculatingFee ||
+                      isPayingFee ||
+                      !commissionAmount ||
+                      parseFloat(commissionAmount) <= 0
+                    "
                     class="w-full bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     <span v-if="isPayingFee" class="animate-spin">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
                       </svg>
                     </span>
                     <span>{{ isPayingFee ? "جاري الدفع..." : "دفع" }}</span>
@@ -1623,14 +1773,22 @@
 
             <!-- Packages Tab Content -->
             <div v-if="activeTab === 'packages'" class="space-y-6">
-              <div v-if="isLoadingPackages" class="flex justify-center items-center py-12">
+              <div
+                v-if="isLoadingPackages"
+                class="flex justify-center items-center py-12"
+              >
                 <div class="text-center">
-                  <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"></div>
+                  <div
+                    class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"
+                  ></div>
                   <p class="text-gray-600 text-sm">جاري تحميل الباقات...</p>
                 </div>
               </div>
 
-              <div v-else-if="packagesError" class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+              <div
+                v-else-if="packagesError"
+                class="bg-red-50 border border-red-200 rounded-xl p-4 text-center"
+              >
                 <p class="text-red-600 text-sm">{{ packagesError }}</p>
                 <button
                   @click="fetchPackages"
@@ -1642,10 +1800,15 @@
 
               <div v-else>
                 <div v-if="packages.length === 0" class="text-center py-12">
-                  <p class="text-gray-500 text-lg">لا توجد باقات متاحة حالياً</p>
+                  <p class="text-gray-500 text-lg">
+                    لا توجد باقات متاحة حالياً
+                  </p>
                 </div>
 
-                <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-6">
+                <div
+                  v-else
+                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-6"
+                >
                   <!-- Golden Package Card -->
                   <div
                     v-for="(packageItem, index) in packages"
@@ -1670,7 +1833,9 @@
                       <!-- Title with Icon -->
                       <div class="flex items-center gap-2">
                         <span>🥇 </span>
-                        <span class="text-lg sm:text-xl font-bold text-[#FE9B0E]">
+                        <span
+                          class="text-lg sm:text-xl font-bold text-[#FE9B0E]"
+                        >
                           {{ packageItem.title }}
                         </span>
                       </div>
@@ -1701,14 +1866,22 @@
 
             <!-- Subscription Tab Content -->
             <div v-if="activeTab === 'subscription'" class="space-y-6">
-              <div v-if="isLoadingSubscriptions" class="flex justify-center items-center py-12">
+              <div
+                v-if="isLoadingSubscriptions"
+                class="flex justify-center items-center py-12"
+              >
                 <div class="text-center">
-                  <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"></div>
+                  <div
+                    class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"
+                  ></div>
                   <p class="text-gray-600 text-sm">جاري تحميل الاشتراكات...</p>
                 </div>
               </div>
 
-              <div v-else-if="subscriptionsError" class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+              <div
+                v-else-if="subscriptionsError"
+                class="bg-red-50 border border-red-200 rounded-xl p-4 text-center"
+              >
                 <p class="text-red-600 text-sm">{{ subscriptionsError }}</p>
                 <button
                   @click="fetchSubscriptions"
@@ -1719,7 +1892,10 @@
               </div>
 
               <div v-else>
-                <div v-if="subscriptions.length === 0" class="text-center py-12">
+                <div
+                  v-if="subscriptions.length === 0"
+                  class="text-center py-12"
+                >
                   <p class="text-gray-500 text-lg">لا توجد اشتراكات حالياً</p>
                 </div>
 
@@ -1809,15 +1985,23 @@
             <!-- FAQ Tab Content -->
             <div v-if="activeTab === 'faq'" class="space-y-6">
               <!-- Loading State -->
-              <div v-if="isLoadingFaq" class="flex justify-center items-center py-12">
+              <div
+                v-if="isLoadingFaq"
+                class="flex justify-center items-center py-12"
+              >
                 <div class="text-center">
-                  <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"></div>
+                  <div
+                    class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"
+                  ></div>
                   <p class="text-gray-600 text-sm">جاري التحميل...</p>
                 </div>
               </div>
 
               <!-- Error State -->
-              <div v-else-if="faqError" class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+              <div
+                v-else-if="faqError"
+                class="bg-red-50 border border-red-200 rounded-xl p-4 text-center"
+              >
                 <p class="text-red-600 text-sm">{{ faqError }}</p>
                 <button
                   @click="fetchFAQContent"
@@ -1831,7 +2015,9 @@
               <div v-else class="space-y-3">
                 <!-- Empty State -->
                 <div v-if="faqs.length === 0" class="text-center py-12">
-                  <p class="text-gray-500 text-lg">لا توجد أسئلة متكررة حالياً</p>
+                  <p class="text-gray-500 text-lg">
+                    لا توجد أسئلة متكررة حالياً
+                  </p>
                 </div>
 
                 <!-- FAQs -->
@@ -1845,14 +2031,20 @@
                       {{ faq.question }}
                     </AccordionHeader>
                     <AccordionContent>
-                      <div class="m-0 text-gray-700 leading-relaxed" v-html="faq.answer"></div>
+                      <div
+                        class="m-0 text-gray-700 leading-relaxed"
+                        v-html="faq.answer"
+                      ></div>
                     </AccordionContent>
                   </AccordionPanel>
                 </Accordion>
               </div>
 
               <!-- Pagination -->
-              <div v-if="!isLoadingFaq && !faqError && totalFaqs > 0" class="flex justify-center pt-4">
+              <div
+                v-if="!isLoadingFaq && !faqError && totalFaqs > 0"
+                class="flex justify-center pt-4"
+              >
                 <Paginator
                   :rows="faqPerPage"
                   :total-records="totalFaqs"
@@ -1866,7 +2058,9 @@
 
             <!-- Privacy Tab Content -->
             <div v-if="activeTab === 'privacy'" class="space-y-6">
-              <div class="rounded-xl p-4 sm:p-6 bg-white border border-gray-200">
+              <div
+                class="rounded-xl p-4 sm:p-6 bg-white border border-gray-200"
+              >
                 <p
                   v-if="isLoadingPrivacy"
                   class="text-gray-500 text-base sm:text-lg leading-relaxed text-start mb-4"
@@ -1890,7 +2084,9 @@
 
             <!-- Terms Tab Content -->
             <div v-if="activeTab === 'terms'" class="space-y-6">
-              <div class="rounded-xl p-4 sm:p-6 bg-white border border-gray-200">
+              <div
+                class="rounded-xl p-4 sm:p-6 bg-white border border-gray-200"
+              >
                 <p
                   v-if="isLoadingTerms"
                   class="text-gray-500 text-base sm:text-lg leading-relaxed text-start mb-4"
@@ -1916,7 +2112,9 @@
             <div v-if="activeTab === 'about-us'" class="space-y-6">
               <div class="space-y-6">
                 <!-- Introduction Section -->
-                <div class="rounded-xl p-4 sm:p-6 bg-white border border-gray-200">
+                <div
+                  class="rounded-xl p-4 sm:p-6 bg-white border border-gray-200"
+                >
                   <p
                     v-if="isLoadingAbout"
                     class="text-gray-500 text-base sm:text-lg leading-relaxed text-start mb-4"
@@ -2318,9 +2516,7 @@
               isMobileMenuOpen ? 'block' : 'hidden lg:block',
             ]"
           >
-            <div
-              class="  p-3 sm:p-4"
-            > 
+            <div class="p-3 sm:p-4">
               <nav
                 class="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar"
               >
@@ -2661,10 +2857,7 @@
     </div>
 
     <!-- Charge Wallet Modal -->
-    <ChargeWalletModal
-      v-model="isChargeModalOpen"
-      @confirm="handleCharge"
-    />
+    <ChargeWalletModal v-model="isChargeModalOpen" @confirm="handleCharge" />
 
     <!-- Commission Payment Modal -->
     <CommissionPaymentModal
@@ -2674,10 +2867,7 @@
     />
 
     <!-- Success Modal -->
-    <SuccessModal
-      v-model="isSuccessModalOpen"
-      title="تم الاشتراك بنجاح"
-    />
+    <SuccessModal v-model="isSuccessModalOpen" title="تم الاشتراك بنجاح" />
 
     <!-- Package Payment Modal -->
     <PackagePaymentModal
@@ -2688,10 +2878,7 @@
     />
 
     <!-- Logout Confirmation Modal -->
-    <LogoutModal
-      v-model="isLogoutModalOpen"
-      @confirm="confirmLogout"
-    />
+    <LogoutModal v-model="isLogoutModalOpen" @confirm="confirmLogout" />
 
     <!-- Delete Account Confirmation Modal -->
     <DeleteAccountModal
@@ -2700,28 +2887,15 @@
     />
 
     <!-- Delete Ad Confirmation Modal -->
-    <DeleteAdModal
-      v-model="isDeleteAdModalOpen"
-      @confirm="confirmDeleteAd"
-    />
+    <DeleteAdModal v-model="isDeleteAdModalOpen" @confirm="confirmDeleteAd" />
 
     <!-- Location Modal -->
-    <LocationModal
-      v-model="isLocationModalOpen"
-      @confirm="confirmLocation"
-    />
+    <LocationModal v-model="isLocationModalOpen" @confirm="confirmLocation" />
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  reactive,
-  ref,
-  computed,
-  watch,
-  nextTick,
-  onMounted,
-} from "vue";
+import { reactive, ref, computed, watch, nextTick, onMounted } from "vue";
 import Paginator from "primevue/paginator";
 import { useToast } from "primevue/usetoast";
 import Accordion from "primevue/accordion";
@@ -2839,71 +3013,71 @@ const faqs = ref([]);
 // Parse HTML content to extract Q&A pairs
 const parseFAQHTML = (htmlString) => {
   if (!htmlString) return [];
-  
+
   const items = [];
-  
+
   // Check if we're in browser environment
-  if (process.client && typeof document !== 'undefined') {
+  if (process.client && typeof document !== "undefined") {
     // Create a temporary DOM element to parse HTML
-    const tempDiv = document.createElement('div');
+    const tempDiv = document.createElement("div");
     tempDiv.innerHTML = htmlString;
-    
+
     // Find all h3 elements (questions)
-    const questions = tempDiv.querySelectorAll('h3');
-    
+    const questions = tempDiv.querySelectorAll("h3");
+
     questions.forEach((questionEl, index) => {
       const question = questionEl.textContent.trim();
-      
+
       // Find the next sibling paragraph (answer)
       let answerEl = questionEl.nextElementSibling;
-      let answer = '';
-      
+      let answer = "";
+
       // Collect all paragraphs until the next h3 or end
-      while (answerEl && answerEl.tagName !== 'H3') {
-        if (answerEl.tagName === 'P') {
+      while (answerEl && answerEl.tagName !== "H3") {
+        if (answerEl.tagName === "P") {
           answer += answerEl.outerHTML;
         }
         answerEl = answerEl.nextElementSibling;
       }
-      
+
       if (question && answer) {
         items.push({
           id: index + 1,
           question,
-          answer
+          answer,
         });
       }
     });
   } else {
     // Fallback: use regex parsing for SSR
     const parts = htmlString.split(/<h3>/);
-    
+
     parts.forEach((part, index) => {
       if (index === 0) return; // Skip first empty part
-      
+
       const h3Match = part.match(/^(.*?)<\/h3>/);
       if (h3Match) {
         const question = h3Match[1].trim();
         const rest = part.substring(h3Match[0].length);
-        
+
         // Extract all paragraphs
         const pMatches = rest.match(/<p>[\s\S]*?<\/p>/g);
-        let answer = '';
+        let answer = "";
         if (pMatches) {
-          answer = pMatches.join('');
+          answer = pMatches.join("");
         }
-        
+
         if (question && answer) {
           items.push({
             id: index,
             question,
-            answer
+            answer,
           });
         }
       }
     });
   }
-  
+
   return items;
 };
 
@@ -2995,25 +3169,30 @@ const fetchRatings = async (page = 1) => {
 
   try {
     // Get token from multiple sources
-    let token = userStore.token || user.value?.token || user.value?.access_token;
-    
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
     // If no token found, try to get from localStorage
     if (!token && process.client) {
       try {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           token = parsedUser?.token || parsedUser?.access_token;
         }
       } catch (e) {
-        console.error('Error getting token from localStorage:', e);
+        console.error("Error getting token from localStorage:", e);
       }
     }
 
     // If still no token, try authStore
     if (!token) {
       const authStore = useAuthStore();
-      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+      if (
+        authStore.authUser &&
+        typeof authStore.authUser === "object" &&
+        "token" in authStore.authUser
+      ) {
         token = authStore.authUser.token;
       } else if (authStore.token) {
         token = authStore.token;
@@ -3038,7 +3217,8 @@ const fetchRatings = async (page = 1) => {
     if (response && response.key === "success" && response.data) {
       // Map API response to review structure
       // Try different possible response structures
-      const ratesData = response.data.rates || response.data.data || response.data || [];
+      const ratesData =
+        response.data.rates || response.data.data || response.data || [];
       reviews.value = ratesData.map((rate) => ({
         id: rate.id || rate.rate_id,
         name: rate.user?.name || rate.name || rate.user_name || "مستخدم",
@@ -3051,7 +3231,8 @@ const fetchRatings = async (page = 1) => {
         ratingsPagination.value = response.data.pagination;
         ratingsCurrentPage.value = response.data.pagination.current_page;
         reviewsPerPage.value = response.data.pagination.per_page;
-        reviewsFirst.value = (response.data.pagination.current_page - 1) * reviewsPerPage.value;
+        reviewsFirst.value =
+          (response.data.pagination.current_page - 1) * reviewsPerPage.value;
       } else {
         // If no pagination, assume all data is loaded
         ratingsPagination.value.total_items = reviews.value.length;
@@ -3079,7 +3260,9 @@ const fetchRatings = async (page = 1) => {
 };
 
 // Total reviews count
-const totalReviews = computed(() => ratingsPagination.value.total_items || reviews.value.length);
+const totalReviews = computed(
+  () => ratingsPagination.value.total_items || reviews.value.length
+);
 
 // Paginated reviews (now directly from API)
 const paginatedReviews = computed(() => reviews.value);
@@ -3089,12 +3272,12 @@ const onReviewsPageChange = async (event) => {
   reviewsFirst.value = event.first;
   reviewsPerPage.value = event.rows;
   const newPage = Math.floor(event.first / event.rows) + 1;
-  
+
   // Fetch new page data from API
   if (newPage !== ratingsCurrentPage.value) {
     await fetchRatings(newPage);
   }
-  
+
   // Scroll to top when page changes
   if (process.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -3344,8 +3527,9 @@ const fetchFollowers = async (page = 1) => {
 
   try {
     // Get token from multiple sources
-    let token = userStore.token || user.value?.token || user.value?.access_token;
-    
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
     if (!token && process.client) {
       try {
         const storedUser = localStorage.getItem("user");
@@ -3379,7 +3563,8 @@ const fetchFollowers = async (page = 1) => {
     );
 
     if (response?.key === "unauthenticated") {
-      followingError.value = response?.msg || "يرجى تسجيل الدخول لعرض المتابعين.";
+      followingError.value =
+        response?.msg || "يرجى تسجيل الدخول لعرض المتابعين.";
       return;
     }
 
@@ -3392,7 +3577,8 @@ const fetchFollowers = async (page = 1) => {
       followingPagination.value = response.data.pagination;
       followingCurrentPage.value = response.data.pagination.current_page;
       followingPerPage.value = response.data.pagination.per_page;
-      followingFirst.value = (response.data.pagination.current_page - 1) * followingPerPage.value;
+      followingFirst.value =
+        (response.data.pagination.current_page - 1) * followingPerPage.value;
     } else {
       throw new Error(response?.msg || "فشل في تحميل المتابعين");
     }
@@ -3425,12 +3611,12 @@ const onFollowingPageChange = async (event) => {
   followingFirst.value = event.first;
   followingPerPage.value = event.rows;
   const newPage = Math.floor(event.first / event.rows) + 1;
-  
+
   // Fetch new page data from API
   if (newPage !== followingCurrentPage.value) {
     await fetchFollowers(newPage);
   }
-  
+
   // Scroll to top when page changes
   if (process.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -3462,9 +3648,9 @@ watch(settingsSubTab, (newTab) => {
   changeMobileForm.verificationCode = "";
   changeMobileForm.newMobile = "";
   changeMobileForm.countryCode = "+966";
-  
+
   // Send code to old phone when change-mobile tab is opened
-  if (newTab === 'change-mobile') {
+  if (newTab === "change-mobile") {
     // Use nextTick to ensure the component is ready
     nextTick(() => {
       sendOldPhoneCode();
@@ -3474,9 +3660,16 @@ watch(settingsSubTab, (newTab) => {
 
 // Watch for when first verification section becomes visible
 watch(
-  () => settingsSubTab.value === 'change-mobile' && !isCodeVerified.value && !hasEnteredNewMobile.value,
+  () =>
+    settingsSubTab.value === "change-mobile" &&
+    !isCodeVerified.value &&
+    !hasEnteredNewMobile.value,
   (shouldShow) => {
-    if (shouldShow && !hasSentOldPhoneCode.value && !isSendingOldPhoneCode.value) {
+    if (
+      shouldShow &&
+      !hasSentOldPhoneCode.value &&
+      !isSendingOldPhoneCode.value
+    ) {
       sendOldPhoneCode();
     }
   },
@@ -3491,25 +3684,30 @@ const handleUnfollow = async (userId) => {
 
   try {
     // Get token from multiple sources
-    let token = userStore.token || user.value?.token || user.value?.access_token;
-    
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
     // If no token found, try to get from localStorage
     if (!token && process.client) {
       try {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           token = parsedUser?.token || parsedUser?.access_token;
         }
       } catch (e) {
-        console.error('Error getting token from localStorage:', e);
+        console.error("Error getting token from localStorage:", e);
       }
     }
 
     // If still no token, try authStore
     if (!token) {
       const authStore = useAuthStore();
-      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+      if (
+        authStore.authUser &&
+        typeof authStore.authUser === "object" &&
+        "token" in authStore.authUser
+      ) {
         token = authStore.authUser.token;
       } else if (authStore.token) {
         token = authStore.token;
@@ -3544,7 +3742,9 @@ const handleUnfollow = async (userId) => {
 
     if (response && response.key === "success") {
       // Remove from local state immediately for better UX
-      const index = followingUsers.value.findIndex((user) => user.id === userId);
+      const index = followingUsers.value.findIndex(
+        (user) => user.id === userId
+      );
       if (index !== -1) {
         followingUsers.value.splice(index, 1);
         // Update pagination total
@@ -3552,7 +3752,7 @@ const handleUnfollow = async (userId) => {
           followingPagination.value.total_items--;
         }
       }
-      
+
       toast.add({
         severity: "success",
         summary: "نجح",
@@ -3598,13 +3798,15 @@ const mapConsultantPackage = (item, index = 0) => {
     id: item?.id ?? item?.package_id ?? `pkg-${index + 1}`,
     price: String(
       item?.price ??
-      item?.price_after_discount ??
-      item?.package_price ??
-      item?.amount ??
-      0
+        item?.price_after_discount ??
+        item?.package_price ??
+        item?.amount ??
+        0
     ),
     title: item?.title ?? item?.name ?? item?.name_ar ?? "باقات استشارية",
-    features: rawFeatures.length ? rawFeatures : ["لا توجد مميزات متاحة لهذه الباقة"],
+    features: rawFeatures.length
+      ? rawFeatures
+      : ["لا توجد مميزات متاحة لهذه الباقة"],
   };
 };
 
@@ -3614,7 +3816,8 @@ const fetchPackages = async () => {
 
   try {
     // Try to get auth token (API requires authentication)
-    let token = userStore.token || user.value?.token || user.value?.access_token;
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
 
     if (!token && process.client) {
       try {
@@ -3633,15 +3836,18 @@ const fetchPackages = async () => {
       return;
     }
 
-    const response = await $fetch("https://backend.wattani-sa.com/api/v1/consultant-packages", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-Requested-With": "XMLHttpRequest",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-    });
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/consultant-packages",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      }
+    );
 
     if (response?.key === "unauthenticated") {
       packagesError.value = response?.msg || "يرجى تسجيل الدخول لعرض الباقات.";
@@ -3655,7 +3861,9 @@ const fetchPackages = async () => {
       (Array.isArray(response) && response) ||
       [];
 
-    packages.value = apiPackages.map((pkg, index) => mapConsultantPackage(pkg, index));
+    packages.value = apiPackages.map((pkg, index) =>
+      mapConsultantPackage(pkg, index)
+    );
     hasFetchedPackages.value = true;
   } catch (error) {
     console.error("Error fetching consultant packages:", error);
@@ -3684,17 +3892,24 @@ const mapSubscription = (item, index = 0) => {
 
   return {
     id: item?.id ?? item?.subscription_id ?? `sub-${index + 1}`,
-    packageId: item?.package_id ?? item?.packageId ?? item?.id ?? item?.subscription_id ?? `sub-${index + 1}`,
+    packageId:
+      item?.package_id ??
+      item?.packageId ??
+      item?.id ??
+      item?.subscription_id ??
+      `sub-${index + 1}`,
     price: String(
       item?.price ??
-      item?.price_after_discount ??
-      item?.subscription_price ??
-      item?.amount ??
-      0
+        item?.price_after_discount ??
+        item?.subscription_price ??
+        item?.amount ??
+        0
     ),
     title: item?.title ?? item?.name ?? item?.name_ar ?? "اشتراك",
     medalNumber: item?.medalNumber ?? item?.rank ?? item?.order ?? index + 1,
-    features: rawFeatures.length ? rawFeatures : ["لا توجد مميزات متاحة لهذا الاشتراك"],
+    features: rawFeatures.length
+      ? rawFeatures
+      : ["لا توجد مميزات متاحة لهذا الاشتراك"],
   };
 };
 
@@ -3704,7 +3919,8 @@ const fetchSubscriptions = async () => {
 
   try {
     // Get token
-    let token = userStore.token || user.value?.token || user.value?.access_token;
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
 
     if (!token && process.client) {
       try {
@@ -3723,29 +3939,36 @@ const fetchSubscriptions = async () => {
       return;
     }
 
-    const response = await $fetch("https://backend.wattani-sa.com/api/v1/my-consultant-subscriptions", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-Requested-With": "XMLHttpRequest",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-    });
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/my-consultant-subscriptions",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      }
+    );
 
     if (response?.key === "unauthenticated") {
-      subscriptionsError.value = response?.msg || "يرجى تسجيل الدخول لعرض الاشتراكات.";
+      subscriptionsError.value =
+        response?.msg || "يرجى تسجيل الدخول لعرض الاشتراكات.";
       return;
     }
 
     const apiSubs =
       (Array.isArray(response?.data) && response.data) ||
-      (Array.isArray(response?.data?.subscriptions) && response.data.subscriptions) ||
+      (Array.isArray(response?.data?.subscriptions) &&
+        response.data.subscriptions) ||
       (Array.isArray(response?.subscriptions) && response.subscriptions) ||
       (Array.isArray(response) && response) ||
       [];
 
-    subscriptions.value = apiSubs.map((sub, index) => mapSubscription(sub, index));
+    subscriptions.value = apiSubs.map((sub, index) =>
+      mapSubscription(sub, index)
+    );
     hasFetchedSubscriptions.value = true;
   } catch (error) {
     console.error("Error fetching consultant subscriptions:", error);
@@ -3924,7 +4147,7 @@ onMounted(() => {
     navigateTo("/login");
     return;
   }
-  
+
   // Load user data into form
   form.clientName = user.value.name || "";
   form.mobileNumber = user.value.phone || "";
@@ -4032,7 +4255,7 @@ const handleProfileAvatarChange = (event) => {
       });
       return;
     }
-    
+
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.add({
@@ -4043,7 +4266,7 @@ const handleProfileAvatarChange = (event) => {
       });
       return;
     }
-    
+
     // Create preview
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -4056,48 +4279,51 @@ const handleProfileAvatarChange = (event) => {
 const handleMobileNumberInput = (event: Event) => {
   const target = event.target as HTMLInputElement;
   // Remove all non-numeric characters
-  form.mobileNumber = target.value.replace(/\D/g, '');
+  form.mobileNumber = target.value.replace(/\D/g, "");
 };
 
 const handleNewMobileInput = (event: Event) => {
   const target = event.target as HTMLInputElement;
   // Remove all non-numeric characters
-  changeMobileForm.newMobile = target.value.replace(/\D/g, '');
+  changeMobileForm.newMobile = target.value.replace(/\D/g, "");
 };
 
 // OTP Input Handlers
 const handleOtpInput = (index, event) => {
-  const value = event.target.value.replace(/\D/g, ''); // Only allow digits
+  const value = event.target.value.replace(/\D/g, ""); // Only allow digits
   if (value) {
     otpDigits.value[index] = value.slice(-1); // Only take the last character
-    
+
     // Move to next input if available
     if (index < 3 && otpInputs.value[index + 1]) {
       otpInputs.value[index + 1].focus();
     }
   } else {
-    otpDigits.value[index] = '';
+    otpDigits.value[index] = "";
   }
 };
 
 const handleOtpKeydown = (index, event) => {
   // Handle backspace
-  if (event.key === 'Backspace' && !otpDigits.value[index] && index > 0) {
+  if (event.key === "Backspace" && !otpDigits.value[index] && index > 0) {
     otpInputs.value[index - 1].focus();
   }
   // Handle arrow keys
-  if (event.key === 'ArrowLeft' && index > 0) {
+  if (event.key === "ArrowLeft" && index > 0) {
     otpInputs.value[index - 1].focus();
   }
-  if (event.key === 'ArrowRight' && index < 3) {
+  if (event.key === "ArrowRight" && index < 3) {
     otpInputs.value[index + 1].focus();
   }
 };
 
 const handleOtpPaste = (event) => {
   event.preventDefault();
-  const pastedData = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 4);
-  pastedData.split('').forEach((digit, index) => {
+  const pastedData = event.clipboardData
+    .getData("text")
+    .replace(/\D/g, "")
+    .slice(0, 4);
+  pastedData.split("").forEach((digit, index) => {
     if (index < 4) {
       otpDigits.value[index] = digit;
     }
@@ -4119,25 +4345,30 @@ const sendOldPhoneCode = async () => {
 
   try {
     // Get token from multiple sources
-    let token = userStore.token || user.value?.token || user.value?.access_token;
-    
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
     // If no token found, try to get from localStorage
     if (!token && process.client) {
       try {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           token = parsedUser?.token || parsedUser?.access_token;
         }
       } catch (e) {
-        console.error('Error getting token from localStorage:', e);
+        console.error("Error getting token from localStorage:", e);
       }
     }
 
     // If still no token, try authStore
     if (!token) {
       const authStore = useAuthStore();
-      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+      if (
+        authStore.authUser &&
+        typeof authStore.authUser === "object" &&
+        "token" in authStore.authUser
+      ) {
         token = authStore.authUser.token;
       } else if (authStore.token) {
         token = authStore.token;
@@ -4199,7 +4430,7 @@ const sendOldPhoneCode = async () => {
 };
 
 const handleVerifyCode = async () => {
-  const code = otpDigits.value.join('');
+  const code = otpDigits.value.join("");
   if (code.length !== 4) {
     toast.add({
       severity: "warn",
@@ -4214,25 +4445,30 @@ const handleVerifyCode = async () => {
 
   try {
     // Get token from multiple sources
-    let token = userStore.token || user.value?.token || user.value?.access_token;
-    
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
     // If no token found, try to get from localStorage
     if (!token && process.client) {
       try {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           token = parsedUser?.token || parsedUser?.access_token;
         }
       } catch (e) {
-        console.error('Error getting token from localStorage:', e);
+        console.error("Error getting token from localStorage:", e);
       }
     }
 
     // If still no token, try authStore
     if (!token) {
       const authStore = useAuthStore();
-      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+      if (
+        authStore.authUser &&
+        typeof authStore.authUser === "object" &&
+        "token" in authStore.authUser
+      ) {
         token = authStore.authUser.token;
       } else if (authStore.token) {
         token = authStore.token;
@@ -4269,10 +4505,10 @@ const handleVerifyCode = async () => {
     if (response && response.key === "success") {
       // Store the verification code
       changeMobileForm.verificationCode = code;
-      
+
       // Mark as verified only after successful API response
       isCodeVerified.value = true;
-      
+
       toast.add({
         severity: "success",
         summary: "نجح",
@@ -4311,7 +4547,7 @@ const handleNextStep = async () => {
   }
 
   // Validate mobile number format (should be 9 digits for Saudi Arabia)
-  const mobileNumber = changeMobileForm.newMobile.replace(/\D/g, '');
+  const mobileNumber = changeMobileForm.newMobile.replace(/\D/g, "");
   if (mobileNumber.length !== 9) {
     toast.add({
       severity: "warn",
@@ -4326,25 +4562,30 @@ const handleNextStep = async () => {
 
   try {
     // Get token from multiple sources
-    let token = userStore.token || user.value?.token || user.value?.access_token;
-    
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
     // If no token found, try to get from localStorage
     if (!token && process.client) {
       try {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           token = parsedUser?.token || parsedUser?.access_token;
         }
       } catch (e) {
-        console.error('Error getting token from localStorage:', e);
+        console.error("Error getting token from localStorage:", e);
       }
     }
 
     // If still no token, try authStore
     if (!token) {
       const authStore = useAuthStore();
-      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+      if (
+        authStore.authUser &&
+        typeof authStore.authUser === "object" &&
+        "token" in authStore.authUser
+      ) {
         token = authStore.authUser.token;
       } else if (authStore.token) {
         token = authStore.token;
@@ -4372,7 +4613,7 @@ const handleNextStep = async () => {
         },
         body: {
           phone: mobileNumber,
-          country_code: changeMobileForm.countryCode.replace('+', ''),
+          country_code: changeMobileForm.countryCode.replace("+", ""),
           lang: "ar",
           iso: "SA",
         },
@@ -4382,10 +4623,10 @@ const handleNextStep = async () => {
     if (response && response.key === "success") {
       // Mark that we've entered the new mobile number
       hasEnteredNewMobile.value = true;
-      
+
       // Reset OTP for new verification
       otpDigits.value = ["", "", "", ""];
-      
+
       toast.add({
         severity: "success",
         summary: "نجح",
@@ -4413,7 +4654,7 @@ const handleNextStep = async () => {
 };
 
 const handleVerifyNewCode = async () => {
-  const code = otpDigits.value.join('');
+  const code = otpDigits.value.join("");
   if (code.length !== 4) {
     toast.add({
       severity: "warn",
@@ -4428,25 +4669,30 @@ const handleVerifyNewCode = async () => {
 
   try {
     // Get token from multiple sources
-    let token = userStore.token || user.value?.token || user.value?.access_token;
-    
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
     // If no token found, try to get from localStorage
     if (!token && process.client) {
       try {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           token = parsedUser?.token || parsedUser?.access_token;
         }
       } catch (e) {
-        console.error('Error getting token from localStorage:', e);
+        console.error("Error getting token from localStorage:", e);
       }
     }
 
     // If still no token, try authStore
     if (!token) {
       const authStore = useAuthStore();
-      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+      if (
+        authStore.authUser &&
+        typeof authStore.authUser === "object" &&
+        "token" in authStore.authUser
+      ) {
         token = authStore.authUser.token;
       } else if (authStore.token) {
         token = authStore.token;
@@ -4483,10 +4729,10 @@ const handleVerifyNewCode = async () => {
     if (response && response.key === "success") {
       // Store the new verification code
       changeMobileForm.verificationCode = code;
-      
+
       // Mark as verified only after successful API response
       isNewCodeVerified.value = true;
-      
+
       toast.add({
         severity: "success",
         summary: "نجح",
@@ -4503,9 +4749,9 @@ const handleVerifyNewCode = async () => {
         isNewCodeVerified.value = false;
         changeMobileForm.newMobile = "";
         changeMobileForm.verificationCode = "";
-        
+
         // Navigate to personal-info section
-        settingsSubTab.value = 'personal-info';
+        settingsSubTab.value = "personal-info";
       }, 2000);
     } else {
       throw new Error(response?.msg || "رمز التحقق غير صحيح");
@@ -4529,7 +4775,7 @@ const handleVerifyNewCode = async () => {
 
 const handleSubmit = () => {
   console.log("Form submitted:", form);
-  
+
   // Update user data in auth
   if (user.value) {
     const updatedUser = {
@@ -4541,9 +4787,9 @@ const handleSubmit = () => {
       location: form.location,
       avatar: form.avatar,
     };
-    
+
     login(updatedUser);
-    
+
     // Show success message
     toast.add({
       severity: "success",
@@ -4627,7 +4873,7 @@ const handleChangePasswordSubmit = async () => {
     });
     return;
   }
-  
+
   // Validate password length
   if (changePasswordForm.newPassword.length < 6) {
     toast.add({
@@ -4658,7 +4904,11 @@ const handleChangePasswordSubmit = async () => {
   // If still no token, try authStore
   if (!token) {
     const authStore = useAuthStore();
-    if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+    if (
+      authStore.authUser &&
+      typeof authStore.authUser === "object" &&
+      "token" in authStore.authUser
+    ) {
       token = authStore.authUser.token;
     } else if (authStore.token) {
       token = authStore.token;
@@ -4679,19 +4929,31 @@ const handleChangePasswordSubmit = async () => {
   isChangingPassword.value = true;
 
   try {
+    // Log the form data for debugging
+    console.log("Form data being sent:", {
+      old_password: changePasswordForm.currentPassword,
+      password: changePasswordForm.newPassword,
+      password_confirmation: changePasswordForm.confirmPassword,
+    });
+
+    // Create form data
+    const formData = new FormData();
+    formData.append("old_password", changePasswordForm.currentPassword);
+    formData.append("password", changePasswordForm.newPassword);
+    formData.append(
+      "password_confirmation",
+      changePasswordForm.confirmPassword
+    );
+
     const response = await $fetch(
       "https://backend.wattani-sa.com/api/v1/update-passward",
       {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          // Let the browser set the Content-Type with the boundary
         },
-        body: {
-          old_password: changePasswordForm.currentPassword,
-          new_password: changePasswordForm.newPassword,
-          new_password_confirmation: changePasswordForm.confirmPassword,
-        },
+        body: formData,
       }
     );
 
@@ -4723,7 +4985,7 @@ const handleChangePasswordSubmit = async () => {
       error?.data?.msg ||
       error?.message ||
       "حدث خطأ أثناء تغيير كلمة المرور. الرجاء المحاولة مرة أخرى.";
-    
+
     toast.add({
       severity: "error",
       summary: "خطأ",
@@ -4743,7 +5005,6 @@ const handlePackageSubscribe = (packageItem) => {
 const openPackagePaymentModal = () => {
   isPackagePaymentModalOpen.value = true;
 };
-
 
 const handlePackagePaymentConfirm = async (paymentMethod) => {
   if (!selectedPackage.value) {
@@ -4766,25 +5027,30 @@ const handlePackagePaymentConfirm = async (paymentMethod) => {
 
   try {
     // Get token from multiple sources
-    let token = userStore.token || user.value?.token || user.value?.access_token;
-    
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
     // If no token found, try to get from localStorage
     if (!token && process.client) {
       try {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           token = parsedUser?.token || parsedUser?.access_token;
         }
       } catch (e) {
-        console.error('Error getting token from localStorage:', e);
+        console.error("Error getting token from localStorage:", e);
       }
     }
 
     // If still no token, try authStore
     if (!token) {
       const authStore = useAuthStore();
-      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+      if (
+        authStore.authUser &&
+        typeof authStore.authUser === "object" &&
+        "token" in authStore.authUser
+      ) {
         token = authStore.authUser.token;
       } else if (authStore.token) {
         token = authStore.token;
@@ -4868,7 +5134,7 @@ const handleRenewSubscription = (subscription) => {
   // Open the package payment modal with the subscription data
   // Use packageId if available, otherwise fall back to id
   const packageId = subscription.packageId || subscription.id;
-  
+
   if (!packageId) {
     toast.add({
       severity: "error",
@@ -5111,7 +5377,8 @@ const handleJoinConsultantSubmit = async () => {
 
   try {
     // Get token for authenticated request
-    let token = userStore.token || user.value?.token || user.value?.access_token;
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
 
     if (!token && process.client) {
       try {
@@ -5139,7 +5406,10 @@ const handleJoinConsultantSubmit = async () => {
     const formData = new FormData();
     formData.append("cv", cvFile.value);
     formData.append("proof", proofFile.value);
-    formData.append("consultation_cost", joinConsultantForm.consultationCost.trim());
+    formData.append(
+      "consultation_cost",
+      joinConsultantForm.consultationCost.trim()
+    );
 
     // Make API call
     const response = await $fetch(
@@ -5161,7 +5431,7 @@ const handleJoinConsultantSubmit = async () => {
       cvFile.value = null;
       proofFile.value = null;
       joinConsultantForm.consultationCost = "";
-      
+
       // Reset file inputs
       const cvInput = document.getElementById("cvFile");
       const proofInput = document.getElementById("proofFile");
@@ -5185,7 +5455,7 @@ const handleJoinConsultantSubmit = async () => {
       error?.data?.msg ||
       error?.message ||
       "حدث خطأ أثناء إرسال الطلب. الرجاء المحاولة مرة أخرى.";
-    
+
     toast.add({
       severity: "error",
       summary: "خطأ",
@@ -5224,8 +5494,9 @@ const confirmLogout = async () => {
 
   try {
     // Prepare token from multiple sources
-    let token = userStore.token || user.value?.token || user.value?.access_token;
-    
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
     if (!token && process.client) {
       try {
         const storedUser = localStorage.getItem("user");
@@ -5285,7 +5556,6 @@ const openChargeModal = () => {
   isChargeModalOpen.value = true;
 };
 
-
 const handleCharge = (amount) => {
   if (!amount || parseFloat(amount) <= 0) {
     // You can add validation feedback here
@@ -5300,11 +5570,11 @@ const handleCharge = (amount) => {
 // Calculate fee when amount changes
 const handleCommissionAmountChange = async () => {
   const amount = commissionAmount.value;
-  
+
   // Reset previous calculation
   calculatedFee.value = null;
   feeCalculationError.value = null;
-  
+
   // Only calculate if amount is valid
   if (!amount || parseFloat(amount) <= 0) {
     return;
@@ -5320,25 +5590,30 @@ const calculateFee = async (amount) => {
 
   try {
     // Get token from multiple sources
-    let token = userStore.token || user.value?.token || user.value?.access_token;
-    
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
     // If no token found, try to get from localStorage
     if (!token && process.client) {
       try {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           token = parsedUser?.token || parsedUser?.access_token;
         }
       } catch (e) {
-        console.error('Error getting token from localStorage:', e);
+        console.error("Error getting token from localStorage:", e);
       }
     }
 
     // If still no token, try authStore
     if (!token) {
       const authStore = useAuthStore();
-      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+      if (
+        authStore.authUser &&
+        typeof authStore.authUser === "object" &&
+        "token" in authStore.authUser
+      ) {
         token = authStore.authUser.token;
       } else if (authStore.token) {
         token = authStore.token;
@@ -5363,7 +5638,8 @@ const calculateFee = async (amount) => {
 
     if (response && response.key === "success") {
       // Store the calculated fee (total amount including fees)
-      calculatedFee.value = response.data?.total_amount || response.data?.fee || amount;
+      calculatedFee.value =
+        response.data?.total_amount || response.data?.fee || amount;
     } else {
       throw new Error(response?.msg || "فشل في حساب الرسوم");
     }
@@ -5402,7 +5678,7 @@ const openCommissionPaymentModal = async () => {
 const handleCommissionPaymentConfirm = async (paymentMethod) => {
   const amount = commissionAmount.value || "60";
   const finalAmount = calculatedFee.value || amount;
-  
+
   if (!amount || parseFloat(amount) <= 0) {
     toast.add({
       severity: "warn",
@@ -5418,25 +5694,30 @@ const handleCommissionPaymentConfirm = async (paymentMethod) => {
 
   try {
     // Get token from multiple sources
-    let token = userStore.token || user.value?.token || user.value?.access_token;
-    
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
     // If no token found, try to get from localStorage
     if (!token && process.client) {
       try {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           token = parsedUser?.token || parsedUser?.access_token;
         }
       } catch (e) {
-        console.error('Error getting token from localStorage:', e);
+        console.error("Error getting token from localStorage:", e);
       }
     }
 
     // If still no token, try authStore
     if (!token) {
       const authStore = useAuthStore();
-      if (authStore.authUser && typeof authStore.authUser === 'object' && 'token' in authStore.authUser) {
+      if (
+        authStore.authUser &&
+        typeof authStore.authUser === "object" &&
+        "token" in authStore.authUser
+      ) {
         token = authStore.authUser.token;
       } else if (authStore.token) {
         token = authStore.token;
@@ -5471,7 +5752,7 @@ const handleCommissionPaymentConfirm = async (paymentMethod) => {
       // Close commission modal
       isCommissionPaymentModalOpen.value = false;
       selectedCommissionPaymentMethod.value = "wallet";
-      
+
       // Reset form
       commissionAmount.value = "";
       calculatedFee.value = null;
@@ -5500,8 +5781,6 @@ const handleCommissionPaymentConfirm = async (paymentMethod) => {
     isPayingFee.value = false;
   }
 };
-
-
 
 // Reset password visibility when switching away from change-password sub-tab
 watch(
