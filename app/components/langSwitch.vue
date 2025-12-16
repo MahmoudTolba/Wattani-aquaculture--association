@@ -14,9 +14,26 @@
 const { locale, setLocale } = useI18n();
 
 // toggle language function
-const toggleLang = () => {
+const toggleLang = async () => {
   const newLang = locale.value === "ar" ? "en" : "ar";
-  setLocale(newLang);
+
+  try {
+    // Call the API to update the language preference
+    await $fetch("https://backend.wattani-sa.com/api/v1/change-lang", {
+      method: "PATCH",
+      params: {
+        lang: newLang,
+        device_id: "123459", // You might want to make this dynamic
+        device_type: "ios", // You might want to detect the actual device type
+      },
+    });
+
+    // Only update the locale if the API call is successful
+    setLocale(newLang);
+  } catch (error) {
+    console.error("Failed to update language:", error);
+    // You might want to show an error message to the user here
+  }
 };
 </script>
 

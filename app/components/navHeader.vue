@@ -89,7 +89,11 @@
           to="/profile"
           class="hidden md:flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
         >
-          <img :src="userAvatar" alt="user-icon" class="w-10 h-10 rounded-full object-cover" />
+          <img
+            :src="userAvatar"
+            alt="user-icon"
+            class="w-10 h-10 rounded-full object-cover"
+          />
           <span class="text-gray-700 text-sm"> {{ userName }} </span>
         </NuxtLink>
         <!-- actions - hidden on mobile, shown in menu -->
@@ -129,9 +133,15 @@
               class="flex items-center gap-3 px-3 py-3 rounded-md bg-gray-50 hover:bg-gray-100 transition border border-gray-200"
               @click="isMobileMenuOpen = false"
             >
-              <img :src="userAvatar" alt="user-icon" class="w-10 h-10 rounded-full object-cover" />
+              <img
+                :src="userAvatar"
+                alt="user-icon"
+                class="w-10 h-10 rounded-full object-cover"
+              />
               <div class="flex flex-col">
-                <span class="text-gray-700 text-sm font-medium">{{ userName }}</span>
+                <span class="text-gray-700 text-sm font-medium">{{
+                  userName
+                }}</span>
                 <span class="text-gray-500 text-xs">عرض الملف الشخصي</span>
               </div>
             </NuxtLink>
@@ -188,31 +198,36 @@
             <div
               class="flex items-center justify-between gap-2 border-y border-gray-100 py-3"
             >
-<NuxtLink
-  v-for="action in actionButtons"
-  :key="'mobile-action-' + action.id"
-  :to="action.to"
-  :class="[
-    'relative flex h-12 w-12 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:bg-[#15c472]/10',
-    action.id === 'notifications' && hasNotifications ? 'text-[#15c472]' : '',
-  ]"
-  :aria-label="resolveLabel(action.aria)"
-  @click="isMobileMenuOpen = false"
->
-  <img
-    :src="action.icon"
-    :alt="resolveLabel(action.aria)"
-    class="h-5 w-5"
-  />
-  <span
-    v-if="action.id === 'notifications' && hasNotifications"
-    class="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#D92D20]"
-  />
-</NuxtLink>
+              <NuxtLink
+                v-for="action in actionButtons"
+                :key="'mobile-action-' + action.id"
+                :to="action.to"
+                :class="[
+                  'relative flex h-12 w-12 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:bg-[#15c472]/10',
+                  action.id === 'notifications' && hasNotifications
+                    ? 'text-[#15c472]'
+                    : '',
+                ]"
+                :aria-label="resolveLabel(action.aria)"
+                @click="isMobileMenuOpen = false"
+              >
+                <img
+                  :src="action.icon"
+                  :alt="resolveLabel(action.aria)"
+                  class="h-5 w-5"
+                />
+                <span
+                  v-if="action.id === 'notifications' && hasNotifications"
+                  class="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#D92D20]"
+                />
+              </NuxtLink>
             </div>
 
             <!-- Login and Register Buttons - shown when not authenticated -->
-            <div v-if="!showAuth" class="flex flex-col gap-2 border-t border-gray-100 pt-3">
+            <div
+              v-if="!showAuth"
+              class="flex flex-col gap-2 border-t border-gray-100 pt-3"
+            >
               <NuxtLink
                 to="/login"
                 class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#00a859] to-[#15c472] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow text-center"
@@ -232,7 +247,10 @@
               </div>
             </div>
             <!-- Language switcher when authenticated -->
-            <div v-else class="flex justify-center border-t border-gray-100 pt-3">
+            <div
+              v-else
+              class="flex justify-center border-t border-gray-100 pt-3"
+            >
               <LangSwitch />
             </div>
 
@@ -273,26 +291,28 @@
           </NuxtLink>
         </nav>
         <div class="hidden md:flex items-center gap-4">
-<NuxtLink
-  v-for="action in actionButtons"
-  :key="'desktop-action-' + action.id"
-  :to="action.to"
-  :class="[
-    'relative flex h-10 w-10 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:border-[#15c472]/40',
-    action.id === 'notifications' && hasNotifications ? 'text-[#15c472]' : '',
-  ]"
-  :aria-label="resolveLabel(action.aria)"
->
-  <img
-    :src="action.icon"
-    :alt="resolveLabel(action.aria)"
-    class="h-5 w-5"
-  />
-  <span
-    v-if="action.id === 'notifications' && hasNotifications"
-    class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#D92D20]"
-  />
-</NuxtLink>
+          <NuxtLink
+            v-for="action in actionButtons"
+            :key="'desktop-action-' + action.id"
+            :to="action.to"
+            :class="[
+              'relative flex h-10 w-10 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:border-[#15c472]/40',
+              action.id === 'notifications' && hasNotifications
+                ? 'text-[#15c472]'
+                : '',
+            ]"
+            :aria-label="resolveLabel(action.aria)"
+          >
+            <img
+              :src="action.icon"
+              :alt="resolveLabel(action.aria)"
+              class="h-5 w-5"
+            />
+            <span
+              v-if="action.id === 'notifications' && hasNotifications"
+              class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#D92D20]"
+            />
+          </NuxtLink>
           <button
             type="button"
             class="inline-flex items-center gap-2 rounded-full border border-[#15c472] px-5 py-2 text-sm font-semibold text-[#15c472] transition hover:bg-[#15c472]/5"
@@ -384,8 +404,12 @@ const { locale } = useI18n();
 const { isAuthenticated, getUserName, getUserAvatar } = useAuth();
 // Only show user data after mount to prevent hydration mismatches
 const showAuth = computed(() => isMounted.value && isAuthenticated.value);
-const userName = computed(() => isMounted.value ? (getUserName.value || "محمد عبدالعزيز") : "");
-const userAvatar = computed(() => isMounted.value ? getUserAvatar.value : "/images/profile-avatar.png");
+const userName = computed(() =>
+  isMounted.value ? getUserName.value || "محمد عبدالعزيز" : ""
+);
+const userAvatar = computed(() =>
+  isMounted.value ? getUserAvatar.value : "/images/profile-avatar.png"
+);
 const hasNotifications = computed(() => notificationsStore.hasNotifications);
 
 // Base navigation items (always shown)
@@ -405,7 +429,11 @@ const baseNavItems = [
 ];
 
 // Consultation link (only shown when authenticated)
-const consultationItem = { id: "consultation", to: "/my-consultation", labels: { ar: "استشاراتي", en: "My consultation" } };
+const consultationItem = {
+  id: "consultation",
+  to: "/my-consultation",
+  labels: { ar: "استشاراتي", en: "My consultation" },
+};
 
 // Computed navigation items - include consultation only when authenticated
 const navItems = computed(() => {
