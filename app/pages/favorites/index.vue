@@ -1,10 +1,33 @@
 <template>
   <div>
+    <Toast position="top-center" />
     <div class="min-h-screen p-10">
       <h1 class="text-3xl font-bold mb-8 text-gray-800">المفضلة</h1>
       
+      <!-- Loading State -->
+      <div v-if="isLoading" class="text-center py-12">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+        <p class="text-gray-500 mt-4">جاري تحميل المفضلة...</p>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="text-center py-12">
+        <p class="text-red-500 mb-4">{{ error }}</p>
+        <button
+          @click="() => loadFavorites(1)"
+          class="bg-gradient-to-r from-[#00a859] to-[#15c472] text-white py-2 px-6 rounded-lg hover:opacity-90 transition"
+        >
+          إعادة المحاولة
+        </button>
+      </div>
+
       <!-- Cards Grid -->
-      <div class="cards-grid mb-8">
+      <div v-else>
+        <div v-if="listings.length === 0" class="text-center py-12">
+          <p class="text-gray-400 text-lg">لا توجد عناصر في المفضلة حاليا</p>
+        </div>
+        
+        <div v-else class="cards-grid mb-8">
         <article
           v-for="listing in paginatedListings"
           :key="listing.id"
@@ -22,6 +45,7 @@
               type="button"
               aria-label="حفظ الإعلان"
               @click.stop="toggleFav(listing)"
+              :disabled="isToggling === (listing.id || listing.advert_id)"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -77,84 +101,216 @@
             </div>
           </div>
         </article>
-      </div>
+        </div>
 
-      <!-- Pagination -->
-      <div class="flex justify-center">
-        <Paginator
-          :rows="rows"
-          :total-records="totalListings"
-          :first="first"
-          @page="onPageChange"
-          template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-          class="p-paginator"
-        />
+        <!-- Pagination -->
+        <div v-if="totalListings > rows" class="flex justify-center">
+          <Paginator
+            :rows="rows"
+            :totalRecords="totalListings"
+            :first="(currentPage - 1) * rows"
+            @page="onPageChange"
+            template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+            class="p-paginator"
+          />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, computed, reactive } from "vue";
+<script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "#imports";
 import Paginator from "primevue/paginator";
+import Toast from "primevue/toast";
+import { useFavorites } from "~/composables/useFavorites";
+import { useToast } from "primevue/usetoast";
 
 const router = useRouter();
+const { fetchFavorites, toggleFavorite } = useFavorites();
+const toast = useToast();
 
-// Pagination State
+// State
+const listings = ref<any[]>([]);
 const rows = ref(12); // Items per page
-const first = ref(0); // First item index
-
-// Mock Data Generator
-function createListings(title, price) {
-  return Array.from({ length: 24 }).map((_, index) => ({
-    id: `${title.replace(/\s+/g, "-")}-${index}`,
-    title,
-    price: `${price}`,
-    rating: "4.5",
-    image: "/images/card-img.jpg",
-    location: "مدينة الرياض",
-    timeAgo: index === 1 ? "منذ 7 ساعات" : "منذ ٦ ساعات",
-    owner: {
-      name: "محمود عبد العزيز",
-      avatar: "/images/card-user.jpg",
-    },
-    isFav: true,
-  }));
-}
-
-// All listings
-const allListings = reactive(createListings("سنارة سمك كبيرة", "50"));
-
-// Total listings count
-const totalListings = computed(() => allListings.length);
+const currentPage = ref(1);
+const totalListings = ref(0);
+const pagination = ref<any>(null);
+const isLoading = ref(false);
+const error = ref<string | null>(null);
+const isToggling = ref<string | null>(null); // Track which item is being toggled
 
 // Paginated listings
-const paginatedListings = computed(() => {
-  const end = first.value + rows.value;
-  return allListings.slice(first.value, end);
-});
+const paginatedListings = computed(() => listings.value);
+
+// Load favorites from API
+const loadFavorites = async (page: number = currentPage.value) => {
+  isLoading.value = true;
+  error.value = null;
+  currentPage.value = page;
+
+  try {
+    const data = await fetchFavorites(page, rows.value);
+    console.log("Favorites API Response:", data);
+    
+    // Handle different possible data structures
+    let favoritesArray: any[] = [];
+    const dataObj = data as any;
+    
+    if (dataObj.favorites) {
+      if (Array.isArray(dataObj.favorites)) {
+        favoritesArray = dataObj.favorites;
+      } else if (dataObj.favorites.data && Array.isArray(dataObj.favorites.data)) {
+        favoritesArray = dataObj.favorites.data;
+        pagination.value = dataObj.favorites.pagination || null;
+      }
+    } else if (dataObj.adverts && Array.isArray(dataObj.adverts)) {
+      favoritesArray = dataObj.adverts;
+    } else if (dataObj.data && Array.isArray(dataObj.data)) {
+      favoritesArray = dataObj.data;
+    }
+    
+    // Map API data to component format
+    listings.value = favoritesArray.map((item: any) => ({
+      id: item.id || item.advert_id,
+      title: item.title || item.name || 'عنوان غير متاح',
+      price: item.price || item.price_per_unit || '0',
+      rating: item.rating || item.rate || "4.5",
+      image: item.image || item.photo || item.thumbnail || "/images/card-img.jpg",
+      location: item.location || item.city || item.address || "موقع غير محدد",
+      timeAgo: item.created_at ? formatTimeAgo(item.created_at) : "منذ وقت",
+      owner: {
+        name: item.owner?.name || item.user?.name || item.seller?.name || "مستخدم",
+        avatar: item.owner?.avatar || item.user?.avatar || item.seller?.avatar || "/images/card-user.jpg",
+      },
+      isFav: true, // All items in favorites are favorited
+      ...item, // Keep original data
+    }));
+    
+    pagination.value = pagination.value || dataObj.pagination || null;
+    totalListings.value = pagination.value?.total_items || favoritesArray.length || listings.value.length;
+
+    console.log("Loaded favorites count:", listings.value.length);
+    console.log("Total records:", totalListings.value);
+  } catch (err: any) {
+    console.error("Error loading favorites:", err);
+    const isUnauthenticated =
+      err?.data?.key === "unauthenticated" ||
+      err?.data?.msg?.includes("يرجى اعادة تسجيل الدخول");
+    
+    error.value = isUnauthenticated
+      ? "يرجى تسجيل الدخول لعرض المفضلة"
+      : err?.data?.msg ||
+        err?.message ||
+        "حدث خطأ أثناء تحميل المفضلة. الرجاء المحاولة مرة أخرى.";
+    
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: error.value,
+      life: 3000,
+    });
+
+    if (isUnauthenticated) {
+      setTimeout(() => {
+        navigateTo("/login");
+      }, 500);
+    }
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Toggle favorite
+const toggleFav = async (listing: any) => {
+  const listingId = listing.id || listing.advert_id;
+  if (!listingId) {
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: "معرف الإعلان غير موجود",
+      life: 3000,
+    });
+    return;
+  }
+
+  isToggling.value = listingId;
+  
+  try {
+    await toggleFavorite(listingId);
+    
+    // Remove from favorites list (since it's now unfavorited)
+    listings.value = listings.value.filter(item => (item.id || item.advert_id) !== listingId);
+    totalListings.value = Math.max(0, totalListings.value - 1);
+    
+    toast.add({
+      severity: "success",
+      summary: "نجح",
+      detail: "تم إزالة الإعلان من المفضلة",
+      life: 2000,
+    });
+    
+    // If current page is empty and not first page, go to previous page
+    if (listings.value.length === 0 && currentPage.value > 1) {
+      await loadFavorites(currentPage.value - 1);
+    }
+  } catch (err: any) {
+    console.error("Error toggling favorite:", err);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: err?.data?.msg || err?.message || "حدث خطأ أثناء تحديث المفضلة",
+      life: 3000,
+    });
+  } finally {
+    isToggling.value = null;
+  }
+};
+
+// Format time ago
+const formatTimeAgo = (dateString: string) => {
+  if (!dateString) return "منذ وقت";
+  
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return "الآن";
+  if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
+  if (diffHours < 24) return `منذ ${diffHours} ساعة`;
+  if (diffDays < 7) return `منذ ${diffDays} يوم`;
+  
+  return date.toLocaleDateString("ar-SA", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
 
 // Pagination handler
-const onPageChange = (event) => {
-  first.value = event.first;
+const onPageChange = async (event: any) => {
   rows.value = event.rows;
+  const newPage = Math.floor(event.first / event.rows) + 1;
+  await loadFavorites(newPage);
   // Scroll to top when page changes
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 // Methods
-function goToDetails(listing) {
+function goToDetails(listing: any) {
   router.push({
-    path: `/product/${encodeURIComponent(listing.id)}`,
+    path: `/product/${encodeURIComponent(listing.id || listing.advert_id)}`,
   });
 }
 
-function toggleFav(listing) {
-  // Toggle favorite status
-  listing.isFav = !listing.isFav;
-  console.log("toggle fav", listing.id, listing.isFav);
-}
+// Load favorites on mount
+onMounted(() => {
+  loadFavorites(1);
+});
 </script>
 
 <style scoped>
