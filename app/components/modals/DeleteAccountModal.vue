@@ -40,15 +40,18 @@
             <button
               type="button"
               @click="handleConfirmDelete"
-              class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-red-700 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-red-800 transition-colors"
+              :disabled="loading"
+              class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-red-700 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              نعم
+              <span v-if="loading">جاري الحذف...</span>
+              <span v-else>نعم</span>
             </button>
             <!-- No Button (Left) -->
             <button
               type="button"
               @click="$emit('update:modelValue', false)"
-              class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-white border-2 border-[#15c472] text-gray-800 text-sm sm:text-base font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+              :disabled="loading"
+              class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-white border-2 border-[#15c472] text-gray-800 text-sm sm:text-base font-semibold rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               لا
             </button>
@@ -67,29 +70,17 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(["update:modelValue", "confirm"]);
 
-const { logout } = useAuth();
-
-const handleConfirmDelete = async () => {
-  // Emit confirm event for parent component to handle any additional logic
+const handleConfirmDelete = () => {
+  // Emit confirm event for parent component to handle API call and logout
   emit("confirm");
-  
-  // Close the modal
-  emit("update:modelValue", false);
-  
-  // TODO: Replace with actual API call to delete account
-  // await $fetch('/api/auth/delete-account', {
-  //   method: 'DELETE'
-  // });
-  
-  // Logout the user (clears authentication state)
-  logout();
-  
-  // Navigate to login page
-  navigateTo("/login");
 };
 
 watch(

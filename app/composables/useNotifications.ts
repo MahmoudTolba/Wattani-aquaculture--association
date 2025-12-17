@@ -26,8 +26,28 @@ interface NotificationsResponse {
   key: string;
   msg: string;
   data: {
-    notifications: Notification[];
+    notifications: {
+      data: Notification[];
+      pagination?: {
+        total_items: number;
+        count_items: number;
+        per_page: number;
+        total_pages: number;
+        current_page: number;
+        next_page_url: string;
+        perv_page_url: string;
+      };
+    };
     unread_count?: number;
+  };
+}
+
+interface NotificationsCountResponse {
+  key: string;
+  msg: string;
+  data: {
+    unread_count?: number;
+    total_count?: number;
   };
 }
 
@@ -109,7 +129,7 @@ export const useNotifications = () => {
     }
   };
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = async (page: number = 1, perPage: number = 20) => {
     try {
       const headers = buildAuthHeaders();
       const response = await $fetch<NotificationsResponse>(
@@ -117,6 +137,10 @@ export const useNotifications = () => {
         {
           method: 'GET',
           headers: headers,
+          query: {
+            page,
+            per_page: perPage,
+          },
         }
       );
 
@@ -202,14 +226,19 @@ export const useNotifications = () => {
   const fetchNotificationsCount = async () => {
     try {
       const headers = buildAuthHeaders();
-      const response = await $fetch(
+      const response = await $fetch<NotificationsCountResponse>(
         'https://backend.wattani-sa.com/api/v1/count-notifications',
         {
           method: 'GET',
           headers: headers,
         }
       );
-      return response;
+
+      if (response && response.key === 'success' && response.data) {
+        return response.data;
+      } else {
+        throw new Error(response?.msg || 'فشل في جلب عدد الإشعارات');
+      }
     } catch (err: any) {
       console.error('Error fetching notifications count:', err);
       throw err;

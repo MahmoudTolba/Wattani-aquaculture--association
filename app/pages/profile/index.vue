@@ -54,7 +54,7 @@
                   <button
                     type="button"
                     @click="(profileAvatarInput as any)?.click()"
-                    class="absolute bottom-0 right-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-[#15c472] rounded-full flex items-center justify-center shadow-lg hover:bg-[#12a866] transition-colors"
+                    class="hidden"
                     aria-label="Edit Profile Picture"
                   >
                     <svg
@@ -105,7 +105,8 @@
                     v-model="form.clientName"
                     type="text"
                     placeholder="العميل"
-                    class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                    readonly
+                    class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right cursor-not-allowed opacity-75"
                   />
                 </div>
 
@@ -118,7 +119,7 @@
                     رقم الجوال
                   </label>
                   <div
-                    class="flex flex-col sm:flex-row rounded-lg sm:rounded-xl border border-gray-200 bg-white shadow-sm focus-within:border-[#15c472] focus-within:ring-2 focus-within:ring-[#15c472]/20 overflow-hidden"
+                    class="flex flex-col sm:flex-row rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50 shadow-sm overflow-hidden opacity-75"
                   >
                     <div
                       class="flex items-center justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-3 py-2.5 sm:px-4 sm:py-3 bg-gray-50 text-xs sm:text-sm text-gray-700 min-w-[90px] sm:min-w-[100px]"
@@ -135,8 +136,8 @@
                       v-model="form.mobileNumber"
                       type="tel"
                       placeholder="رقم الجوال"
-                      @input="handleMobileNumberInput"
-                      class="flex-1 w-full bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 text-right"
+                      readonly
+                      class="flex-1 w-full bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 text-right cursor-not-allowed opacity-75"
                     />
                   </div>
                 </div>
@@ -154,7 +155,8 @@
                     v-model="form.email"
                     type="email"
                     placeholder="البريد الإلكتروني"
-                    class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                    readonly
+                    class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right cursor-not-allowed opacity-75"
                   />
                 </div>
 
@@ -170,7 +172,8 @@
                     <select
                       id="city"
                       v-model="form.city"
-                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 pr-8 sm:pr-10 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 appearance-none text-right"
+                      disabled
+                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 sm:px-4 sm:py-3 pr-8 sm:pr-10 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 appearance-none text-right cursor-not-allowed opacity-75"
                     >
                       <option value="">اختر المدينة</option>
                       <option value="riyadh">الرياض</option>
@@ -214,7 +217,8 @@
                       v-model="form.location"
                       type="text"
                       placeholder="تحديد الموقع"
-                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 pr-10 sm:pr-12 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
+                      readonly
+                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 sm:px-4 sm:py-3 pr-10 sm:pr-12 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right cursor-not-allowed opacity-75"
                     />
                     <div
                       class="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
@@ -302,12 +306,13 @@
                 <div class="flex flex-col items-center mb-6 sm:mb-8">
                   <div class="relative">
                     <img
-                      src="/images/profile-avatar.png"
+                      :src="settingsAvatarPreview || settingsForm.avatar || '/images/profile-avatar.png'"
                       alt="Profile Picture"
                       class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full object-cover border-2 sm:border-4 border-gray-100"
                     />
                     <button
                       type="button"
+                      @click="(settingsAvatarInput as any)?.click()"
                       class="absolute bottom-0 right-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-[#15c472] rounded-full flex items-center justify-center shadow-lg hover:bg-[#12a866] transition-colors"
                       aria-label="Edit Profile Picture"
                     >
@@ -331,6 +336,13 @@
                         />
                       </svg>
                     </button>
+                    <input
+                      ref="settingsAvatarInput"
+                      type="file"
+                      accept="image/*"
+                      class="hidden"
+                      @change="handleSettingsAvatarChange"
+                    />
                   </div>
                 </div>
 
@@ -354,6 +366,37 @@
                       placeholder="العميل"
                       class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
                     />
+                  </div>
+
+                  <!-- Mobile Number -->
+                  <div class="space-y-2">
+                    <label
+                      for="settingsMobileNumber"
+                      class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
+                    >
+                      رقم الجوال
+                    </label>
+                    <div
+                      class="flex flex-col sm:flex-row rounded-lg sm:rounded-xl border border-gray-200 bg-white shadow-sm focus-within:border-[#15c472] focus-within:ring-2 focus-within:ring-[#15c472]/20 overflow-hidden"
+                    >
+                      <div
+                        class="flex items-center justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-3 py-2.5 sm:px-4 sm:py-3 bg-gray-50 text-xs sm:text-sm text-gray-700 min-w-[90px] sm:min-w-[100px]"
+                      >
+                        <span>+966</span>
+                        <img
+                          src="/images/Country Flags.png"
+                          alt="Saudi Arabia Flag"
+                          class="w-7 h-7 sm:w-6 sm:h-6"
+                        />
+                      </div>
+                      <input
+                        id="settingsMobileNumber"
+                        v-model="settingsForm.phone"
+                        type="tel"
+                        placeholder="رقم الجوال"
+                        class="flex-1 w-full bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 text-right"
+                      />
+                    </div>
                   </div>
 
                   <!-- Email -->
@@ -461,9 +504,11 @@
                   <div class="pt-4 sm:pt-6">
                     <button
                       type="submit"
-                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
+                      :disabled="isUpdatingProfile"
+                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      حفظ
+                      <span v-if="isUpdatingProfile">جاري التحديث...</span>
+                      <span v-else>حفظ</span>
                     </button>
                   </div>
                 </form>
@@ -1977,10 +2022,6 @@
               </div>
             </div>
 
-            <!-- Favorites Tab Content -->
-            <!-- <div v-if="activeTab === 'favorites'" class="space-y-6">
-              <p class="text-gray-600">صفحة المفضلة - قيد التطوير</p>
-            </div> -->
 
             <!-- FAQ Tab Content -->
             <div v-if="activeTab === 'faq'" class="space-y-6">
@@ -2217,12 +2258,44 @@
               </div>
 
               <!-- Complaint Detail View -->
-              <div v-else-if="selectedComplaint" class="space-y-6">
-                <!-- Back Button -->
-                <button
-                  @click="selectedComplaint = null"
-                  class="flex items-center gap-2 text-gray-700 hover:text-[#15c472] transition-colors text-sm sm:text-base"
-                >
+              <div v-else-if="selectedComplaint || isLoadingComplaintDetails" class="space-y-6">
+                <!-- Loading State -->
+                <div v-if="isLoadingComplaintDetails" class="flex justify-center items-center py-12">
+                  <div class="text-gray-600 text-lg">جاري تحميل التفاصيل...</div>
+                </div>
+
+                <!-- Error State -->
+                <div v-else-if="complaintDetailsError" class="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-6">
+                  <p class="text-red-800 text-center mb-4">{{ complaintDetailsError }}</p>
+                  <button
+                    @click="selectedComplaint = null; complaintDetailsError = null"
+                    class="flex items-center gap-2 text-gray-700 hover:text-[#15c472] transition-colors text-sm sm:text-base mx-auto"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </svg>
+                    <span>العودة</span>
+                  </button>
+                </div>
+
+                <!-- Complaint Details -->
+                <template v-else-if="selectedComplaint">
+                  <!-- Back Button -->
+                  <button
+                    @click="selectedComplaint = null"
+                    class="flex items-center gap-2 text-gray-700 hover:text-[#15c472] transition-colors text-sm sm:text-base"
+                  >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="w-5 h-5"
@@ -2265,6 +2338,19 @@
                     تفاصيل الشكوى
                   </h2>
                   <div class="space-y-3">
+                    <!-- Complaint Number -->
+                    <div
+                      class="flex items-center justify-between py-3 border-b border-gray-200"
+                    >
+                      <span class="text-gray-600 text-sm sm:text-base"
+                        >رقم الشكوى</span
+                      >
+                      <span
+                        class="text-gray-800 font-semibold text-sm sm:text-base"
+                        >{{ selectedComplaint.number }}</span
+                      >
+                    </div>
+
                     <!-- Complaint Date -->
                     <div
                       class="flex items-center justify-between py-3 border-b border-gray-200"
@@ -2278,7 +2364,7 @@
                       >
                     </div>
 
-                    <!-- Complaint Address -->
+                    <!-- Complaint Subject/Title -->
                     <div
                       class="flex items-center justify-between py-3 border-b border-gray-200"
                     >
@@ -2287,7 +2373,7 @@
                       >
                       <span
                         class="text-gray-800 font-semibold text-sm sm:text-base"
-                        >{{ selectedComplaint.address }}</span
+                        >{{ selectedComplaint.subject || selectedComplaint.address || "لا يوجد عنوان" }}</span
                       >
                     </div>
 
@@ -2320,12 +2406,14 @@
                   >
                     {{
                       selectedComplaint.description ||
-                      "هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر. هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر."
+                      selectedComplaint.subject ||
+                      "لا يوجد وصف متاح"
                     }}
                   </p>
                 </div>
-                <!-- Complaint Description Card -->
+                <!-- Admin Response Card -->
                 <div
+                  v-if="selectedComplaint.admin_message"
                   class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6"
                 >
                   <h2
@@ -2336,12 +2424,10 @@
                   <p
                     class="text-gray-700 text-sm sm:text-base leading-relaxed text-right"
                   >
-                    {{
-                      selectedComplaint.description ||
-                      "هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر. هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر هذا النص يمكن استبداله بنص اخر."
-                    }}
+                    {{ selectedComplaint.admin_message }}
                   </p>
                 </div>
+                </template>
               </div>
 
               <!-- Complaints List View -->
@@ -2987,6 +3073,7 @@
     <!-- Delete Account Confirmation Modal -->
     <DeleteAccountModal
       v-model="isDeleteAccountModalOpen"
+      :loading="isDeletingAccount"
       @confirm="confirmDeleteAccount"
     />
 
@@ -3015,6 +3102,7 @@ import DeleteAccountModal from "~/components/modals/DeleteAccountModal.vue";
 import DeleteAdModal from "~/components/modals/DeleteAdModal.vue";
 import LocationModal from "~/components/modals/LocationModal.vue";
 import { useUserStore } from "~/stores/user";
+import { useAuthStore } from "~/stores/authUserStore";
 
 // Type definitions
 interface ApiResponse<T = any> {
@@ -3049,6 +3137,10 @@ interface User {
   avatar: string;
   token?: string;
   access_token?: string;
+  phone?: string;
+  email?: string;
+  city?: string;
+  location?: string;
 }
 
 interface Package {
@@ -3075,6 +3167,8 @@ interface Complaint {
   address: string;
   status: string;
   description: string;
+  subject?: string;
+  admin_message?: string;
 }
 
 interface Ad {
@@ -3189,10 +3283,12 @@ const isLoadingFaq = ref(false);
 const faqError = ref(null);
 
 // Complaints Pagination State
-const complaintsPerPage = ref(4); // Items per page
+const complaintsPerPage = ref(10); // Items per page
 const complaintsFirst = ref(0); // First item index
 const selectedComplaint = ref<Complaint | null>(null);
 const isShowingNewComplaintForm = ref(false);
+const isLoadingComplaintDetails = ref(false);
+const complaintDetailsError = ref<string | null>(null);
 const isLoadingComplaints = ref(false);
 const complaintsError = ref<string | null>(null);
 const hasFetchedComplaints = ref(false);
@@ -3562,7 +3658,6 @@ const openDeleteAdModal = (adId: number) => {
 
 const confirmDeleteAd = () => {
   if (selectedAdToDelete.value) {
-    console.log("Deleting ad:", selectedAdToDelete.value);
     // Remove the ad from the array
     const index = myAds.value.findIndex(
       (ad) => ad.id === selectedAdToDelete.value
@@ -3648,7 +3743,6 @@ const confirmLocation = () => {
 };
 
 const handleAdSubmit = () => {
-  console.log("Ad form submitted", { ...adForm });
 
   if (selectedAdToEdit.value) {
     // Edit mode - update existing ad
@@ -3676,7 +3770,6 @@ const handleAdSubmit = () => {
         image: imageToUse,
       };
       // Add your API call here to update the ad
-      console.log("Ad updated:", myAds.value[adIndex]);
     }
   } else {
     // Add mode - create new ad
@@ -4253,22 +4346,28 @@ const fetchComplaints = async () => {
     }
 
     if (response && response.key === "success" && response.data) {
-      // Map API response to complaint structure
-      const apiComplaints =
-        (Array.isArray(response.data) && response.data) ||
-        (Array.isArray(response.data.complaints) && response.data.complaints) ||
-        (Array.isArray((response.data as any)?.data) && (response.data as any).data) ||
-        [];
+      // API structure: response.data.complaints.data
+      const complaintsData = (response.data as any)?.complaints?.data || 
+                            (Array.isArray((response.data as any)?.data) ? (response.data as any).data : []) ||
+                            (Array.isArray(response.data) ? response.data : []);
 
-      complaints.value = apiComplaints.map((item: any) => ({
-        id: item.id || item.complaint_id || 0,
-        number: item.number || item.complaint_number || item.id?.toString() || "",
-        date: item.date || item.created_at || item.created_date || "",
+
+      // Map API response to complaint structure
+      const mappedComplaints = complaintsData.map((item: any) => ({
+        id: item.id || 0,
+        number: item.complaint_num || item.number || item.id?.toString() || "",
+        date: item.created_at || item.date || "",
         address: item.address || item.location || "",
-        status: item.status || "جديدة",
-        description: item.description || item.message || item.complaint || "",
+        status: item.status?.title || (typeof item.status === 'string' ? item.status : "جديدة"),
+        description: item.message || item.description || "",
+        subject: item.subject || "",
+        admin_message: item.admin_message || "",
       }));
+
+      // Sort by ID descending (newest first) to show latest complaints at the top
+      complaints.value = mappedComplaints.sort((a: Complaint, b: Complaint) => b.id - a.id);
       hasFetchedComplaints.value = true;
+      
     } else {
       throw new Error(response?.msg || "فشل في تحميل الشكاوى");
     }
@@ -4289,16 +4388,93 @@ const fetchComplaints = async () => {
   }
 };
 
+// Fetch complaint details from API
+const fetchComplaintDetails = async (complaintId: number) => {
+  isLoadingComplaintDetails.value = true;
+  complaintDetailsError.value = null;
+
+  try {
+    // Get token for authenticated request
+    let token =
+      userStore.token || user.value?.token || user.value?.access_token;
+
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    if (!token) {
+      complaintDetailsError.value = "يرجى تسجيل الدخول لعرض تفاصيل الشكوى.";
+      return;
+    }
+
+    const response = await $fetch<ApiResponse<any>>(
+      `https://backend.wattani-sa.com/api/v1/complaint/${complaintId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      }
+    );
+
+    if (response?.key === "unauthenticated") {
+      complaintDetailsError.value =
+        response?.msg || "يرجى تسجيل الدخول لعرض تفاصيل الشكوى.";
+      return;
+    }
+
+    if (response && response.key === "success" && response.data) {
+      // Map API response to complaint structure
+      const complaintData = response.data;
+      selectedComplaint.value = {
+        id: complaintData.id || complaintId,
+        number: complaintData.complaint_num || complaintData.number || complaintData.id?.toString() || "",
+        date: complaintData.created_at || complaintData.date || "",
+        address: complaintData.address || complaintData.location || "",
+        status: complaintData.status?.title || (typeof complaintData.status === 'string' ? complaintData.status : "جديدة"),
+        description: complaintData.message || complaintData.description || "",
+        subject: complaintData.subject || "",
+        admin_message: complaintData.admin_message || "",
+      };
+      
+      // Scroll to top when viewing details
+      if (import.meta.client) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    } else {
+      throw new Error(response?.msg || "فشل في تحميل تفاصيل الشكوى");
+    }
+  } catch (error: any) {
+    console.error("Error fetching complaint details:", error);
+    complaintDetailsError.value =
+      (error as any)?.data?.msg ||
+      (error as any)?.message ||
+      "حدث خطأ أثناء تحميل تفاصيل الشكوى. الرجاء المحاولة مرة أخرى.";
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: complaintDetailsError.value,
+      life: 3000,
+    });
+  } finally {
+    isLoadingComplaintDetails.value = false;
+  }
+};
+
 // View complaint details
 const viewComplaintDetails = (complaintId: number) => {
-  const complaint = complaints.value.find((c) => c.id === complaintId);
-  if (complaint) {
-    selectedComplaint.value = complaint;
-    // Scroll to top when viewing details
-    if (import.meta.client) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }
+  // Fetch details from API
+  fetchComplaintDetails(complaintId);
 };
 
 // Handle new complaint form submission
@@ -4372,7 +4548,13 @@ const handleNewComplaintSubmit = async () => {
       newComplaintForm.message = "";
       isShowingNewComplaintForm.value = false;
 
-      // Refresh complaints list
+      // Refresh complaints list - reset flag and pagination to force refresh
+      // Add a small delay to ensure API has processed the new complaint
+      hasFetchedComplaints.value = false;
+      complaintsFirst.value = 0; // Reset to first page
+      
+      // Wait a moment for the API to process, then fetch
+      await new Promise(resolve => setTimeout(resolve, 500));
       await fetchComplaints();
     } else {
       throw new Error(response?.msg || "فشل في إرسال الشكوى");
@@ -4424,6 +4606,123 @@ const form = reactive({
   avatar: "",
 });
 
+// Function to load user data into form
+const loadUserDataToForm = () => {
+  // Get authStore to check for additional user data
+  const authStore = useAuthStore();
+  
+  // Load user data into form - check both user.value and authStore.authUser
+  // Prioritize authStore.authUser as it may have more complete data from API
+  let userData = (authStore.authUser as any) || user.value || {};
+  
+  // If userData has nested structure (e.g., userData.user or userData.data), extract it
+  if (userData && typeof userData === 'object') {
+    if (userData.user && typeof userData.user === 'object') {
+      userData = { ...userData, ...userData.user };
+    }
+    if (userData.data && typeof userData.data === 'object') {
+      userData = { ...userData, ...userData.data };
+    }
+  }
+  
+  form.clientName = userData.name || userData.username || "";
+  form.mobileNumber = userData.phone || userData.mobile || "";
+  form.email = userData.email || "";
+  // City can be an object {id, name} or a string
+  if (userData.city && typeof userData.city === 'object') {
+    form.city = userData.city.id?.toString() || userData.city.name || "";
+  } else {
+    form.city = userData.city || userData.city_id || userData.city_name || userData.cityName || "";
+  }
+  // Location is map_desc in the API response
+  form.location = userData.map_desc || userData.location || userData.mapDesc || userData.address || "";
+  form.avatar = userData.avatar || userData.image || userData.profile_picture || "/images/profile-avatar.png";
+  
+  // Also load data into settingsForm
+  settingsForm.clientName = userData.name || userData.username || "";
+  settingsForm.email = userData.email || "";
+  settingsForm.phone = userData.phone || userData.mobile || "";
+  // City can be an object {id, name} or a string
+  if (userData.city && typeof userData.city === 'object') {
+    settingsForm.city = userData.city.id?.toString() || userData.city.name || "";
+  } else {
+    settingsForm.city = userData.city || userData.city_id || userData.city_name || userData.cityName || "";
+  }
+  // Location is map_desc in the API response
+  settingsForm.location = userData.map_desc || userData.location || userData.mapDesc || userData.address || "";
+  settingsForm.avatar = userData.avatar || userData.image || userData.profile_picture || "/images/profile-avatar.png";
+  settingsAvatarPreview.value = settingsForm.avatar;
+};
+
+// Fetch user profile from API - primary data source
+const fetchUserProfile = async () => {
+  try {
+    // Get token for authenticated request
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+    
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    if (!token) {
+      return;
+    }
+
+    // Fetch user profile from API
+    const response = await $fetch<ApiResponse<any>>(
+      "https://backend.wattani-sa.com/api/v1/profile",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      }
+    );
+
+    if (response && response.key === "success" && response.data) {
+      // Extract user data - handle different possible structures
+      let profileData = response.data;
+      if (profileData.user && typeof profileData.user === 'object') {
+        profileData = { ...profileData, ...profileData.user };
+      }
+      if (profileData.data && typeof profileData.data === 'object') {
+        profileData = { ...profileData, ...profileData.data };
+      }
+      
+      // Update authStore with complete profile data
+      const authStore = useAuthStore();
+      authStore.updateUserData(profileData);
+      
+      // Also update user.value with complete data for persistence
+      if (user.value) {
+        login({ ...user.value, ...profileData });
+      } else {
+        login(profileData);
+      }
+      
+      // Load form with fresh API data
+      loadUserDataToForm();
+    } else {
+      // If API fails, still try to load from stored data
+      loadUserDataToForm();
+    }
+  } catch (error: any) {
+    console.error("Error fetching user profile:", error);
+    // If API fails, still try to load from stored data
+    loadUserDataToForm();
+  }
+};
+
 // Load user data from auth on mount
 onMounted(() => {
   // Redirect to login if not authenticated
@@ -4432,21 +4731,40 @@ onMounted(() => {
     return;
   }
 
-  // Load user data into form
-  form.clientName = user.value.name || "";
-  form.mobileNumber = user.value.phone || "";
-  form.email = user.value.email || "";
-  form.city = user.value.city || "";
-  form.location = user.value.location || "";
-  form.avatar = user.value.avatar || "/images/profile-avatar.png";
+  // First load from stored data as fallback (for immediate display)
+  loadUserDataToForm();
+  
+  // Then fetch complete profile from API (primary data source)
+  // This will update all fields including city and location
+  if (import.meta.client) {
+    fetchUserProfile();
+  }
 });
+
+// Watch for changes in authStore.authUser and user.value to update form when data changes
+watch(() => {
+  const authStore = useAuthStore();
+  return {
+    authUser: authStore.authUser,
+    user: user.value
+  };
+}, () => {
+  if (user.value) {
+    loadUserDataToForm();
+  }
+}, { deep: true, immediate: false });
 
 const settingsForm = reactive({
   clientName: "",
   email: "",
+  phone: "",
   city: "",
   location: "",
+  avatar: "",
 });
+
+const settingsAvatarInput = ref<HTMLInputElement | null>(null);
+const settingsAvatarPreview = ref<string>("");
 
 const changeMobileForm = reactive({
   currentMobile: "",
@@ -5060,7 +5378,6 @@ const handleVerifyNewCode = async () => {
 };
 
 const handleSubmit = () => {
-  console.log("Form submitted:", form);
 
   // Update user data in auth
   if (user.value) {
@@ -5086,7 +5403,50 @@ const handleSubmit = () => {
   }
 };
 
-const handleSettingsSubmit = () => {
+// Handle settings avatar change
+const settingsAvatarFile = ref<File | null>(null);
+const handleSettingsAvatarChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (file) {
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: "الرجاء اختيار صورة",
+        life: 3000,
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: "حجم الصورة يجب أن يكون أقل من 5 ميجابايت",
+        life: 3000,
+      });
+      return;
+    }
+
+    settingsAvatarFile.value = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        settingsAvatarPreview.value = e.target.result as string;
+        // Also update the form avatar so it shows immediately
+        settingsForm.avatar = settingsAvatarPreview.value;
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+// Handle settings form submission
+const isUpdatingProfile = ref(false);
+const handleSettingsSubmit = async () => {
   if (
     !settingsForm.clientName.trim() ||
     !settingsForm.email.trim() ||
@@ -5100,14 +5460,116 @@ const handleSettingsSubmit = () => {
     });
     return;
   }
-  console.log("Settings form submitted:", settingsForm);
-  // Add your form submission logic here
-  toast.add({
-    severity: "success",
-    summary: "نجح",
-    detail: "تم حفظ البيانات الشخصية بنجاح",
-    life: 3000,
-  });
+
+  if (isUpdatingProfile.value) return;
+  isUpdatingProfile.value = true;
+
+  try {
+    // Get token for authenticated request
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    if (!token) {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: "يرجى تسجيل الدخول أولاً",
+        life: 3000,
+      });
+      isUpdatingProfile.value = false;
+      return;
+    }
+
+    // Create FormData for the update request
+    const formData = new FormData();
+    formData.append("name", settingsForm.clientName.trim());
+    formData.append("email", settingsForm.email.trim());
+    formData.append("phone", settingsForm.phone.trim());
+    formData.append("city", settingsForm.city.trim());
+    formData.append("city_id", settingsForm.city.trim());
+    formData.append("location", settingsForm.location || "");
+    formData.append("map_desc", settingsForm.location || "");
+    formData.append("lang", "ar");
+    formData.append("iso", "SA");
+
+    // Add avatar file if selected
+    if (settingsAvatarFile.value) {
+      formData.append("avatar", settingsAvatarFile.value);
+    }
+
+    const response = await $fetch<ApiResponse<any>>(
+      "https://backend.wattani-sa.com/api/v1/update-profile?_method=put",
+      {
+        method: "POST",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          // Don't set Content-Type for FormData, browser will set it automatically
+        },
+        body: formData,
+      }
+    );
+
+    if (response && response.key === "success") {
+      // Update user data in stores
+      const authStore = useAuthStore();
+      const updatedUserData = {
+        ...user.value,
+        name: settingsForm.clientName,
+        email: settingsForm.email,
+        phone: settingsForm.phone,
+        city: settingsForm.city,
+        location: settingsForm.location,
+        map_desc: settingsForm.location,
+        avatar: response.data?.avatar || settingsForm.avatar || settingsAvatarPreview.value || user.value?.avatar,
+      };
+
+      // Update authStore
+      authStore.updateUserData(updatedUserData);
+      
+      // Update user.value (localStorage) - this will update navbar
+      login(updatedUserData);
+
+      // Reload profile data to get latest from API
+      await fetchUserProfile();
+
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم تحديث البيانات الشخصية بنجاح",
+        life: 3000,
+      });
+
+      // Reset avatar file
+      settingsAvatarFile.value = null;
+    } else {
+      throw new Error(response?.msg || "فشل في تحديث البيانات");
+    }
+  } catch (error: any) {
+    console.error("Error updating profile:", error);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        (error as any)?.data?.msg ||
+        (error as any)?.data?.message ||
+        (error as any)?.message ||
+        "حدث خطأ أثناء تحديث البيانات. الرجاء المحاولة مرة أخرى.",
+      life: 3000,
+    });
+  } finally {
+    isUpdatingProfile.value = false;
+  }
 };
 
 const handleChangeMobileSubmit = () => {
@@ -5123,7 +5585,6 @@ const handleChangeMobileSubmit = () => {
     });
     return;
   }
-  console.log("Change mobile form submitted:", changeMobileForm);
   // Add your form submission logic here
   toast.add({
     severity: "success",
@@ -5215,13 +5676,6 @@ const handleChangePasswordSubmit = async () => {
   isChangingPassword.value = true;
 
   try {
-    // Log the form data for debugging
-    console.log("Form data being sent:", {
-      old_password: changePasswordForm.currentPassword,
-      password: changePasswordForm.newPassword,
-      password_confirmation: changePasswordForm.confirmPassword,
-    });
-
     // Create form data
     const formData = new FormData();
     formData.append("old_password", changePasswordForm.currentPassword);
@@ -5759,10 +6213,88 @@ const openDeleteAccountModal = () => {
   isDeleteAccountModalOpen.value = true;
 };
 
-const confirmDeleteAccount = () => {
-  console.log("Account deletion confirmed");
-  // Add your account deletion logic here
-  isDeleteAccountModalOpen.value = false;
+const isDeletingAccount = ref(false);
+
+const confirmDeleteAccount = async () => {
+  if (isDeletingAccount.value) return;
+  isDeletingAccount.value = true;
+
+  try {
+    // Get token for authenticated request
+    let token = userStore.token || user.value?.token || user.value?.access_token;
+
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    if (!token) {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: "يرجى تسجيل الدخول أولاً",
+        life: 3000,
+      });
+      isDeleteAccountModalOpen.value = false;
+      isDeletingAccount.value = false;
+      return;
+    }
+
+    const response = await $fetch<ApiResponse>(
+      "https://backend.wattani-sa.com/api/v1/delete-account",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      }
+    );
+
+    if (response && response.key === "success") {
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم حذف الحساب بنجاح",
+        life: 3000,
+      });
+      
+      // Close modal
+      isDeleteAccountModalOpen.value = false;
+      
+      // Logout user and clear all data
+      const { logout } = useAuth();
+      logout();
+      userStore.logout();
+      
+      // Navigate to login page
+      navigateTo("/login");
+    } else {
+      throw new Error(response?.msg || "فشل في حذف الحساب");
+    }
+  } catch (error: any) {
+    console.error("Error deleting account:", error);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        (error as any)?.data?.msg ||
+        (error as any)?.data?.message ||
+        (error as any)?.message ||
+        "حدث خطأ أثناء حذف الحساب. الرجاء المحاولة مرة أخرى.",
+      life: 3000,
+    });
+  } finally {
+    isDeletingAccount.value = false;
+  }
 };
 
 const handleDeleteAccount = () => {
@@ -5849,7 +6381,6 @@ const handleCharge = (amount: string) => {
     // You can add validation feedback here
     return;
   }
-  console.log("Charging wallet with amount:", amount);
   // Add your charge logic here
   isChargeModalOpen.value = false;
   chargeAmount.value = "";
@@ -6086,10 +6617,6 @@ watch(
 watch(
   () => isSuccessModalOpen.value,
   (isOpen) => {
-    console.log("Success modal state changed to:", isOpen);
-    if (isOpen) {
-      console.log("Success modal should be visible now!");
-    }
   },
   { immediate: true }
 );

@@ -14,7 +14,7 @@
           </span>
         </h1>
         <button
-          v-if="notifications.length > 0"
+          v-if="totalRecords > 0"
           class="delete-all-btn bg-transparent border-none text-red-500 text-base cursor-pointer flex items-center gap-[5px]"
           @click="showDeleteConfirm = true"
           :disabled="isDeleting"
@@ -38,7 +38,7 @@
       <div v-else-if="error" class="text-center py-8">
         <p class="text-red-500 mb-4">{{ error }}</p>
         <button
-          @click="loadNotifications"
+          @click="() => loadNotifications(1)"
           class="bg-gradient-to-r from-[#00a859] to-[#15c472] text-white py-2 px-6 rounded-lg hover:opacity-90 transition"
         >
           إعادة المحاولة
@@ -47,61 +47,53 @@
 
       <!-- Notifications List -->
       <div v-else>
+        <!-- Debug Info (can be removed later) -->
+        <div v-if="false" class="mb-4 p-4 bg-gray-100 rounded text-xs">
+          <p><strong>Notifications loaded:</strong> {{ notifications.length }}</p>
+          <p><strong>Total records:</strong> {{ totalRecords }}</p>
+          <p><strong>Current page:</strong> {{ currentPage }}</p>
+          <p><strong>Notification types:</strong> {{ notificationTypes?.length || 0 }}</p>
+          <p><strong>First notification:</strong> {{ notifications[0] ? JSON.stringify(notifications[0], null, 2) : 'None' }}</p>
+        </div>
+        
         <ul
-          class="notifications-list list-none p-0 m-0"
+          class="notifications-list list-none p-0 m-0 space-y-3"
           v-if="visibleNotifications.length"
         >
           <li
             v-for="notification in visibleNotifications"
             :key="notification.id"
-            class="notification-item flex justify-between items-start py-4 border-b border-gray-100 transition-colors hover:bg-gray-50"
-            :class="{ 'bg-blue-50': !notification.read_at }"
+            class="notification-item bg-gray-50 rounded-lg p-4 flex items-center justify-between gap-4 transition-all hover:shadow-md"
           >
-            <div class="flex-1 pr-4">
-              <div class="flex items-start gap-3">
-                <img 
-                  src="/icons/bell-icon.svg" 
-                  alt="bell-icon" 
-                  class="mt-1 flex-shrink-0"
-                  :class="{ 'opacity-100': !notification.read_at, 'opacity-50': notification.read_at }"
-                />
-                <div class="flex-1">
-                  <h3 
-                    class="font-semibold text-base mb-1"
-                    :class="{ 'text-teal-600': !notification.read_at, 'text-gray-600': notification.read_at }"
-                  >
-                    {{ notification.title }}
-                  </h3>
-                  <p 
-                    class="text-sm mb-2"
-                    :class="{ 'text-gray-700': !notification.read_at, 'text-gray-500': notification.read_at }"
-                  >
-                    {{ notification.message }}
-                  </p>
-                  <p class="text-xs text-gray-400">
-                    {{ formatDate(notification.created_at) }}
-                  </p>
-                </div>
-              </div>
+            <!-- Bell Icon on Right (RTL) -->
+            <div class="flex-shrink-0">
+              <img 
+                src="/icons/bell-icon.svg" 
+                alt="bell-icon" 
+                class="w-5 h-5"
+                :class="{ 'opacity-100': !notification.read_at, 'opacity-50': notification.read_at }"
+              />
             </div>
-            <div class="flex items-center gap-2">
+            
+            <!-- Notification Text in Middle -->
+            <div class="flex-1 text-right">
+              <p class="text-sm text-gray-800 font-medium">
+                {{ getNotificationTitle(notification) }}
+              </p>
+            </div>
+            
+            <!-- Trash Icon on Left (RTL) -->
+            <div class="flex-shrink-0">
               <button
-                v-if="!notification.read_at"
-                @click="markNotificationAsRead(notification.id)"
-                class="text-teal-500 text-sm px-3 py-1 rounded hover:bg-teal-50 transition"
-                title="تحديد كمقروء"
-              >
-                ✓
-              </button>
-              <button
-                class="delete-single-btn bg-transparent border-none text-red-500 text-lg cursor-pointer"
+                class="delete-single-btn bg-transparent border-none cursor-pointer p-0"
                 @click="deleteSingle(notification.id)"
                 :disabled="isDeleting"
+                title="حذف الإشعار"
               >
                 <img
                   src="/icons/trash-icon.svg"
                   alt="delete-icon"
-                  class="bg-[#D92D2026] p-2 rounded-md"
+                  class="w-5 h-5"
                 />
               </button>
             </div>
@@ -110,10 +102,10 @@
         <p v-else class="text-center text-gray-400 py-6">لا توجد إشعارات حاليا</p>
         
         <Paginator
-          v-if="notifications.length > rows"
+          v-if="totalRecords > rows"
           :rows="rows"
-          :totalRecords="notifications.length"
-          :first="first"
+          :totalRecords="totalRecords"
+          :first="(currentPage - 1) * rows"
           :rowsPerPageOptions="[5, 10, 20]"
           @page="onPageChange"
           class="mt-6"
@@ -168,31 +160,79 @@ import { useNotifications } from "~/composables/useNotifications";
 import { useToast } from "primevue/usetoast";
 
 const notificationsStore = useNotificationsStore() as any;
-const { fetchNotifications, markAsRead, deleteNotification, deleteAllNotifications } = useNotifications();
+const { 
+  fetchNotifications, 
+  markAsRead, 
+  deleteNotification, 
+  deleteAllNotifications,
+  fetchNotificationsCount,
+  fetchNotificationTypes,
+  notificationTypes
+} = useNotifications();
 const toast = useToast();
 
-const notifications = computed(() => notificationsStore.notifications);
-const rows = ref(5);
-const first = ref(0);
+const notifications = ref<any[]>([]);
+const rows = ref(20);
+const currentPage = ref(1);
+const totalRecords = ref(0);
+const pagination = ref<any>(null);
 const showDeleteConfirm = ref(false);
 const isLoading = ref(false);
 const isDeleting = ref(false);
 const error = ref<string | null>(null);
 
-const visibleNotifications = computed(() =>
-  notifications.value.slice(first.value, first.value + rows.value)
-);
+const visibleNotifications = computed(() => notifications.value);
 
-const loadNotifications = async () => {
+// Get notification title from type or fallback to message
+const getNotificationTitle = (notification: any) => {
+  // First check if notification has a direct title
+  if (notification.title) {
+    return notification.title;
+  }
+  
+  // Try to find the type title from notification types
+  if (notification.type && notificationTypes && notificationTypes.value && notificationTypes.value.length > 0) {
+    const typeInfo = notificationTypes.value.find((t: any) => 
+      t.id === notification.type || 
+      t.name === notification.type ||
+      t.id === notification.notification_type_id
+    );
+    if (typeInfo?.title) {
+      return typeInfo.title;
+    }
+  }
+  
+  // Fallback to message or default
+  return notification.message || notification.body || 'إشعار';
+};
+
+const loadNotifications = async (page: number = currentPage.value) => {
   isLoading.value = true;
   error.value = null;
+  currentPage.value = page;
 
   try {
-    const data = await fetchNotifications();
+    // Fetch notifications with pagination
+    const data = await fetchNotifications(page, rows.value);
+    console.log("API Response Data:", data);
+    console.log("Notifications Data:", data.notifications);
+    console.log("Notifications Array:", data.notifications?.data);
+    
+    notifications.value = data.notifications?.data || [];
+    pagination.value = data.notifications?.pagination || null;
+    totalRecords.value = pagination.value?.total_items || notifications.value.length;
+
+    console.log("Loaded notifications count:", notifications.value.length);
+    console.log("Total records:", totalRecords.value);
+
+    // Update store with current page notifications
     notificationsStore.setNotifications(
-      data.notifications || [],
+      notifications.value,
       data.unread_count
     );
+
+    // Fetch unread count separately to ensure it's up to date
+    await loadUnreadCount();
   } catch (err: any) {
     console.error("Error loading notifications:", err);
     const isUnauthenticated =
@@ -223,10 +263,31 @@ const loadNotifications = async () => {
   }
 };
 
+const loadUnreadCount = async () => {
+  try {
+    const countData = await fetchNotificationsCount();
+    if (countData?.unread_count !== undefined) {
+      notificationsStore.unreadCount = countData.unread_count;
+    }
+  } catch (err: any) {
+    console.error("Error loading unread count:", err);
+    // Don't show error toast for count, just log it
+  }
+};
+
 const markNotificationAsRead = async (notificationId: string) => {
   try {
     await markAsRead(notificationId);
     notificationsStore.markAsRead(notificationId);
+    
+    // Update local notification state
+    const notification = notifications.value.find(n => n.id === notificationId);
+    if (notification) {
+      notification.read_at = new Date().toISOString();
+    }
+    
+    // Reload unread count
+    await loadUnreadCount();
     
     toast.add({
       severity: "success",
@@ -250,6 +311,21 @@ const deleteSingle = async (notificationId: string) => {
     isDeleting.value = true;
     await deleteNotification(notificationId);
     notificationsStore.deleteById(notificationId);
+    
+    // Remove from local notifications
+    notifications.value = notifications.value.filter(n => n.id !== notificationId);
+    totalRecords.value = Math.max(0, totalRecords.value - 1);
+    
+    // Reload unread count
+    await loadUnreadCount();
+    
+    // If current page is empty and not first page, go to previous page
+    if (notifications.value.length === 0 && currentPage.value > 1) {
+      await loadNotifications(currentPage.value - 1);
+    } else {
+      // Reload current page to refresh data
+      await loadNotifications(currentPage.value);
+    }
     
     toast.add({
       severity: "success",
@@ -275,7 +351,13 @@ const confirmDeleteAll = async () => {
     isDeleting.value = true;
     await deleteAllNotifications();
     notificationsStore.deleteAll();
+    notifications.value = [];
+    totalRecords.value = 0;
+    currentPage.value = 1;
     showDeleteConfirm.value = false;
+    
+    // Reload unread count
+    await loadUnreadCount();
     
     toast.add({
       severity: "success",
@@ -296,9 +378,10 @@ const confirmDeleteAll = async () => {
   }
 };
 
-const onPageChange = (event: any) => {
-  first.value = event.first;
+const onPageChange = async (event: any) => {
   rows.value = event.rows;
+  const newPage = Math.floor(event.first / event.rows) + 1;
+  await loadNotifications(newPage);
 };
 
 const formatDate = (dateString: string) => {
@@ -323,27 +406,16 @@ const formatDate = (dateString: string) => {
   });
 };
 
-watch(
-  () => notifications.value.length,
-  (newLength) => {
-    if (newLength === 0) {
-      first.value = 0;
-      return;
-    }
-
-    if (first.value >= newLength) {
-      const lastPageStart = Math.max(
-        0,
-        Math.floor((newLength - 1) / rows.value) * rows.value
-      );
-      first.value = lastPageStart;
-    }
+// Load notifications and notification types on mount
+onMounted(async () => {
+  await loadNotifications(1);
+  // Load notification types for future use (filtering, etc.)
+  try {
+    await fetchNotificationTypes();
+  } catch (err) {
+    console.error("Error loading notification types:", err);
+    // Don't show error, just log it
   }
-);
-
-// Load notifications on mount
-onMounted(() => {
-  loadNotifications();
 });
 </script>
 
