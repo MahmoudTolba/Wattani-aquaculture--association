@@ -1028,9 +1028,18 @@
                     رصيدك الحالي هو
                   </p>
                   <div class="flex items-center justify-center gap-2">
-                    <span class="text-green-600 text-3xl sm:text-4xl font-bold"
-                      >60</span
+                    <span 
+                      v-if="!isLoadingWallet"
+                      class="text-green-600 text-3xl sm:text-4xl font-bold"
                     >
+                      {{ walletBalance }}
+                    </span>
+                    <span 
+                      v-else
+                      class="text-gray-400 text-3xl sm:text-4xl font-bold"
+                    >
+                      ...
+                    </span>
                     <img
                       src="/icons/green-currency.svg"
                       alt="rial-icon"
@@ -1043,9 +1052,10 @@
                 <button
                   type="button"
                   @click="openChargeModal"
-                  class="w-full max-w-xl 2xl:max-w-xl xl:max-w-lg lg:max-w-md md:max-w-sm sm:max-w-sm px-6 py-4 bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300 transform hover:scale-105"
+                  :disabled="isChargingWallet"
+                  class="w-full max-w-xl 2xl:max-w-xl xl:max-w-lg lg:max-w-md md:max-w-sm sm:max-w-sm px-6 py-4 bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  شحن
+                  {{ isChargingWallet ? 'جاري الشحن...' : 'شحن' }}
                 </button>
               </div>
             </div>
@@ -3097,6 +3107,7 @@ import ChargeWalletModal from "~/components/modals/ChargeWalletModal.vue";
 import CommissionPaymentModal from "~/components/modals/CommissionPaymentModal.vue";
 import SuccessModal from "~/components/modals/SuccessModal.vue";
 import PackagePaymentModal from "~/components/modals/PackagePaymentModal.vue";
+import { useWallet } from "~/composables/useWallet";
 import LogoutModal from "~/components/modals/LogoutModal.vue";
 import DeleteAccountModal from "~/components/modals/DeleteAccountModal.vue";
 import DeleteAdModal from "~/components/modals/DeleteAdModal.vue";
@@ -3195,11 +3206,15 @@ type PaymentMethod = string | { id: number; name: string };
 const toast = useToast();
 const userStore = useUserStore();
 const { user, login } = useAuth();
+const { showWallet, chargeWallet } = useWallet();
 
 const activeTab = ref("profile");
 const isMobileMenuOpen = ref(false);
 const isChargeModalOpen = ref(false);
 const chargeAmount = ref("");
+const walletBalance = ref(0);
+const isLoadingWallet = ref(false);
+const isChargingWallet = ref(false);
 const commissionAmount = ref("");
 const calculatedFee = ref(null);
 const isCalculatingFee = ref(false);
@@ -3931,6 +3946,8 @@ watch(activeTab, (newTab) => {
     fetchSubscriptions();
   } else if (newTab === "complaints" && !hasFetchedComplaints.value && !isLoadingComplaints.value) {
     fetchComplaints();
+  } else if (newTab === "wallet") {
+    loadWalletBalance();
   }
 });
 
@@ -4725,20 +4742,27 @@ const fetchUserProfile = async () => {
 
 // Load user data from auth on mount
 onMounted(() => {
-  // Redirect to login if not authenticated
-  if (!user.value) {
-    navigateTo("/login");
-    return;
-  }
+  // Wait for auth hydration from localStorage (useAuth uses nextTick)
+  nextTick(() => {
+    // Check both user.value and localStorage for authentication
+    const storedUser = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+    const hasUser = user.value || storedUser;
+    
+    // Only redirect if truly not authenticated (after hydration check)
+    if (!hasUser) {
+      navigateTo("/login");
+      return;
+    }
 
-  // First load from stored data as fallback (for immediate display)
-  loadUserDataToForm();
+    // First load from stored data as fallback (for immediate display)
+    loadUserDataToForm();
   
-  // Then fetch complete profile from API (primary data source)
-  // This will update all fields including city and location
-  if (import.meta.client) {
-    fetchUserProfile();
-  }
+    // Then fetch complete profile from API (primary data source)
+    // This will update all fields including city and location
+    if (import.meta.client) {
+      fetchUserProfile();
+    }
+  });
 });
 
 // Watch for changes in authStore.authUser and user.value to update form when data changes
@@ -6372,18 +6396,113 @@ const confirmLogout = async () => {
   }
 };
 
+// Load wallet balance
+const loadWalletBalance = async () => {
+  isLoadingWallet.value = true;
+  try {
+    const data = await showWallet();
+    console.log("=== Wallet API Response ===", JSON.stringify(data, null, 2));
+    console.log("=== Data keys ===", Object.keys(data || {}));
+    
+    // Handle different possible balance field names
+    const balance = data.balance || data.wallet_balance || data.amount || data.current_balance || 0;
+    walletBalance.value = typeof balance === 'number' ? balance : parseFloat(balance) || 0;
+    console.log("✓ Wallet balance loaded:", walletBalance.value);
+    console.log("✓ Balance type:", typeof walletBalance.value);
+  } catch (err: any) {
+    console.error("Error loading wallet balance:", err);
+    const isUnauthenticated =
+      err?.data?.key === "unauthenticated" ||
+      err?.data?.msg?.includes("يرجى اعادة تسجيل الدخول") ||
+      err?.message === "unauthenticated";
+    
+    // Don't redirect on wallet load - just show error or set balance to 0
+    // User might be viewing profile without being fully authenticated
+    if (isUnauthenticated) {
+      walletBalance.value = 0;
+      console.warn("User not authenticated, wallet balance set to 0");
+    } else {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: err?.data?.msg || err?.message || "حدث خطأ أثناء تحميل رصيد المحفظة",
+        life: 3000,
+      });
+    }
+  } finally {
+    isLoadingWallet.value = false;
+  }
+};
+
 const openChargeModal = () => {
   isChargeModalOpen.value = true;
 };
 
-const handleCharge = (amount: string) => {
+const handleCharge = async (amount: string) => {
   if (!amount || parseFloat(amount) <= 0) {
-    // You can add validation feedback here
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى إدخال مبلغ صحيح",
+      life: 3000,
+    });
     return;
   }
-  // Add your charge logic here
-  isChargeModalOpen.value = false;
-  chargeAmount.value = "";
+
+  isChargingWallet.value = true;
+  
+  try {
+    const response = await chargeWallet(amount);
+    console.log("=== Charge wallet response ===", JSON.stringify(response, null, 2));
+    console.log("=== Response data ===", response?.data);
+    
+    // Check if response contains updated balance
+    const responseData = response?.data || {};
+    const newBalance = responseData.balance || responseData.wallet_balance || responseData.amount || responseData.new_balance;
+    
+    if (newBalance !== undefined && newBalance !== null) {
+      console.log("✓ Found balance in charge response:", newBalance);
+      walletBalance.value = newBalance;
+    } else {
+      console.log("⚠ No balance in charge response, reloading from API...");
+      // Wait a bit for backend to update, then reload
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await loadWalletBalance();
+    }
+    
+    toast.add({
+      severity: "success",
+      summary: "نجح",
+      detail: response?.msg || "تم شحن المحفظة بنجاح",
+      life: 3000,
+    });
+    
+    isChargeModalOpen.value = false;
+    chargeAmount.value = "";
+  } catch (err: any) {
+    console.error("Error charging wallet:", err);
+    const isUnauthenticated =
+      err?.data?.key === "unauthenticated" ||
+      err?.data?.msg?.includes("يرجى اعادة تسجيل الدخول");
+    
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: isUnauthenticated
+        ? "يرجى تسجيل الدخول لشحن المحفظة"
+        : err?.data?.msg || err?.message || "حدث خطأ أثناء شحن المحفظة",
+      life: 3000,
+    });
+    
+    // Don't auto-redirect - let user decide to login
+    // if (isUnauthenticated) {
+    //   setTimeout(() => {
+    //     navigateTo("/login");
+    //   }, 500);
+    // }
+  } finally {
+    isChargingWallet.value = false;
+  }
 };
 
 // Calculate fee when amount changes
