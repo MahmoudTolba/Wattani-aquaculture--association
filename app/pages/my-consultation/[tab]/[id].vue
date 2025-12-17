@@ -856,6 +856,12 @@ const fetchCourseOrder = async () => {
           data.amount ??
           data.total ??
           fallbackOrderData.price,
+        // Store additional IDs for rating
+        orderId: data.id ?? data.order_id ?? Number(orderId),
+        courseId: data.course_id ?? data.course?.id ?? courseId.value,
+        consultantId: data.consultant_id ?? data.consultant?.id ?? data.user_id ?? data.user?.id,
+        // Store full data for reference
+        rawData: data,
       };
     } else {
       throw new Error(response?.msg || "فشل في جلب بيانات الطلب");
@@ -953,7 +959,6 @@ const closeRatingModal = () => {
 
 const submitRating = async () => {
   if (selectedStars.value === 0 || !ratingComment.value.trim()) {
-    // You can add validation feedback here
     toast.add({
       severity: "warn",
       summary: "تنبيه",
@@ -966,19 +971,53 @@ const submitRating = async () => {
   isSubmittingRating.value = true;
 
   try {
+    const headers = buildAuthHeaders();
+    
+    // Determine rateable_type and rateable_id
+    // Try "order" instead of "course_order" - API might expect this format
+    let rateableType = "order";
+    let rateableId = orderData.value?.orderId || orderData.value?.rawData?.id || Number(orderId) || courseId.value;
+    
+    // Ensure rateableId is a number
+    rateableId = Number(rateableId);
+    
+    if (!rateableId || isNaN(rateableId)) {
+      throw new Error("معرف الطلب غير صحيح");
+    }
+    
+    console.log("=== Submitting Rating ===");
+    console.log("Full orderData:", JSON.stringify(orderData.value, null, 2));
+    console.log("rateable_type:", rateableType);
+    console.log("rateable_id:", rateableId);
+    console.log("rate:", selectedStars.value);
+    console.log("comment:", ratingComment.value);
+    
+    // API expects form-data based on the image showing form-data format
+    const formData = new FormData();
+    formData.append('comment', ratingComment.value);
+    formData.append('rateable_type', rateableType);
+    formData.append('rateable_id', rateableId.toString());
+    formData.append('rate', selectedStars.value.toString());
+    
+    console.log("=== Request Body (FormData) ===");
+    console.log("comment:", ratingComment.value);
+    console.log("rateable_type:", rateableType);
+    console.log("rateable_id:", rateableId);
+    console.log("rate:", selectedStars.value);
+    
+    // Remove Content-Type header to let browser set it with boundary for FormData
+    const { 'Content-Type': _, ...formHeaders } = headers;
+    
     const response = await $fetch(
-      `https://backend.wattani-sa.com/api/v1/courses/${courseId.value}/rate`,
+      'https://backend.wattani-sa.com/api/v1/rate',
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: {
-          rate: selectedStars.value,
-          comment: ratingComment.value,
-        },
+        headers: formHeaders,
+        body: formData,
       }
     );
+
+    console.log("Rating API Response:", response);
 
     if (response?.key === "success") {
       userRating.value = {
@@ -989,7 +1028,7 @@ const submitRating = async () => {
       toast.add({
         severity: "success",
         summary: "تم",
-        detail: "تم إرسال التقييم بنجاح",
+        detail: response?.msg || "تم إرسال التقييم بنجاح",
         life: 3000,
       });
       closeRatingModal();
@@ -997,18 +1036,37 @@ const submitRating = async () => {
       throw new Error(response?.msg || "فشل في إرسال التقييم");
     }
   } catch (err) {
-    console.error("Error submitting rating:", err);
+    console.error("=== Error submitting rating ===", err);
+    console.error("Error response:", JSON.stringify(err, null, 2));
+    console.error("Error data:", err?.data);
+    console.error("Error message:", err?.message);
+    console.error("Error response data msg:", err?.data?.msg);
+    
+    const isUnauthenticated =
+      err?.data?.key === "unauthenticated" ||
+      err?.data?.msg?.includes("يرجى اعادة تسجيل الدخول");
+    
+    // Get the actual error message from API
     const errorMessage =
+      err?.data?.msg ||
       err?.data?.message ||
       err?.message ||
-      err?.data?.msg ||
       "حدث خطأ أثناء إرسال التقييم. الرجاء المحاولة مرة أخرى.";
+    
+    console.error("Final error message:", errorMessage);
+    
     toast.add({
       severity: "error",
       summary: "خطأ",
-      detail: errorMessage,
-      life: 3000,
+      detail: isUnauthenticated ? "يرجى تسجيل الدخول لإرسال التقييم" : errorMessage,
+      life: 5000,
     });
+
+    if (isUnauthenticated) {
+      setTimeout(() => {
+        navigateTo("/login");
+      }, 500);
+    }
   } finally {
     isSubmittingRating.value = false;
   }
