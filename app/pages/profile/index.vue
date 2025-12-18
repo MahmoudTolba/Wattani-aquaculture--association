@@ -1388,11 +1388,96 @@
 
               <!-- Ads Grid -->
               <div v-else>
+                <!-- Search and Filter Section -->
+                <div class="mb-6 space-y-4">
+                  <!-- Search Bar -->
+                  <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="flex-1">
+                      <input
+                        v-model="advertSearchQuery"
+                        type="text"
+                        placeholder="ابحث في الإعلانات..."
+                        class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                        @input="handleAdvertSearch"
+                      />
+                    </div>
+                    <button
+                      @click="addAdvertisement"
+                      class="px-6 py-3 bg-teal-500 text-white text-sm font-semibold rounded-xl hover:bg-teal-600 transition-colors whitespace-nowrap"
+                    >
+                      إضافة إعلان جديد
+                    </button>
+                  </div>
+
+                  <!-- Filter by Category/Subcategory -->
+                  <div class="flex flex-col sm:flex-row gap-4">
+                    <select
+                      v-model="advertFilterCategory"
+                      class="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                      @change="handleCategoryFilter"
+                    >
+                      <option value="">جميع الأقسام</option>
+                      <option
+                        v-for="dept in departments"
+                        :key="dept.value"
+                        :value="dept.value"
+                      >
+                        {{ dept.label }}
+                      </option>
+                    </select>
+
+                    <select
+                      v-model="advertFilterSubcategory"
+                      class="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                      :disabled="!advertFilterCategory"
+                      @change="handleSubcategoryFilter"
+                    >
+                      <option value="">جميع الأقسام الفرعية</option>
+                      <option
+                        v-for="subCat in subCategories"
+                        :key="subCat.value"
+                        :value="subCat.value"
+                      >
+                        {{ subCat.label }}
+                      </option>
+                    </select>
+
+                    <button
+                      v-if="advertFilterCategory || advertFilterSubcategory || advertSearchQuery"
+                      @click="clearAdvertFilters"
+                      class="px-4 py-3 bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-300 transition-colors whitespace-nowrap"
+                    >
+                      إعادة تعيين
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Loading State -->
+                <div v-if="isLoadingMyAdverts || isLoadingAdvertSearch" class="flex justify-center items-center py-12">
+                  <div class="text-gray-500">جاري تحميل الإعلانات...</div>
+                </div>
+                
+                <!-- Empty State -->
+                <div v-else-if="filteredAds.length === 0" class="flex flex-col items-center justify-center py-12">
+                  <p class="text-gray-500 text-lg mb-4">
+                    {{ advertSearchQuery || advertFilterCategory || advertFilterSubcategory ? "لا توجد نتائج" : "لا توجد إعلانات" }}
+                  </p>
+                  <button
+                    v-if="!advertSearchQuery && !advertFilterCategory && !advertFilterSubcategory"
+                    @click="addAdvertisement"
+                    class="px-6 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+                  >
+                    إضافة إعلان جديد
+                  </button>
+                </div>
+                
+                <!-- Ads Grid -->
                 <div
+                  v-else
                   class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 md:grid-cols-2 gap-4 sm:gap-6"
                 >
                   <article
-                    v-for="ad in myAds"
+                    v-for="ad in filteredAds"
                     :key="ad.id"
                     class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
                   >
@@ -1435,7 +1520,11 @@
                     <div class="p-4">
                       <div class="flex items-center justify-between mb-2">
                         <!-- Rating -->
-                        <div class="flex items-center gap-1">
+                        <button
+                          @click="viewAdRatings(ad.id)"
+                          class="flex items-center gap-1 hover:opacity-80 transition-opacity"
+                          :title="`${ad.ratingsCount || 0} تقييم`"
+                        >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             class="h-4 w-4 text-amber-400 fill-current"
@@ -1446,9 +1535,10 @@
                             />
                           </svg>
                           <span class="text-sm font-bold text-gray-600">{{
-                            ad.rating
+                            ad.rating || 0
                           }}</span>
-                        </div>
+                          <span v-if="ad.ratingsCount" class="text-xs text-gray-500">({{ ad.ratingsCount }})</span>
+                        </button>
                         <!-- Product Title -->
                         <h3
                           class="text-base font-bold text-gray-900 text-right flex-1 pr-2"
@@ -3120,7 +3210,7 @@
     />
 
     <!-- Delete Ad Confirmation Modal -->
-    <DeleteAdModal v-model="isDeleteAdModalOpen" @confirm="confirmDeleteAd" />
+    <DeleteAdModal v-model="isDeleteAdModalOpen" :loading="isDeletingAd" @confirm="confirmDeleteAd" />
 
     <!-- Location Modal -->
     <LocationModal v-model="isLocationModalOpen" @confirm="handleLocationConfirm" />
@@ -3147,6 +3237,7 @@ import LocationModal from "~/components/modals/LocationModal.vue";
 import { useUserStore } from "~/stores/user";
 import { useAuthStore } from "~/stores/authUserStore";
 import { useMyAds } from "~/composables/useMyAds";
+import { useAdverts } from "~/composables/useAdverts";
 
 // Type definitions
 interface ApiResponse<T = any> {
@@ -3286,6 +3377,14 @@ const isDeleteAccountModalOpen = ref(false);
 // Delete Ad Modal State
 const isDeleteAdModalOpen = ref(false);
 const selectedAdToDelete = ref<number | null>(null);
+
+// Advert Search and Filter State
+const advertSearchQuery = ref("");
+const advertFilterCategory = ref("");
+const advertFilterSubcategory = ref("");
+const isLoadingAdvertSearch = ref(false);
+const filteredAds = ref<any[]>([]);
+const allAds = ref<any[]>([]); // Store all ads for filtering
 
 // Add Ad Form State
 const isAddAdFormOpen = ref(false);
@@ -3634,7 +3733,21 @@ const onReviewsPageChange = async (event: PaginationEvent) => {
 };
 
 // My Ads Data - Use shared composable
-const { myAds, setAds, removeAd, addAd } = useMyAds();
+const { myAds, setAds, removeAd, addAd, updateAd } = useMyAds();
+
+// Adverts API composable
+const { 
+  deleteAdvert, 
+  updateAdvert,
+  createAdvert,
+  getAdvert, 
+  getMyAdverts,
+  getAdvertRatings,
+  searchAdverts,
+  getAdvertsByCategory,
+  getAdvertsBySubcategory,
+  isLoading: isDeletingAd 
+} = useAdverts();
 
 // My Ads Methods
 // Fetch categories from API
@@ -3729,7 +3842,10 @@ const fetchSubCategories = async (categoryId: string) => {
   }
 
   isLoadingSubCategories.value = true;
-  adForm.subCategoryId = ""; // Reset selection when category changes
+  // Only reset subcategory if we're not editing (to preserve loaded subcategory when editing)
+  if (!selectedAdToEdit.value) {
+    adForm.subCategoryId = ""; // Reset selection when category changes
+  }
 
   try {
     const authStore = useAuthStore();
@@ -3838,34 +3954,302 @@ watch(
   }
 );
 
-const editAd = (adId: number) => {
-  const ad = myAds.value.find((a) => a.id === adId);
-  if (!ad) {
-    console.error("Ad not found:", adId);
+const editAd = async (adId: number) => {
+  try {
+    isLoadingAd.value = true;
+    
+    // Fetch full advert data from API
+    const advert = await getAdvert(adId);
+    
+    // Set the ad to edit
+    selectedAdToEdit.value = adId;
+
+    // Populate form with advert data from API
+    adForm.categoryId = advert.category_id?.toString() || "";
+    adForm.subCategoryId = advert.sub_category_id?.toString() || "";
+    adForm.titleAr = advert.name_ar || advert.name || "";
+    adForm.titleEn = advert.name_en || advert.name || "";
+    adForm.price = advert.price?.toString() || "";
+    adForm.cityId = advert.city_id?.toString() || advert.city?.id?.toString() || "";
+    adForm.descriptionAr = advert.description_ar || advert.description || "";
+    adForm.descriptionEn = advert.description_en || advert.description || "";
+    
+    // Set location data
+    if (advert.lat && advert.lng) {
+      adForm.locationData = {
+        lat: parseFloat(advert.lat),
+        lng: parseFloat(advert.lng),
+        address: advert.map_desc || "",
+      };
+      adForm.location = advert.map_desc || `${advert.lat}, ${advert.lng}`;
+    }
+
+    // Set image preview if available
+    if (advert.image) {
+      adImagePreview.value = advert.image.startsWith('http') 
+        ? advert.image 
+        : `https://backend.wattani-sa.com${advert.image}`;
+    }
+
+    // Set gallery previews if available
+    if (advert.attachments && advert.attachments.length > 0) {
+      galleryPreviews.value = advert.attachments.map(att => 
+        att.url.startsWith('http') ? att.url : `https://backend.wattani-sa.com${att.url}`
+      );
+    }
+
+    // Fetch sub-categories for the selected category
+    if (adForm.categoryId) {
+      await fetchSubCategories(adForm.categoryId);
+    }
+
+    // Open the form
+    isAddAdFormOpen.value = true;
+
+    // Scroll to top when opening form
+    if (import.meta.client) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  } catch (error: any) {
+    console.error("Error loading advert for editing:", error);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: error?.data?.msg || error?.message || "فشل في تحميل بيانات الإعلان",
+      life: 3000,
+    });
+  } finally {
+    isLoadingAd.value = false;
+  }
+};
+
+// Fetch user's adverts from API
+const isLoadingMyAdverts = ref(false);
+const fetchMyAdverts = async () => {
+  if (isLoadingMyAdverts.value) return;
+  
+  isLoadingMyAdverts.value = true;
+  try {
+    const adverts = await getMyAdverts();
+    
+    // Transform API response to match Ad interface
+    const transformedAds = adverts.map((advert: any) => ({
+      id: advert.id,
+      title: advert.name_ar || advert.name || "عنوان غير متاح",
+      image: advert.image || advert.attachment || "/images/card-img.jpg",
+      rating: advert.average_rating || 0,
+      price: advert.price?.toString() || "0",
+      location: advert.map_desc || advert.city?.name || "موقع غير محدد",
+      timeAgo: advert.date || "منذ وقت",
+      seller: {
+        name: advert.user?.name || "مستخدم",
+        avatar: advert.user?.avatar || "/images/profile-avatar.png",
+      },
+    }));
+    
+    allAds.value = transformedAds;
+    filteredAds.value = transformedAds;
+    setAds(transformedAds);
+  } catch (error: any) {
+    console.error("Error fetching my adverts:", error);
+    // Don't show error toast if it's just unauthenticated - user might not be logged in
+    if (error?.data?.key !== 'unauthenticated') {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: error?.data?.msg || error?.message || "فشل في جلب الإعلانات",
+        life: 3000,
+      });
+    }
+  } finally {
+    isLoadingMyAdverts.value = false;
+  }
+};
+
+// Advert Search and Filter Functions
+const handleAdvertSearch = async () => {
+  if (!advertSearchQuery.value.trim()) {
+    // If search is empty, show all ads
+    filteredAds.value = allAds.value;
     return;
   }
 
-  // Set the ad to edit
-  selectedAdToEdit.value = adId as any;
+  isLoadingAdvertSearch.value = true;
+  try {
+    const results = await searchAdverts({
+      search: advertSearchQuery.value,
+      category_id: advertFilterCategory.value ? Number(advertFilterCategory.value) : undefined,
+      sub_category_id: advertFilterSubcategory.value ? Number(advertFilterSubcategory.value) : undefined,
+    });
 
-  // Populate form with ad data
-  // Note: The ad structure might not have all form fields, so we map what we can
-  adForm.titleAr = ad.title || "";
-  adForm.titleEn = ad.title || ""; // If no English title, use Arabic
-  adForm.price = ad.price || "";
-  adForm.location = ad.location || "";
+    if (results && results.data) {
+      const transformedAds = results.data.map((advert: any) => ({
+        id: advert.id,
+        title: advert.name_ar || advert.name || "عنوان غير متاح",
+        image: advert.image || advert.attachment || "/images/card-img.jpg",
+        rating: advert.average_rating || 0,
+        ratingsCount: advert.ratings_count || 0,
+        price: advert.price?.toString() || "0",
+        location: advert.map_desc || advert.city?.name || "موقع غير محدد",
+        timeAgo: advert.date || "منذ وقت",
+        categoryId: advert.category_id,
+        subCategoryId: advert.sub_category_id,
+        seller: {
+          name: advert.user?.name || "مستخدم",
+          avatar: advert.user?.avatar || "/images/profile-avatar.png",
+        },
+      }));
+      filteredAds.value = transformedAds;
+    }
+  } catch (error: any) {
+    console.error("Error searching adverts:", error);
+    // Fallback to local filtering
+    filterAdsLocally();
+  } finally {
+    isLoadingAdvertSearch.value = false;
+  }
+};
 
-  // Set image preview if available
-  if (ad.image) {
-    adImagePreview.value = ad.image;
+const handleCategoryFilter = async () => {
+  advertFilterSubcategory.value = ""; // Reset subcategory when category changes
+  
+  if (!advertFilterCategory.value) {
+    filteredAds.value = allAds.value;
+    return;
   }
 
-  // Open the form
-  isAddAdFormOpen.value = true;
+  isLoadingAdvertSearch.value = true;
+  try {
+    const results = await getAdvertsByCategory(Number(advertFilterCategory.value));
+    
+    if (results && results.data) {
+      const transformedAds = results.data.map((advert: any) => ({
+        id: advert.id,
+        title: advert.name_ar || advert.name || "عنوان غير متاح",
+        image: advert.image || advert.attachment || "/images/card-img.jpg",
+        rating: advert.average_rating || 0,
+        ratingsCount: advert.ratings_count || 0,
+        price: advert.price?.toString() || "0",
+        location: advert.map_desc || advert.city?.name || "موقع غير محدد",
+        timeAgo: advert.date || "منذ وقت",
+        categoryId: advert.category_id,
+        subCategoryId: advert.sub_category_id,
+        seller: {
+          name: advert.user?.name || "مستخدم",
+          avatar: advert.user?.avatar || "/images/profile-avatar.png",
+        },
+      }));
+      filteredAds.value = transformedAds;
+    }
+  } catch (error: any) {
+    console.error("Error filtering by category:", error);
+    filterAdsLocally();
+  } finally {
+    isLoadingAdvertSearch.value = false;
+  }
+};
 
-  // Scroll to top when opening form
-  if (import.meta.client) {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+const handleSubcategoryFilter = async () => {
+  if (!advertFilterSubcategory.value) {
+    await handleCategoryFilter();
+    return;
+  }
+
+  isLoadingAdvertSearch.value = true;
+  try {
+    const results = await getAdvertsBySubcategory(Number(advertFilterSubcategory.value));
+    
+    if (results && results.data) {
+      const transformedAds = results.data.map((advert: any) => ({
+        id: advert.id,
+        title: advert.name_ar || advert.name || "عنوان غير متاح",
+        image: advert.image || advert.attachment || "/images/card-img.jpg",
+        rating: advert.average_rating || 0,
+        ratingsCount: advert.ratings_count || 0,
+        price: advert.price?.toString() || "0",
+        location: advert.map_desc || advert.city?.name || "موقع غير محدد",
+        timeAgo: advert.date || "منذ وقت",
+        categoryId: advert.category_id,
+        subCategoryId: advert.sub_category_id,
+        seller: {
+          name: advert.user?.name || "مستخدم",
+          avatar: advert.user?.avatar || "/images/profile-avatar.png",
+        },
+      }));
+      filteredAds.value = transformedAds;
+    }
+  } catch (error: any) {
+    console.error("Error filtering by subcategory:", error);
+    filterAdsLocally();
+  } finally {
+    isLoadingAdvertSearch.value = false;
+  }
+};
+
+const filterAdsLocally = () => {
+  let filtered = [...allAds.value];
+  
+  if (advertSearchQuery.value.trim()) {
+    const query = advertSearchQuery.value.toLowerCase();
+    filtered = filtered.filter(ad => 
+      ad.title.toLowerCase().includes(query) ||
+      ad.location.toLowerCase().includes(query)
+    );
+  }
+  
+  if (advertFilterCategory.value) {
+    filtered = filtered.filter(ad => ad.categoryId?.toString() === advertFilterCategory.value);
+  }
+  
+  if (advertFilterSubcategory.value) {
+    filtered = filtered.filter(ad => ad.subCategoryId?.toString() === advertFilterSubcategory.value);
+  }
+  
+  filteredAds.value = filtered;
+};
+
+const clearAdvertFilters = () => {
+  advertSearchQuery.value = "";
+  advertFilterCategory.value = "";
+  advertFilterSubcategory.value = "";
+  filteredAds.value = allAds.value;
+};
+
+// View Advert Ratings
+const viewAdRatings = async (advertId: number) => {
+  try {
+    isLoadingAdvertSearch.value = true;
+    const ratingsData = await getAdvertRatings(advertId);
+    
+    if (ratingsData && ratingsData.data && ratingsData.data.length > 0) {
+      const ratingsList = ratingsData.data.map((rating: any) => 
+        `- ${rating.user?.name || 'مستخدم'}: ${rating.rate}/5 ${rating.comment ? `- ${rating.comment}` : ''}`
+      ).join('\n');
+      
+      toast.add({
+        severity: "info",
+        summary: "تقييمات الإعلان",
+        detail: ratingsList || `عدد التقييمات: ${ratingsData.pagination?.total_items || 0}`,
+        life: 5000,
+      });
+    } else {
+      toast.add({
+        severity: "info",
+        summary: "تقييمات الإعلان",
+        detail: `عدد التقييمات: ${ratingsData?.pagination?.total_items || 0}`,
+        life: 3000,
+      });
+    }
+  } catch (error: any) {
+    console.error("Error fetching ratings:", error);
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "فشل في جلب التقييمات",
+      life: 3000,
+    });
+  } finally {
+    isLoadingAdvertSearch.value = false;
   }
 };
 
@@ -3874,13 +4258,48 @@ const openDeleteAdModal = (adId: number) => {
   isDeleteAdModalOpen.value = true;
 };
 
-const confirmDeleteAd = () => {
-  if (selectedAdToDelete.value) {
-    // Remove the ad from the array using composable
+const confirmDeleteAd = async () => {
+  if (!selectedAdToDelete.value || isDeletingAd.value) return;
+
+  try {
+    // Call the delete API
+    await deleteAdvert(selectedAdToDelete.value);
+
+    // Remove the ad from the local array using composable
     removeAd(selectedAdToDelete.value);
-    // Add your delete API call here
+
+    // Show success message
+    toast.add({
+      severity: "success",
+      summary: "نجح",
+      detail: "تم حذف الإعلان بنجاح",
+      life: 3000,
+    });
+
+    // Close modal and reset
     isDeleteAdModalOpen.value = false;
     selectedAdToDelete.value = null;
+    
+    // Refresh my adverts list
+    if (activeTab.value === "my-ads") {
+      await fetchMyAdverts();
+    }
+  } catch (error: any) {
+    console.error("Error deleting advert:", error);
+    
+    // Show error message
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        error?.data?.msg ||
+        error?.data?.message ||
+        error?.message ||
+        "حدث خطأ أثناء حذف الإعلان. الرجاء المحاولة مرة أخرى.",
+      life: 3000,
+    });
+    
+    // Don't close modal on error so user can try again
   }
 };
 
@@ -3976,6 +4395,7 @@ const handleLocationConfirm = (locationData: any) => {
 
 const handleAdSubmit = async () => {
   // Validate required fields
+  // For edit mode, image is not required if already exists
   if (
     !adForm.categoryId ||
     !adForm.subCategoryId ||
@@ -3986,7 +4406,7 @@ const handleAdSubmit = async () => {
     !adForm.location ||
     !adForm.descriptionAr ||
     !adForm.descriptionEn ||
-    !adForm.image
+    (!adForm.image && !selectedAdToEdit.value)
   ) {
     toast.add({
       severity: "warn",
@@ -3998,23 +4418,29 @@ const handleAdSubmit = async () => {
   }
 
     // Validate that sub-category belongs to selected category
-  if (adForm.subCategoryId && adForm.categoryId) {
-    const selectedSubCat = subCategories.value.find(
-      (subCat: { label: string; value: string }) => subCat.value === adForm.subCategoryId
-    );
-    if (!selectedSubCat) {
-      toast.add({
-        severity: "warn",
-        summary: "تحذير",
-        detail: "يرجى اختيار قسم فرعي صحيح ينتمي للقسم الرئيسي المختار",
-        life: 3000,
-      });
-      return;
+  // Only validate if we're creating a new ad (not editing) and subcategories list is loaded
+  // When editing, the subcategory comes from the API and is already validated
+  if (adForm.subCategoryId && adForm.categoryId && !selectedAdToEdit.value) {
+    // Only validate if subcategories list is populated
+    if (subCategories.value.length > 0) {
+      const selectedSubCat = subCategories.value.find(
+        (subCat: { label: string; value: string }) => subCat.value === adForm.subCategoryId
+      );
+      if (!selectedSubCat) {
+        toast.add({
+          severity: "warn",
+          summary: "تحذير",
+          detail: "يرجى اختيار قسم فرعي صحيح ينتمي للقسم الرئيسي المختار",
+          life: 3000,
+        });
+        return;
+      }
     }
   }
 
-  // Validate that sub-categories are available
-  if (!subCategories.value.length) {
+  // Validate that sub-categories are available (only for new ads)
+  // When editing, subcategory is already set from API
+  if (!selectedAdToEdit.value && !subCategories.value.length && !isLoadingSubCategories.value) {
     toast.add({
       severity: "warn",
       summary: "تحذير",
@@ -4070,57 +4496,88 @@ const handleAdSubmit = async () => {
     formData.append("lng", adForm.locationData.lng.toString());
     formData.append("map_desc", adForm.mapDesc);
     
-    // Main image
-    formData.append("image", adForm.image);
+    // Main image - only append if it's a new file (not when editing without changing image)
+    if (adForm.image && adForm.image instanceof File && adForm.image !== null) {
+      formData.append("image", adForm.image);
+    }
 
-    // Append gallery images as attachments[] array
+    // Append gallery images as attachments[] array (only new files)
     adForm.attachments.forEach((image) => {
-      formData.append("attachments[]", image);
+      if (image instanceof File) {
+        formData.append("attachments[]", image);
+      }
     });
 
-    // Make API call
-    const response = await $fetch<ApiResponse<any>>(
-      "https://backend.wattani-sa.com/api/v1/advert/store",
-      {
-        method: "POST",
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: formData,
-      }
-    );
-
-    // Check if response indicates success
-    if (response && response.key === "success") {
+    let response;
+    if (selectedAdToEdit.value) {
+      // Update existing advert
+      const updatedAdvert = await updateAdvert(selectedAdToEdit.value, formData);
+      
       toast.add({
         severity: "success",
         summary: "نجح",
-        detail: response.msg || "تم إنشاء الإعلان بنجاح",
+        detail: "تم تحديث الإعلان بنجاح",
         life: 3000,
       });
 
-      // Add the new ad to myAds list
-      const newAd = {
-        id: response.data?.id || Date.now(), // Use API response ID or timestamp as fallback
-        title: adForm.titleAr,
-        image: adImagePreview.value || response.data?.image || "/images/card-img.jpg",
-        rating: 0, // New ads start with no rating
-        price: adForm.price,
-        location: adForm.location || adForm.locationData?.address || "موقع غير محدد",
-        timeAgo: "الآن",
-        seller: {
-          name: user.value?.name || userStore.user?.name || "مستخدم",
-          avatar: user.value?.avatar || userStore.user?.avatar || "/images/profile-avatar.png",
-        },
-      };
-      
-      // Add to shared myAds state
-      addAd(newAd);
+      // Update the ad in myAds list
+      if (updatedAdvert?.id) {
+        updateAd(updatedAdvert.id, {
+          title: adForm.titleAr,
+          price: adForm.price,
+          location: adForm.location || adForm.locationData?.address || "موقع غير محدد",
+          image: updatedAdvert.image || adImagePreview.value || "/images/card-img.jpg",
+        });
+      }
 
       // Reset form
       closeAddAdForm();
+      
+      // Refresh my adverts list
+      if (activeTab.value === "my-ads") {
+        await fetchMyAdverts();
+      }
     } else {
-      throw new Error(response?.msg || "فشل في إنشاء الإعلان");
+      // Create new advert using composable
+      const createdAdvert = await createAdvert(formData);
+      
+      // Check if response indicates success
+      if (createdAdvert) {
+        toast.add({
+          severity: "success",
+          summary: "نجح",
+          detail: "تم إنشاء الإعلان بنجاح",
+          life: 3000,
+        });
+
+        // Add the new ad to myAds list
+        const newAd = {
+          id: createdAdvert.id || Date.now(), // Use API response ID or timestamp as fallback
+          title: adForm.titleAr,
+          image: createdAdvert.image || adImagePreview.value || "/images/card-img.jpg",
+          rating: createdAdvert.average_rating || 0, // New ads start with no rating
+          price: adForm.price,
+          location: adForm.location || adForm.locationData?.address || "موقع غير محدد",
+          timeAgo: "الآن",
+          seller: {
+            name: user.value?.name || userStore.user?.name || "مستخدم",
+            avatar: user.value?.avatar || userStore.user?.avatar || "/images/profile-avatar.png",
+          },
+        };
+        
+        // Add to shared myAds state
+        addAd(newAd);
+
+        // Reset form
+        closeAddAdForm();
+        
+        // Refresh my adverts list
+        if (activeTab.value === "my-ads") {
+          await fetchMyAdverts();
+        }
+      } else {
+        throw new Error("فشل في إنشاء الإعلان");
+      }
     }
   } catch (error: any) {
     console.error("Error creating ad:", error);
@@ -4294,6 +4751,8 @@ watch(activeTab, (newTab) => {
   } else if (newTab === "wallet") {
     loadWalletBalance();
   } else if (newTab === "my-ads") {
+    // Fetch user's adverts from API
+    fetchMyAdverts();
     // Fetch categories and cities when my-ads tab is opened
     fetchCategories();
     fetchCities();
@@ -4301,6 +4760,8 @@ watch(activeTab, (newTab) => {
     if (adForm.categoryId) {
       fetchSubCategories(adForm.categoryId);
     }
+    // Reset filters when switching to my-ads tab
+    clearAdvertFilters();
   }
 });
 
@@ -5095,49 +5556,9 @@ const fetchUserProfile = async () => {
 
 // Load user data from auth on mount
 onMounted(() => {
-  // Initialize with default data if empty (for backward compatibility)
-  if (myAds.value.length === 0) {
-    setAds([
-      {
-        id: 1,
-        title: "سنارة سمك كبيرة",
-        image: "/images/card-img.jpg",
-        rating: 4.5,
-        price: "50",
-        location: "مدينة الرياض",
-        timeAgo: "منذ ٦ ساعات",
-        seller: {
-          name: "محمود عبد العزيز",
-          avatar: "/images/profile-avatar.png",
-        },
-      },
-      {
-        id: 2,
-        title: "سنارة سمك كبيرة",
-        image: "/images/card-img.jpg",
-        rating: 4.5,
-        price: "50",
-        location: "مدينة الرياض",
-        timeAgo: "منذ ٦ ساعات",
-        seller: {
-          name: "محمود عبد العزيز",
-          avatar: "/images/profile-avatar.png",
-        },
-      },
-      {
-        id: 3,
-        title: "سنارة سمك كبيرة",
-        image: "/images/card-img.jpg",
-        rating: 4.5,
-        price: "50",
-        location: "مدينة الرياض",
-        timeAgo: "منذ ٦ ساعات",
-        seller: {
-          name: "محمود عبد العزيز",
-          avatar: "/images/profile-avatar.png",
-        },
-      },
-    ]);
+  // Fetch user's adverts from API if on my-ads tab
+  if (activeTab.value === "my-ads") {
+    fetchMyAdverts();
   }
 
   // Wait for auth hydration from localStorage (useAuth uses nextTick)

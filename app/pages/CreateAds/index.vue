@@ -4,7 +4,7 @@
       <section class="mt-10 mx-6 p-6 md:p-10">
         <div class="flex flex-col items-start gap-2">
           <h1 class="text-2xl md:text-[28px] font-semibold text-gray-900">
-            {{ $t("create-ads.title") }}
+            {{ isEditMode ? "تعديل الإعلان" : $t("create-ads.title") }}
           </h1>
         </div>
 
@@ -281,10 +281,10 @@
           <div class="w-full">
             <button
               type="submit"
-              :disabled="isLoading"
+              :disabled="isLoading || isAdvertLoading"
               class="w-full bg-linear-to-l from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-4 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-102 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {{ isLoading ? "جاري الإرسال..." : $t("create-ads.submit") }}
+              {{ isLoading || isAdvertLoading ? "جاري الإرسال..." : (isEditMode ? "تحديث الإعلان" : $t("create-ads.submit")) }}
             </button>
           </div>
         </form>
@@ -306,12 +306,26 @@ import { useUserStore } from "~/stores/user";
 import { useAuthStore } from "~/stores/authUserStore";
 import { useMyAds } from "~/composables/useMyAds";
 import { useAuth } from "~/composables/useAuth";
+import { useAdverts } from "~/composables/useAdverts";
 
 const toast = useToast();
 const userStore = useUserStore();
 const authStore = useAuthStore();
-const { addAd } = useMyAds();
+const { addAd, updateAd } = useMyAds();
 const { user } = useAuth();
+const {
+  getAdvert,
+  createAdvert,
+  updateAdvert,
+  deleteAdvert,
+  isLoading: isAdvertLoading,
+} = useAdverts();
+
+// Get route to check if we're editing
+const route = useRoute();
+const router = useRouter();
+const isEditMode = computed(() => !!route.query.id);
+const advertId = computed(() => route.query.id ? Number(route.query.id) : null);
 
 // Categories/Departments - IMPORTANT: Update these with actual numeric IDs from your database
 // The API expects category_id to exist in the categories table
@@ -548,13 +562,77 @@ watch(
   }
 );
 
+// Load advert data if in edit mode
+const loadAdvertData = async () => {
+  if (!isEditMode.value || !advertId.value) return;
+  
+  try {
+    isLoading.value = true;
+    const advert = await getAdvert(advertId.value);
+    
+    // Populate form with advert data
+    form.categoryId = advert.category_id?.toString() || "";
+    form.subCategoryId = advert.sub_category_id?.toString() || "";
+    form.titleAr = advert.name_ar || advert.name || "";
+    form.titleEn = advert.name_en || advert.name || "";
+    form.price = advert.price?.toString() || "";
+    form.cityId = advert.city_id?.toString() || advert.city?.id?.toString() || "";
+    form.descriptionAr = advert.description_ar || advert.description || "";
+    form.descriptionEn = advert.description_en || advert.description || "";
+    
+    // Set location data
+    if (advert.lat && advert.lng) {
+      form.locationData = {
+        lat: parseFloat(advert.lat),
+        lng: parseFloat(advert.lng),
+        address: advert.map_desc || "",
+      };
+      form.location = advert.map_desc || `${advert.lat}, ${advert.lng}`;
+    }
+    
+    // Set image previews
+    if (advert.image) {
+      adImagePreview.value = advert.image.startsWith('http') 
+        ? advert.image 
+        : `https://backend.wattani-sa.com${advert.image}`;
+    }
+    
+    if (advert.attachments && advert.attachments.length > 0) {
+      galleryPreviews.value = advert.attachments.map(att => 
+        att.url.startsWith('http') ? att.url : `https://backend.wattani-sa.com${att.url}`
+      );
+    }
+    
+    // Fetch sub-categories for the selected category
+    if (form.categoryId) {
+      await fetchSubCategories(form.categoryId);
+    }
+  } catch (error) {
+    console.error("Error loading advert data:", error);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: error?.data?.msg || error?.message || "فشل في تحميل بيانات الإعلان",
+      life: 5000,
+    });
+    // Navigate back if failed to load
+    router.push('/CreateAds');
+  } finally {
+    isLoading.value = false;
+  }
+};
+
 // Fetch data on component mount
-onMounted(() => {
-  fetchCategories();
-  fetchCities();
-  // If a category is already selected, fetch its sub-categories
-  if (form.categoryId) {
-    fetchSubCategories(form.categoryId);
+onMounted(async () => {
+  await fetchCategories();
+  await fetchCities();
+  
+  // If in edit mode, load advert data
+  if (isEditMode.value) {
+    await loadAdvertData();
+  } else if (form.categoryId) {
+    // If a category is already selected, fetch its sub-categories
+    await fetchSubCategories(form.categoryId);
   }
 });
 
@@ -617,6 +695,7 @@ const galleryImagesLabel = computed(() => {
 
 const handleSubmit = async () => {
   // Validate required fields
+  // For edit mode, image is not required if already exists
   if (
     !form.categoryId ||
     !form.subCategoryId ||
@@ -627,7 +706,7 @@ const handleSubmit = async () => {
     !form.location ||
     !form.descriptionAr ||
     !form.descriptionEn ||
-    !form.image
+    (!form.image && !isEditMode.value)
   ) {
     toast.add({
       severity: "warn",
@@ -665,7 +744,6 @@ const handleSubmit = async () => {
     return;
   }
 
-
   // Validate location data
   if (!form.locationData || !form.locationData.lat || !form.locationData.lng) {
     toast.add({
@@ -680,22 +758,6 @@ const handleSubmit = async () => {
   isLoading.value = true;
 
   try {
-    // Get authentication token
-    let token =
-      userStore.token || authStore.authUser?.token || authStore.token;
-
-    if (!token && import.meta.client) {
-      try {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          token = parsedUser?.token || parsedUser?.access_token;
-        }
-      } catch (e) {
-        console.error("Error getting token from localStorage:", e);
-      }
-    }
-
     // Create FormData for file upload with correct API field names
     const formData = new FormData();
     formData.append("name[ar]", form.titleAr);
@@ -709,88 +771,85 @@ const handleSubmit = async () => {
     formData.append("city_id", form.cityId);
     formData.append("lat", form.locationData.lat.toString());
     formData.append("lng", form.locationData.lng.toString());
-    formData.append("map_desc", form.mapDesc);
+    formData.append("map_desc", form.locationData.address || form.mapDesc);
     
-    // Main image
-    formData.append("image", form.image);
+    // Main image - only append if it's a new file
+    if (form.image && form.image instanceof File) {
+      formData.append("image", form.image);
+    }
 
     // Append gallery images as attachments[] array
     form.attachments.forEach((image) => {
-      formData.append("attachments[]", image);
+      if (image instanceof File) {
+        formData.append("attachments[]", image);
+      }
     });
 
-    // Make API call
-    const response = await $fetch(
-      "https://backend.wattani-sa.com/api/v1/advert/store",
-      {
-        method: "POST",
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: formData,
-      }
-    );
-
-    // Check if response indicates success
-    if (response && response.key === "success") {
+    let response;
+    if (isEditMode.value && advertId.value) {
+      // Update existing advert
+      response = await updateAdvert(advertId.value, formData);
+      
       toast.add({
         severity: "success",
         summary: "نجح",
-        detail: response.msg || "تم إنشاء الإعلان بنجاح",
+        detail: "تم تحديث الإعلان بنجاح",
+        life: 3000,
+      });
+
+      // Update the ad in myAds list
+      if (response?.id) {
+        updateAd(response.id, {
+          title: form.titleAr,
+          price: form.price,
+          location: form.location || form.locationData?.address || "موقع غير محدد",
+        });
+      }
+
+      // Navigate to profile page
+      await navigateTo('/profile?tab=my-ads');
+    } else {
+      // Create new advert
+      response = await createAdvert(formData);
+      
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: "تم إنشاء الإعلان بنجاح",
         life: 3000,
       });
 
       // Add the new ad to myAds list
-      const newAd = {
-        id: response.data?.id || Date.now(), // Use API response ID or timestamp as fallback
-        title: form.titleAr,
-        image: adImagePreview.value || response.data?.image || "/images/card-img.jpg",
-        rating: 0, // New ads start with no rating
-        price: form.price,
-        location: form.location || form.locationData?.address || "موقع غير محدد",
-        timeAgo: "الآن",
-        seller: {
-          name: user.value?.name || userStore.user?.name || "مستخدم",
-          avatar: user.value?.avatar || userStore.user?.avatar || "/images/profile-avatar.png",
-        },
-      };
-      
-      // Add to shared myAds state
-      addAd(newAd);
+      if (response?.id) {
+        const newAd = {
+          id: response.id,
+          title: form.titleAr,
+          image: response.image || adImagePreview.value || "/images/card-img.jpg",
+          rating: response.average_rating || 0,
+          price: form.price,
+          location: form.location || form.locationData?.address || "موقع غير محدد",
+          timeAgo: "الآن",
+          seller: {
+            name: user.value?.name || userStore.user?.name || "مستخدم",
+            avatar: user.value?.avatar || userStore.user?.avatar || "/images/profile-avatar.png",
+          },
+        };
+        
+        // Add to shared myAds state
+        addAd(newAd);
+      }
 
       // Reset form
-      form.categoryId = "";
-      form.subCategoryId = "";
-      form.titleAr = "";
-      form.titleEn = "";
-      form.price = "";
-      form.cityId = "";
-      form.location = "";
-      form.locationData = null;
-      form.mapDesc = "0";
-      form.descriptionAr = "";
-      form.descriptionEn = "";
-      form.image = null;
-      form.attachments = [];
-
-      // Clear previews
-      if (adImagePreview.value) {
-        revokePreview(adImagePreview.value);
-        adImagePreview.value = "";
-      }
-      galleryPreviews.value.forEach(revokePreview);
-      galleryPreviews.value = [];
+      resetForm();
 
       // Navigate to profile page to see the new ad
       await navigateTo('/profile?tab=my-ads');
-    } else {
-      throw new Error(response?.msg || "فشل في إنشاء الإعلان");
     }
   } catch (error) {
-    console.error("Error creating ad:", error);
+    console.error(`Error ${isEditMode.value ? 'updating' : 'creating'} ad:`, error);
     
     // Extract error message from API response
-    let errorMessage = "حدث خطأ أثناء إنشاء الإعلان";
+    let errorMessage = `حدث خطأ أثناء ${isEditMode.value ? 'تحديث' : 'إنشاء'} الإعلان`;
     if (error?.data?.msg) {
       errorMessage = error.data.msg;
     } else if (error?.data?.message) {
@@ -817,6 +876,31 @@ const handleSubmit = async () => {
   } finally {
     isLoading.value = false;
   }
+};
+
+// Reset form function
+const resetForm = () => {
+  form.categoryId = "";
+  form.subCategoryId = "";
+  form.titleAr = "";
+  form.titleEn = "";
+  form.price = "";
+  form.cityId = "";
+  form.location = "";
+  form.locationData = null;
+  form.mapDesc = "0";
+  form.descriptionAr = "";
+  form.descriptionEn = "";
+  form.image = null;
+  form.attachments = [];
+
+  // Clear previews
+  if (adImagePreview.value && adImagePreview.value.startsWith('blob:')) {
+    revokePreview(adImagePreview.value);
+  }
+  adImagePreview.value = "";
+  galleryPreviews.value.forEach(revokePreview);
+  galleryPreviews.value = [];
 };
 </script>
 

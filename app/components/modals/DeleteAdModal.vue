@@ -41,9 +41,10 @@
             <button
               type="button"
               @click="$emit('confirm')"
-              class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-[#A6282A] text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-red-700 transition-colors"
+              :disabled="loading"
+              class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-[#A6282A] text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              حذف المنتج
+              {{ loading ? "جاري الحذف..." : "حذف المنتج" }}
             </button>
             <!-- Back Button (Left) -->
             <button
@@ -65,6 +66,10 @@ import { watch } from "vue";
 
 const props = defineProps({
   modelValue: {
+    type: Boolean,
+    default: false,
+  },
+  loading: {
     type: Boolean,
     default: false,
   },
