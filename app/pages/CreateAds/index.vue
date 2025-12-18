@@ -17,7 +17,7 @@
               <span class="text-red-500 ms-1">*</span>
             </div>
             <select
-              v-model="form.department"
+              v-model="form.categoryId"
               class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
             >
               <option value="" disabled>{{ $t("create-ads.department_placeholder") }}</option>
@@ -29,6 +29,35 @@
                 {{ option.label }}
               </option>
             </select>
+          </div>
+
+          <div class="space-y-2">
+            <div
+              class="flex items-center justify-start text-sm font-medium text-gray-800"
+            >
+              تحديد القسم الفرعي
+              <span class="text-red-500 ms-1">*</span>
+            </div>
+            <select
+              v-model="form.subCategoryId"
+              class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+              required
+              :disabled="!form.categoryId || isLoadingSubCategories"
+            >
+              <option value="" disabled>
+                {{ isLoadingSubCategories ? "جاري التحميل..." : (!form.categoryId ? "اختر القسم أولاً" : (subCategories.length ? "اختر القسم الفرعي" : "لا توجد أقسام فرعية")) }}
+              </option>
+              <option
+                v-for="option in subCategories"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.label }}
+              </option>
+            </select>
+            <p v-if="form.categoryId && !isLoadingSubCategories && !subCategories.length" class="text-xs text-red-500">
+              لا توجد أقسام فرعية متاحة لهذا القسم. يرجى اختيار قسم آخر.
+            </p>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -72,7 +101,7 @@
               <span class="text-red-500 ms-1">*</span>
             </div>
             <input
-              v-model="form.titleAr"
+              v-model="form.price"
               type="text"
               :placeholder="$t('create-ads.cost_placeholder')"
               class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
@@ -89,7 +118,7 @@
                 <span class="text-red-500 ms-1">*</span>
               </div>
               <select
-                v-model="form.city"
+                v-model="form.cityId"
                 class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                 required
               >
@@ -252,9 +281,10 @@
           <div class="w-full">
             <button
               type="submit"
-              class="w-full bg-linear-to-l from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-4 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-102"
+              :disabled="isLoading"
+              class="w-full bg-linear-to-l from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-4 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-102 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {{ $t("create-ads.submit") }}
+              {{ isLoading ? "جاري الإرسال..." : $t("create-ads.submit") }}
             </button>
           </div>
         </form>
@@ -269,33 +299,266 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed } from "vue";
+import { reactive, ref, computed, onMounted, watch } from "vue";
 import LocationModal from "~/components/modals/LocationModal.vue";
+import { useToast } from "primevue/usetoast";
+import { useUserStore } from "~/stores/user";
+import { useAuthStore } from "~/stores/authUserStore";
+import { useMyAds } from "~/composables/useMyAds";
+import { useAuth } from "~/composables/useAuth";
 
-const departments = [
-  { label: "العميل", value: "client" },
-  { label: "المشاريع", value: "projects" },
-  { label: "الخدمات", value: "services" },
-];
+const toast = useToast();
+const userStore = useUserStore();
+const authStore = useAuthStore();
+const { addAd } = useMyAds();
+const { user } = useAuth();
 
-const cities = [
-  { label: "الرياض", value: "riyadh" },
-  { label: "جدة", value: "jeddah" },
-  { label: "الدمام", value: "dammam" },
-];
+// Categories/Departments - IMPORTANT: Update these with actual numeric IDs from your database
+// The API expects category_id to exist in the categories table
+// You can find the correct IDs by checking your database or API response
+const departments = ref([
+  { label: "العميل", value: "1" }, // TODO: Replace with actual category ID
+  { label: "المشاريع", value: "2" }, // TODO: Replace with actual category ID
+  { label: "الخدمات", value: "3" }, // TODO: Replace with actual category ID
+]);
+
+// Cities - IMPORTANT: Update these with actual numeric IDs from your database
+// The API expects city_id to exist in the regions table (based on validation: exists:regions,id)
+const cities = ref([
+  { label: "الرياض", value: "48" }, // Example: Using 48 as shown in API example
+  { label: "جدة", value: "2" }, // TODO: Replace with actual region/city ID
+  { label: "الدمام", value: "3" }, // TODO: Replace with actual region/city ID
+]);
+
+// Sub-categories - Update these with actual numeric IDs from your database
+// You can make this dynamic based on selected category
+const subCategories = ref([]);
+const isLoadingSubCategories = ref(false);
+
+// Fetch categories from API (if endpoint exists)
+const fetchCategories = async () => {
+  try {
+    let token =
+      userStore.token || authStore.authUser?.token || authStore.token;
+
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    // Try to fetch categories from API
+    // Update the endpoint if your API has a categories endpoint
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/categories",
+      {
+        method: "GET",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      }
+    ).catch(() => null);
+
+    if (response && response.key === "success" && response.data) {
+      const categories = Array.isArray(response.data) ? response.data : [];
+      console.log("Categories response:", categories);
+      departments.value = categories.map((cat) => ({
+        label: cat.name_ar || cat.name || cat.title_ar || cat.title,
+        value: cat.id?.toString() || cat.category_id?.toString(),
+      }));
+    }
+  } catch (error) {
+    console.log("Categories endpoint not available, using default values");
+  }
+};
+
+// Fetch cities from API (if endpoint exists)
+const fetchCities = async () => {
+  try {
+    let token =
+      userStore.token || authStore.authUser?.token || authStore.token;
+
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    // Try to fetch cities from API
+    // Update the endpoint if your API has a cities endpoint
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/cities",
+      {
+        method: "GET",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      }
+    ).catch(() => null);
+
+    if (response && response.key === "success" && response.data) {
+      const citiesData = Array.isArray(response.data) ? response.data : [];
+      cities.value = citiesData.map((city) => ({
+        label: city.name_ar || city.name || city.title_ar || city.title,
+        value: city.id?.toString() || city.city_id?.toString(),
+      }));
+    }
+  } catch (error) {
+    console.log("Cities endpoint not available, using default values");
+  }
+};
+
+// Fetch sub-categories from API based on selected category
+const fetchSubCategories = async (categoryId) => {
+  if (!categoryId) {
+    subCategories.value = [];
+    form.subCategoryId = "";
+    isLoadingSubCategories.value = false;
+    return;
+  }
+
+  isLoadingSubCategories.value = true;
+  form.subCategoryId = ""; // Reset selection when category changes
+
+  try {
+    let token =
+      userStore.token || authStore.authUser?.token || authStore.token;
+
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    // Try to fetch sub-categories from API based on category_id
+    // Option 1: Query parameter
+    console.log("Fetching sub-categories for category:", categoryId);
+    let response = await $fetch(
+      `https://backend.wattani-sa.com/api/v1/sub-categories?category_id=${categoryId}`,
+      {
+        method: "GET",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      }
+    ).catch((error) => {
+      console.error("Sub-categories API error (endpoint 1):", error);
+      return null;
+    });
+
+    console.log("Sub-categories response (endpoint 1):", response);
+
+    // Option 2: Alternative endpoint structure if first one fails
+    if (!response || response.key !== "success") {
+      console.log("Trying alternative endpoint...");
+      response = await $fetch(
+        `https://backend.wattani-sa.com/api/v1/categories/${categoryId}/sub-categories`,
+        {
+          method: "GET",
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        }
+      ).catch((error) => {
+        console.error("Sub-categories API error (endpoint 2):", error);
+        return null;
+      });
+      console.log("Sub-categories response (endpoint 2):", response);
+    }
+
+    if (response && response.key === "success" && response.data) {
+      const subCats = Array.isArray(response.data) ? response.data : [];
+      subCategories.value = subCats.map((subCat) => ({
+        label: subCat.name_ar || subCat.name || subCat.title_ar || subCat.title,
+        value: subCat.id?.toString() || subCat.sub_category_id?.toString() || subCat.category_id?.toString(),
+      }));
+      
+      if (subCats.length === 0) {
+        console.warn("No sub-categories found for category:", categoryId);
+        // If no sub-categories exist, use the category itself as sub-category
+        // This handles cases where API requires sub_category_id but category has no sub-categories
+        subCategories.value = [{
+          label: "نفس القسم",
+          value: categoryId.toString()
+        }];
+      }
+    } else {
+      // If API doesn't return sub-categories, use category as sub-category
+      console.warn("Failed to fetch sub-categories. Response:", response);
+      // Use the category itself as sub-category if API fails or returns no data
+      subCategories.value = [{
+        label: "نفس القسم",
+        value: categoryId.toString()
+      }];
+    }
+  } catch (error) {
+    console.error("Sub-categories endpoint error:", error);
+    // Clear sub-categories if API fails
+    subCategories.value = [];
+  } finally {
+    isLoadingSubCategories.value = false;
+  }
+};
 
 const form = reactive({
-  department: "",
-  titleAr: "",
-  titleEn: "",
-  cost: "",
-  city: "",
+  categoryId: "", // category_id
+  subCategoryId: "", // sub_category_id (optional)
+  titleAr: "", // name[ar]
+  titleEn: "", // name[en]
+  price: "", // price
+  cityId: "", // city_id
+  countryCode: "966", // country_code (default Saudi Arabia)
   location: "",
-  descriptionAr: "",
-  descriptionEn: "",
-  adImage: null,
-  galleryImages: [],
+  locationData: null, // Store full location data with lat/lng
+  mapDesc: "0", // map_desc (0 or 1)
+  descriptionAr: "", // description[ar]
+  descriptionEn: "", // description[en]
+  image: null, // image (main image)
+  attachments: [], // attachments[] (gallery images)
 });
+
+// Watch for category changes to fetch sub-categories dynamically
+watch(
+  () => form.categoryId,
+  (newCategoryId) => {
+    if (newCategoryId) {
+      fetchSubCategories(newCategoryId);
+    } else {
+      subCategories.value = [];
+      form.subCategoryId = "";
+    }
+  }
+);
+
+// Fetch data on component mount
+onMounted(() => {
+  fetchCategories();
+  fetchCities();
+  // If a category is already selected, fetch its sub-categories
+  if (form.categoryId) {
+    fetchSubCategories(form.categoryId);
+  }
+});
+
+const isLoading = ref(false);
 
 const isLocationModalOpen = ref(false);
 
@@ -305,6 +568,7 @@ const openLocationModal = () => {
 
 const handleLocationConfirm = (locationData) => {
   if (locationData) {
+    form.locationData = locationData;
     const address =
       locationData.address ||
       `${locationData.lat?.toFixed?.(5) || ""}, ${locationData.lng?.toFixed?.(5) || ""}`;
@@ -322,7 +586,7 @@ const revokePreview = (url) => {
 
 const handleAdImageChange = (event) => {
   const [file] = event.target.files || [];
-  form.adImage = file || null;
+  form.image = file || null;
   if (adImagePreview.value) {
     revokePreview(adImagePreview.value);
     adImagePreview.value = "";
@@ -334,25 +598,225 @@ const handleAdImageChange = (event) => {
 
 const handleGalleryImagesChange = (event) => {
   const files = Array.from(event.target.files || []).slice(0, 5);
-  form.galleryImages = files;
+  form.attachments = files;
   galleryPreviews.value.forEach(revokePreview);
   galleryPreviews.value = files.map((file) => URL.createObjectURL(file));
 };
 
 const adImageLabel = computed(() => {
-  if (form.adImage?.name) return form.adImage.name;
+  if (form.image?.name) return form.image.name;
   return "إرفاق صورة";
 });
 
 const galleryImagesLabel = computed(() => {
-  if (form.galleryImages.length) {
-    return `${form.galleryImages.length} / 5 صور مرفوعة`;
+  if (form.attachments.length) {
+    return `${form.attachments.length} / 5 صور مرفوعة`;
   }
   return "إرفاق صورة";
 });
 
-const handleSubmit = () => {
-  console.log("Create Ads form submitted", { ...form });
+const handleSubmit = async () => {
+  // Validate required fields
+  if (
+    !form.categoryId ||
+    !form.subCategoryId ||
+    !form.titleAr ||
+    !form.titleEn ||
+    !form.price ||
+    !form.cityId ||
+    !form.location ||
+    !form.descriptionAr ||
+    !form.descriptionEn ||
+    !form.image
+  ) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى ملء جميع الحقول المطلوبة",
+      life: 3000,
+    });
+    return;
+  }
+
+  // Validate that sub-category belongs to selected category
+  if (form.subCategoryId && form.categoryId) {
+    const selectedSubCat = subCategories.value.find(
+      (subCat) => subCat.value === form.subCategoryId
+    );
+    if (!selectedSubCat) {
+      toast.add({
+        severity: "warn",
+        summary: "تحذير",
+        detail: "يرجى اختيار قسم فرعي صحيح ينتمي للقسم الرئيسي المختار",
+        life: 3000,
+      });
+      return;
+    }
+  }
+
+  // Validate that sub-categories are available
+  if (!subCategories.value.length) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "لا توجد أقسام فرعية متاحة. يرجى اختيار قسم آخر أو الانتظار حتى يتم تحميل الأقسام الفرعية",
+      life: 3000,
+    });
+    return;
+  }
+
+
+  // Validate location data
+  if (!form.locationData || !form.locationData.lat || !form.locationData.lng) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى تحديد الموقع على الخريطة",
+      life: 3000,
+    });
+    return;
+  }
+
+  isLoading.value = true;
+
+  try {
+    // Get authentication token
+    let token =
+      userStore.token || authStore.authUser?.token || authStore.token;
+
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    // Create FormData for file upload with correct API field names
+    const formData = new FormData();
+    formData.append("name[ar]", form.titleAr);
+    formData.append("name[en]", form.titleEn);
+    formData.append("category_id", form.categoryId);
+    formData.append("sub_category_id", form.subCategoryId); // Required by API
+    formData.append("price", form.price);
+    formData.append("description[ar]", form.descriptionAr);
+    formData.append("description[en]", form.descriptionEn);
+    formData.append("country_code", form.countryCode);
+    formData.append("city_id", form.cityId);
+    formData.append("lat", form.locationData.lat.toString());
+    formData.append("lng", form.locationData.lng.toString());
+    formData.append("map_desc", form.mapDesc);
+    
+    // Main image
+    formData.append("image", form.image);
+
+    // Append gallery images as attachments[] array
+    form.attachments.forEach((image) => {
+      formData.append("attachments[]", image);
+    });
+
+    // Make API call
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/advert/store",
+      {
+        method: "POST",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      }
+    );
+
+    // Check if response indicates success
+    if (response && response.key === "success") {
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم إنشاء الإعلان بنجاح",
+        life: 3000,
+      });
+
+      // Add the new ad to myAds list
+      const newAd = {
+        id: response.data?.id || Date.now(), // Use API response ID or timestamp as fallback
+        title: form.titleAr,
+        image: adImagePreview.value || response.data?.image || "/images/card-img.jpg",
+        rating: 0, // New ads start with no rating
+        price: form.price,
+        location: form.location || form.locationData?.address || "موقع غير محدد",
+        timeAgo: "الآن",
+        seller: {
+          name: user.value?.name || userStore.user?.name || "مستخدم",
+          avatar: user.value?.avatar || userStore.user?.avatar || "/images/profile-avatar.png",
+        },
+      };
+      
+      // Add to shared myAds state
+      addAd(newAd);
+
+      // Reset form
+      form.categoryId = "";
+      form.subCategoryId = "";
+      form.titleAr = "";
+      form.titleEn = "";
+      form.price = "";
+      form.cityId = "";
+      form.location = "";
+      form.locationData = null;
+      form.mapDesc = "0";
+      form.descriptionAr = "";
+      form.descriptionEn = "";
+      form.image = null;
+      form.attachments = [];
+
+      // Clear previews
+      if (adImagePreview.value) {
+        revokePreview(adImagePreview.value);
+        adImagePreview.value = "";
+      }
+      galleryPreviews.value.forEach(revokePreview);
+      galleryPreviews.value = [];
+
+      // Navigate to profile page to see the new ad
+      await navigateTo('/profile?tab=my-ads');
+    } else {
+      throw new Error(response?.msg || "فشل في إنشاء الإعلان");
+    }
+  } catch (error) {
+    console.error("Error creating ad:", error);
+    
+    // Extract error message from API response
+    let errorMessage = "حدث خطأ أثناء إنشاء الإعلان";
+    if (error?.data?.msg) {
+      errorMessage = error.data.msg;
+    } else if (error?.data?.message) {
+      errorMessage = error.data.message;
+    } else if (error?.message) {
+      errorMessage = error.message;
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    }
+    
+    // Provide helpful message for category-related errors
+    if (errorMessage.includes("القسم غير موجود") || errorMessage.includes("غير موجود")) {
+      errorMessage = "القسم المختار غير موجود. يرجى التأكد من اختيار قسم صحيح من القائمة أو تحديث قائمة الأقسام من قاعدة البيانات.";
+    } else if (errorMessage.includes("لا ينتمي") || errorMessage.includes("ينتمي")) {
+      errorMessage = "القسم الفرعي المختار لا ينتمي للقسم الرئيسي. يرجى اختيار قسم فرعي صحيح أو ترك الحقل فارغاً إذا كان اختيارياً.";
+    }
+    
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: errorMessage,
+      life: 5000,
+    });
+  } finally {
+    isLoading.value = false;
+  }
 };
 </script>
 

@@ -1101,7 +1101,7 @@
                       <span class="text-red-500 ms-1">*</span>
                     </div>
                     <select
-                      v-model="adForm.department"
+                      v-model="adForm.categoryId"
                       class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                     >
                       <option value="" disabled>اختر القسم</option>
@@ -1115,8 +1115,38 @@
                     </select>
                   </div>
 
+                  <!-- Sub-Category Selection -->
+                  <div class="space-y-2">
+                    <div
+                      class="flex items-center justify-start text-sm font-medium text-gray-800"
+                    >
+                      تحديد القسم الفرعي
+                      <span class="text-red-500 ms-1">*</span>
+                    </div>
+                    <select
+                      v-model="adForm.subCategoryId"
+                      class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                      required
+                      :disabled="!adForm.categoryId || isLoadingSubCategories"
+                    >
+                      <option value="" disabled>
+                        {{ isLoadingSubCategories ? "جاري التحميل..." : (!adForm.categoryId ? "اختر القسم أولاً" : (subCategories.length ? "اختر القسم الفرعي" : "لا توجد أقسام فرعية")) }}
+                      </option>
+                      <option
+                        v-for="option in subCategories"
+                        :key="option.value"
+                        :value="option.value"
+                      >
+                        {{ option.label }}
+                      </option>
+                    </select>
+                    <p v-if="adForm.categoryId && !isLoadingSubCategories && !subCategories.length" class="text-xs text-red-500">
+                      لا توجد أقسام فرعية متاحة لهذا القسم. يرجى اختيار قسم آخر.
+                    </p>
+                  </div>
+
                   <!-- Title Fields -->
-                  <div class="grid grid-cols-1 gap-6">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
                       <div
                         class="flex items-center justify-start text-sm font-medium text-gray-800"
@@ -1159,7 +1189,7 @@
                       <span class="text-red-500 ms-1">*</span>
                     </div>
                     <input
-                      v-model="adForm.cost"
+                      v-model="adForm.price"
                       type="text"
                       placeholder="التكلفة"
                       class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
@@ -1176,7 +1206,7 @@
                       <span class="text-red-500 ms-1">*</span>
                     </div>
                     <select
-                      v-model="adForm.city"
+                      v-model="adForm.cityId"
                       class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                       required
                     >
@@ -1260,49 +1290,6 @@
                     ></textarea>
                   </div>
 
-                  <!-- Gallery Images Upload -->
-                  <div class="space-y-3">
-                    <div
-                      class="flex items-center justify-start text-sm font-medium text-gray-800"
-                    >
-                      ارفاق صور ( بحد اقصي ٥ صور )
-                    </div>
-                    <label
-                      class="flex h-32 w-full max-w-[200px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white px-4 text-gray-500 cursor-pointer transition hover:border-primary-200 shadow-sm"
-                    >
-                      <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        class="sr-only"
-                        @change="handleGalleryImagesChange"
-                      />
-                      <template v-if="galleryPreviews.length">
-                        <div class="flex gap-2 overflow-hidden">
-                          <img
-                            v-for="(preview, index) in galleryPreviews"
-                            :key="`preview-${index}`"
-                            :src="preview"
-                            alt="gallery preview"
-                            class="h-16 w-16 rounded-lg object-cover"
-                          />
-                        </div>
-                      </template>
-                      <template v-else>
-                        <span class="flex items-center justify-center text-5xl">
-                          <img
-                            src="/icons/upload-icon.svg"
-                            alt="upload"
-                            class="w-6 h-6"
-                          />
-                        </span>
-                        <span class="mt-3 text-sm font-medium text-gray-600">
-                          إرفاق صورة
-                        </span>
-                      </template>
-                    </label>
-                  </div>
-
                   <!-- Ad Image Upload -->
                   <div class="space-y-3">
                     <div
@@ -1312,7 +1299,7 @@
                       <span class="text-red-500 ms-1">*</span>
                     </div>
                     <label
-                      class="flex h-32 w-full max-w-[200px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white px-4 text-gray-500 cursor-pointer transition hover:border-primary-200 shadow-sm"
+                      class="flex h-32 w-full max-w-[200px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white px-4 text-gray-500 cursor-pointer transition hover:border-primary-200"
                     >
                       <input
                         type="file"
@@ -1336,7 +1323,51 @@
                           />
                         </span>
                         <span class="mt-3 text-sm font-medium text-gray-600">
-                          إرفاق صورة
+                          {{ adImageLabel }}
+                        </span>
+                      </template>
+                    </label>
+                  </div>
+
+                  <!-- Gallery Images Upload -->
+                  <div class="space-y-3">
+                    <div
+                      class="flex items-center justify-start text-sm font-medium text-gray-800"
+                    >
+                      ارفاق صور ( بحد اقصي ٥ صور )
+                      <span class="text-xs text-gray-500 ms-2">(يحد اقصي 5 صور)</span>
+                    </div>
+                    <label
+                      class="flex h-32 w-full max-w-[200px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white px-4 text-gray-500 cursor-pointer transition hover:border-primary-200"
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        class="sr-only"
+                        @change="handleGalleryImagesChange"
+                      />
+                      <template v-if="galleryPreviews.length">
+                        <div class="flex gap-2 overflow-hidden">
+                          <img
+                            v-for="(preview, index) in galleryPreviews"
+                            :key="`preview-${index}`"
+                            :src="preview"
+                            alt="gallery preview"
+                            class="h-16 w-16 rounded-lg object-cover"
+                          />
+                        </div>
+                      </template>
+                      <template v-else>
+                        <span class="flex items-center justify-center text-2xl">
+                          <img
+                            src="/icons/upload-icon.svg"
+                            alt="upload"
+                            class="h-6 w-6"
+                          />
+                        </span>
+                        <span class="mt-3 text-sm font-medium text-gray-600">
+                          {{ galleryImagesLabel }}
                         </span>
                       </template>
                     </label>
@@ -1346,9 +1377,10 @@
                   <div class="w-full">
                     <button
                       type="submit"
-                      class="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-4 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl"
+                      :disabled="isLoadingAd"
+                      class="w-full bg-linear-to-l from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-4 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-102 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {{ selectedAdToEdit ? "تعديل" : "اضافة" }}
+                      {{ isLoadingAd ? "جاري الإرسال..." : (selectedAdToEdit ? "تعديل" : "اضافة") }}
                     </button>
                   </div>
                 </form>
@@ -3091,7 +3123,7 @@
     <DeleteAdModal v-model="isDeleteAdModalOpen" @confirm="confirmDeleteAd" />
 
     <!-- Location Modal -->
-    <LocationModal v-model="isLocationModalOpen" @confirm="confirmLocation" />
+    <LocationModal v-model="isLocationModalOpen" @confirm="handleLocationConfirm" />
   </div>
 </template>
 
@@ -3114,6 +3146,7 @@ import DeleteAdModal from "~/components/modals/DeleteAdModal.vue";
 import LocationModal from "~/components/modals/LocationModal.vue";
 import { useUserStore } from "~/stores/user";
 import { useAuthStore } from "~/stores/authUserStore";
+import { useMyAds } from "~/composables/useMyAds";
 
 // Type definitions
 interface ApiResponse<T = any> {
@@ -3258,32 +3291,41 @@ const selectedAdToDelete = ref<number | null>(null);
 const isAddAdFormOpen = ref(false);
 const isLocationModalOpen = ref(false);
 const selectedAdToEdit = ref<number | null>(null);
+const isLoadingAd = ref(false);
+const isLoadingSubCategories = ref(false);
 
-// Departments and Cities
-const departments = [
-  { label: "العميل", value: "client" },
-  { label: "المشاريع", value: "projects" },
-  { label: "الخدمات", value: "services" },
-];
+// Departments and Cities - will be populated from API
+const departments = ref([
+  { label: "العميل", value: "1" },
+  { label: "المشاريع", value: "2" },
+  { label: "الخدمات", value: "3" },
+]);
 
-const cities = [
-  { label: "الرياض", value: "riyadh" },
-  { label: "جدة", value: "jeddah" },
-  { label: "الدمام", value: "dammam" },
-];
+const cities = ref([
+  { label: "الرياض", value: "48" },
+  { label: "جدة", value: "2" },
+  { label: "الدمام", value: "3" },
+]);
+
+// Sub-categories
+const subCategories = ref<Array<{ label: string; value: string }>>([]);
 
 // Ad Form Data
 const adForm = reactive({
-  department: "",
-  titleAr: "",
-  titleEn: "",
-  cost: "",
-  city: "",
+  categoryId: "", // category_id
+  subCategoryId: "", // sub_category_id (optional)
+  titleAr: "", // name[ar]
+  titleEn: "", // name[en]
+  price: "", // price
+  cityId: "", // city_id
+  countryCode: "966", // country_code (default Saudi Arabia)
   location: "",
-  descriptionAr: "",
-  descriptionEn: "",
-  adImage: null as File | null,
-  galleryImages: [] as File[],
+  locationData: null as any, // Store full location data with lat/lng
+  mapDesc: "0", // map_desc (0 or 1)
+  descriptionAr: "", // description[ar]
+  descriptionEn: "", // description[en]
+  image: null as File | null, // image (main image)
+  attachments: [] as File[], // attachments[] (gallery images)
 });
 
 // Image Previews
@@ -3591,50 +3633,211 @@ const onReviewsPageChange = async (event: PaginationEvent) => {
   }
 };
 
-// My Ads Data
-const myAds = ref<Ad[]>([
-  {
-    id: 1,
-    title: "سنارة سمك كبيرة",
-    image: "/images/card-img.jpg",
-    rating: 4.5,
-    price: "50",
-    location: "مدينة الرياض",
-    timeAgo: "منذ ٦ ساعات",
-    seller: {
-      name: "محمود عبد العزيز",
-      avatar: "/images/profile-avatar.png",
-    },
-  },
-  {
-    id: 2,
-    title: "سنارة سمك كبيرة",
-    image: "/images/card-img.jpg",
-    rating: 4.5,
-    price: "50",
-    location: "مدينة الرياض",
-    timeAgo: "منذ ٦ ساعات",
-    seller: {
-      name: "محمود عبد العزيز",
-      avatar: "/images/profile-avatar.png",
-    },
-  },
-  {
-    id: 3,
-    title: "سنارة سمك كبيرة",
-    image: "/images/card-img.jpg",
-    rating: 4.5,
-    price: "50",
-    location: "مدينة الرياض",
-    timeAgo: "منذ ٦ ساعات",
-    seller: {
-      name: "محمود عبد العزيز",
-      avatar: "/images/profile-avatar.png",
-    },
-  },
-]);
+// My Ads Data - Use shared composable
+const { myAds, setAds, removeAd, addAd } = useMyAds();
 
 // My Ads Methods
+// Fetch categories from API
+const fetchCategories = async () => {
+  try {
+    const authStore = useAuthStore();
+    let token =
+      userStore.token || authStore.authUser?.token || authStore.token;
+
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    const response = await $fetch<ApiResponse<any>>(
+      "https://backend.wattani-sa.com/api/v1/categories",
+      {
+        method: "GET",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      }
+    ).catch(() => null);
+
+    if (response && response.key === "success" && response.data) {
+      const categories = Array.isArray(response.data) ? response.data : [];
+      departments.value = categories.map((cat: any) => ({
+        label: cat.name_ar || cat.name || cat.title_ar || cat.title,
+        value: cat.id?.toString() || cat.category_id?.toString(),
+      }));
+    }
+  } catch (error) {
+    console.log("Categories endpoint not available, using default values");
+  }
+};
+
+// Fetch cities from API
+const fetchCities = async () => {
+  try {
+    const authStore = useAuthStore();
+    let token =
+      userStore.token || authStore.authUser?.token || authStore.token;
+
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    const response = await $fetch<ApiResponse<any>>(
+      "https://backend.wattani-sa.com/api/v1/cities",
+      {
+        method: "GET",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      }
+    ).catch(() => null);
+
+    if (response && response.key === "success" && response.data) {
+      const citiesData = Array.isArray(response.data) ? response.data : [];
+      cities.value = citiesData.map((city: any) => ({
+        label: city.name_ar || city.name || city.title_ar || city.title,
+        value: city.id?.toString() || city.city_id?.toString(),
+      }));
+    }
+  } catch (error) {
+    console.log("Cities endpoint not available, using default values");
+  }
+};
+
+// Fetch sub-categories from API based on selected category
+const fetchSubCategories = async (categoryId: string) => {
+  if (!categoryId) {
+    subCategories.value = [];
+    adForm.subCategoryId = "";
+    isLoadingSubCategories.value = false;
+    return;
+  }
+
+  isLoadingSubCategories.value = true;
+  adForm.subCategoryId = ""; // Reset selection when category changes
+
+  try {
+    const authStore = useAuthStore();
+    let token =
+      userStore.token || authStore.authUser?.token || authStore.token;
+
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    console.log("Fetching sub-categories for category:", categoryId);
+    let response: ApiResponse<any> | null = null;
+    
+    try {
+      response = await $fetch<ApiResponse<any>>(
+        `https://backend.wattani-sa.com/api/v1/sub-categories?category_id=${categoryId}`,
+        {
+          method: "GET",
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        }
+      );
+      console.log("Sub-categories response (endpoint 1):", response);
+    } catch (error) {
+      console.error("Sub-categories API error (endpoint 1):", error);
+      response = null;
+    }
+
+    // If first endpoint fails or returns error, try alternative endpoint
+    if (!response || response.key !== "success") {
+      console.log("Trying alternative endpoint...");
+      try {
+        response = await $fetch<ApiResponse<any>>(
+          `https://backend.wattani-sa.com/api/v1/categories/${categoryId}/sub-categories`,
+          {
+            method: "GET",
+            headers: {
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+          }
+        );
+        console.log("Sub-categories response (endpoint 2):", response);
+      } catch (error) {
+        console.error("Sub-categories API error (endpoint 2):", error);
+        response = null;
+      }
+    }
+
+    // If we got a successful response with data
+    if (response && response.key === "success" && response.data) {
+      const subCats = Array.isArray(response.data) ? response.data : [];
+      subCategories.value = subCats.map((subCat: any) => ({
+        label: subCat.name_ar || subCat.name || subCat.title_ar || subCat.title,
+        value: subCat.id?.toString() || subCat.sub_category_id?.toString() || subCat.category_id?.toString(),
+      }));
+      
+      // If no sub-categories exist, use the category itself as sub-category
+      if (subCats.length === 0) {
+        console.warn("No sub-categories found for category:", categoryId);
+        subCategories.value = [{
+          label: "نفس القسم",
+          value: categoryId.toString()
+        }];
+      }
+    } else {
+      // If API doesn't return sub-categories or returns an error, use category as sub-category
+      console.warn("Failed to fetch sub-categories or endpoint not available. Using category as sub-category.");
+      // Use the category itself as sub-category if API fails or returns no data
+      // This handles cases where API requires sub_category_id but category has no sub-categories
+      subCategories.value = [{
+        label: "نفس القسم",
+        value: categoryId.toString()
+      }];
+    }
+  } catch (error) {
+    console.error("Sub-categories endpoint error:", error);
+    // On any error, fall back to using the category itself as sub-category
+    subCategories.value = [{
+      label: "نفس القسم",
+      value: categoryId.toString()
+    }];
+  } finally {
+    isLoadingSubCategories.value = false;
+  }
+};
+
+// Watch for category changes to fetch sub-categories dynamically
+watch(
+  () => adForm.categoryId,
+  (newCategoryId) => {
+    if (newCategoryId) {
+      fetchSubCategories(newCategoryId);
+    } else {
+      subCategories.value = [];
+      adForm.subCategoryId = "";
+    }
+  }
+);
+
 const editAd = (adId: number) => {
   const ad = myAds.value.find((a) => a.id === adId);
   if (!ad) {
@@ -3649,7 +3852,7 @@ const editAd = (adId: number) => {
   // Note: The ad structure might not have all form fields, so we map what we can
   adForm.titleAr = ad.title || "";
   adForm.titleEn = ad.title || ""; // If no English title, use Arabic
-  adForm.cost = ad.price || "";
+  adForm.price = ad.price || "";
   adForm.location = ad.location || "";
 
   // Set image preview if available
@@ -3673,13 +3876,8 @@ const openDeleteAdModal = (adId: number) => {
 
 const confirmDeleteAd = () => {
   if (selectedAdToDelete.value) {
-    // Remove the ad from the array
-    const index = myAds.value.findIndex(
-      (ad) => ad.id === selectedAdToDelete.value
-    );
-    if (index > -1) {
-      myAds.value.splice(index, 1);
-    }
+    // Remove the ad from the array using composable
+    removeAd(selectedAdToDelete.value);
     // Add your delete API call here
     isDeleteAdModalOpen.value = false;
     selectedAdToDelete.value = null;
@@ -3699,16 +3897,20 @@ const closeAddAdForm = () => {
   selectedAdToEdit.value = null;
   // Reset form
   Object.assign(adForm, {
-    department: "",
+    categoryId: "",
+    subCategoryId: "",
     titleAr: "",
     titleEn: "",
-    cost: "",
-    city: "",
+    price: "",
+    cityId: "",
+    countryCode: "966",
     location: "",
+    locationData: null,
+    mapDesc: "0",
     descriptionAr: "",
     descriptionEn: "",
-    adImage: null,
-    galleryImages: [],
+    image: null,
+    attachments: [],
   });
   // Clear previews
   if (adImagePreview.value) {
@@ -3717,6 +3919,7 @@ const closeAddAdForm = () => {
   }
   galleryPreviews.value.forEach(revokePreview);
   galleryPreviews.value = [];
+  subCategories.value = [];
 };
 
 const revokePreview = (url: string) => {
@@ -3726,7 +3929,7 @@ const revokePreview = (url: string) => {
 const handleAdImageChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const [file] = target.files || [];
-  adForm.adImage = file || null;
+  adForm.image = file || null;
   if (adImagePreview.value) {
     revokePreview(adImagePreview.value);
     adImagePreview.value = "";
@@ -3739,75 +3942,217 @@ const handleAdImageChange = (event: Event) => {
 const handleGalleryImagesChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const files = Array.from(target.files || []).slice(0, 5);
-  adForm.galleryImages = files as any;
+  adForm.attachments = files as File[];
   galleryPreviews.value.forEach(revokePreview);
   galleryPreviews.value = files.map((file: File) => URL.createObjectURL(file));
 };
+
+const adImageLabel = computed(() => {
+  if (adForm.image?.name) return adForm.image.name;
+  return "إرفاق صورة";
+});
+
+const galleryImagesLabel = computed(() => {
+  if (adForm.attachments.length) {
+    return `${adForm.attachments.length} / 5 صور مرفوعة`;
+  }
+  return "إرفاق صورة";
+});
 
 const openLocationModal = () => {
   isLocationModalOpen.value = true;
 };
 
-const confirmLocation = () => {
-  // Placeholder: integrate real selection logic later
-  // For now, just set a placeholder location
-  if (!adForm.location) {
-    adForm.location = "موقع محدد";
+const handleLocationConfirm = (locationData: any) => {
+  if (locationData) {
+    adForm.locationData = locationData;
+    const address =
+      locationData.address ||
+      `${locationData.lat?.toFixed?.(5) || ""}, ${locationData.lng?.toFixed?.(5) || ""}`;
+    adForm.location = address.trim();
   }
   isLocationModalOpen.value = false;
 };
 
-const handleAdSubmit = () => {
-
-  if (selectedAdToEdit.value) {
-    // Edit mode - update existing ad
-    const adIndex = myAds.value.findIndex(
-      (ad) => ad.id === selectedAdToEdit.value
-    );
-    if (adIndex > -1) {
-      // Determine image: use new uploaded image if available, otherwise keep original
-      const currentAd = myAds.value[adIndex];
-      if (!currentAd) return;
-      
-      const imageToUse = adForm.adImage
-        ? adImagePreview.value // New file uploaded, use blob preview (in real app, upload file first)
-        : currentAd.image; // Keep original image
-
-      // Update the ad
-      myAds.value[adIndex] = {
-        ...currentAd,
-        title: adForm.titleAr,
-        price: adForm.cost || currentAd.price,
-        location:
-          cities.find((c) => c.value === adForm.city)?.label ||
-          adForm.location ||
-          currentAd.location,
-        image: imageToUse,
-      };
-      // Add your API call here to update the ad
-    }
-  } else {
-    // Add mode - create new ad
-    // Add your API call here to create the ad
-    // After successful creation, add to myAds array and close form
-    const newAd = {
-      id: Date.now(), // Temporary ID
-      title: adForm.titleAr,
-      image: adImagePreview.value || "/images/fishing-rod.jpg",
-      rating: 4.5,
-      price: adForm.cost || "50",
-      location:
-        cities.find((c) => c.value === adForm.city)?.label || "مدينة الرياض",
-      timeAgo: "الآن",
-      seller: {
-        name: "محمود عبد العزيز",
-        avatar: "/images/profile-avatar.png",
-      },
-    };
-    myAds.value.unshift(newAd);
+const handleAdSubmit = async () => {
+  // Validate required fields
+  if (
+    !adForm.categoryId ||
+    !adForm.subCategoryId ||
+    !adForm.titleAr ||
+    !adForm.titleEn ||
+    !adForm.price ||
+    !adForm.cityId ||
+    !adForm.location ||
+    !adForm.descriptionAr ||
+    !adForm.descriptionEn ||
+    !adForm.image
+  ) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى ملء جميع الحقول المطلوبة",
+      life: 3000,
+    });
+    return;
   }
 
-  closeAddAdForm();
+    // Validate that sub-category belongs to selected category
+  if (adForm.subCategoryId && adForm.categoryId) {
+    const selectedSubCat = subCategories.value.find(
+      (subCat: { label: string; value: string }) => subCat.value === adForm.subCategoryId
+    );
+    if (!selectedSubCat) {
+      toast.add({
+        severity: "warn",
+        summary: "تحذير",
+        detail: "يرجى اختيار قسم فرعي صحيح ينتمي للقسم الرئيسي المختار",
+        life: 3000,
+      });
+      return;
+    }
+  }
+
+  // Validate that sub-categories are available
+  if (!subCategories.value.length) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "لا توجد أقسام فرعية متاحة. يرجى اختيار قسم آخر أو الانتظار حتى يتم تحميل الأقسام الفرعية",
+      life: 3000,
+    });
+    return;
+  }
+
+  // Validate location data
+  if (!adForm.locationData || !adForm.locationData.lat || !adForm.locationData.lng) {
+    toast.add({
+      severity: "warn",
+      summary: "تحذير",
+      detail: "يرجى تحديد الموقع على الخريطة",
+      life: 3000,
+    });
+    return;
+  }
+
+  isLoadingAd.value = true;
+
+  try {
+    // Get authentication token
+    const authStore = useAuthStore();
+    let token =
+      userStore.token || authStore.authUser?.token || authStore.token;
+
+    if (!token && import.meta.client) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser?.token || parsedUser?.access_token;
+        }
+      } catch (e) {
+        console.error("Error getting token from localStorage:", e);
+      }
+    }
+
+    // Create FormData for file upload with correct API field names
+    const formData = new FormData();
+    formData.append("name[ar]", adForm.titleAr);
+    formData.append("name[en]", adForm.titleEn);
+    formData.append("category_id", adForm.categoryId);
+    formData.append("sub_category_id", adForm.subCategoryId); // Required by API
+    formData.append("price", adForm.price);
+    formData.append("description[ar]", adForm.descriptionAr);
+    formData.append("description[en]", adForm.descriptionEn);
+    formData.append("country_code", adForm.countryCode);
+    formData.append("city_id", adForm.cityId);
+    formData.append("lat", adForm.locationData.lat.toString());
+    formData.append("lng", adForm.locationData.lng.toString());
+    formData.append("map_desc", adForm.mapDesc);
+    
+    // Main image
+    formData.append("image", adForm.image);
+
+    // Append gallery images as attachments[] array
+    adForm.attachments.forEach((image) => {
+      formData.append("attachments[]", image);
+    });
+
+    // Make API call
+    const response = await $fetch<ApiResponse<any>>(
+      "https://backend.wattani-sa.com/api/v1/advert/store",
+      {
+        method: "POST",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      }
+    );
+
+    // Check if response indicates success
+    if (response && response.key === "success") {
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: response.msg || "تم إنشاء الإعلان بنجاح",
+        life: 3000,
+      });
+
+      // Add the new ad to myAds list
+      const newAd = {
+        id: response.data?.id || Date.now(), // Use API response ID or timestamp as fallback
+        title: adForm.titleAr,
+        image: adImagePreview.value || response.data?.image || "/images/card-img.jpg",
+        rating: 0, // New ads start with no rating
+        price: adForm.price,
+        location: adForm.location || adForm.locationData?.address || "موقع غير محدد",
+        timeAgo: "الآن",
+        seller: {
+          name: user.value?.name || userStore.user?.name || "مستخدم",
+          avatar: user.value?.avatar || userStore.user?.avatar || "/images/profile-avatar.png",
+        },
+      };
+      
+      // Add to shared myAds state
+      addAd(newAd);
+
+      // Reset form
+      closeAddAdForm();
+    } else {
+      throw new Error(response?.msg || "فشل في إنشاء الإعلان");
+    }
+  } catch (error: any) {
+    console.error("Error creating ad:", error);
+    
+    // Extract error message from API response
+    let errorMessage = "حدث خطأ أثناء إنشاء الإعلان";
+    if (error?.data?.msg) {
+      errorMessage = error.data.msg;
+    } else if (error?.data?.message) {
+      errorMessage = error.data.message;
+    } else if (error?.message) {
+      errorMessage = error.message;
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    }
+    
+    // Provide helpful message for category-related errors
+    if (errorMessage.includes("القسم غير موجود") || errorMessage.includes("غير موجود")) {
+      errorMessage = "القسم المختار غير موجود. يرجى التأكد من اختيار قسم صحيح من القائمة أو تحديث قائمة الأقسام من قاعدة البيانات.";
+    } else if (errorMessage.includes("لا ينتمي") || errorMessage.includes("ينتمي")) {
+      errorMessage = "القسم الفرعي المختار لا ينتمي للقسم الرئيسي. يرجى اختيار قسم فرعي صحيح أو ترك الحقل فارغاً إذا كان اختيارياً.";
+    }
+    
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: errorMessage,
+      life: 5000,
+    });
+  } finally {
+    isLoadingAd.value = false;
+  }
 };
 
 // Following Pagination State
@@ -3948,6 +4293,14 @@ watch(activeTab, (newTab) => {
     fetchComplaints();
   } else if (newTab === "wallet") {
     loadWalletBalance();
+  } else if (newTab === "my-ads") {
+    // Fetch categories and cities when my-ads tab is opened
+    fetchCategories();
+    fetchCities();
+    // If a category is already selected, fetch its sub-categories
+    if (adForm.categoryId) {
+      fetchSubCategories(adForm.categoryId);
+    }
   }
 });
 
@@ -4742,6 +5095,51 @@ const fetchUserProfile = async () => {
 
 // Load user data from auth on mount
 onMounted(() => {
+  // Initialize with default data if empty (for backward compatibility)
+  if (myAds.value.length === 0) {
+    setAds([
+      {
+        id: 1,
+        title: "سنارة سمك كبيرة",
+        image: "/images/card-img.jpg",
+        rating: 4.5,
+        price: "50",
+        location: "مدينة الرياض",
+        timeAgo: "منذ ٦ ساعات",
+        seller: {
+          name: "محمود عبد العزيز",
+          avatar: "/images/profile-avatar.png",
+        },
+      },
+      {
+        id: 2,
+        title: "سنارة سمك كبيرة",
+        image: "/images/card-img.jpg",
+        rating: 4.5,
+        price: "50",
+        location: "مدينة الرياض",
+        timeAgo: "منذ ٦ ساعات",
+        seller: {
+          name: "محمود عبد العزيز",
+          avatar: "/images/profile-avatar.png",
+        },
+      },
+      {
+        id: 3,
+        title: "سنارة سمك كبيرة",
+        image: "/images/card-img.jpg",
+        rating: 4.5,
+        price: "50",
+        location: "مدينة الرياض",
+        timeAgo: "منذ ٦ ساعات",
+        seller: {
+          name: "محمود عبد العزيز",
+          avatar: "/images/profile-avatar.png",
+        },
+      },
+    ]);
+  }
+
   // Wait for auth hydration from localStorage (useAuth uses nextTick)
   nextTick(() => {
     // Check both user.value and localStorage for authentication
