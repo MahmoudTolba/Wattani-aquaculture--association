@@ -42,222 +42,13 @@
             </h1>
 
             <!-- Profile Tab Content -->
-            <div v-if="activeTab === 'profile'">
-              <!-- Profile Picture Section -->
-              <div class="flex flex-col items-center mb-6 sm:mb-8">
-                <div class="relative">
-                  <img
-                    :src="form.avatar || '/images/profile-avatar.png'"
-                    alt="Profile Picture"
-                    class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full object-cover border-2 sm:border-4 border-gray-100"
-                  />
-                  <button
-                    type="button"
-                    @click="(profileAvatarInput as any)?.click()"
-                    class="hidden"
-                    aria-label="Edit Profile Picture"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="w-4 h-4 sm:w-5 sm:h-5 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                      />
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                  </button>
-                  <input
-                    ref="profileAvatarInput"
-                    type="file"
-                    accept="image/*"
-                    class="hidden"
-                    @change="handleProfileAvatarChange"
-                  />
-                </div>
-              </div>
-
-              <!-- Form Fields -->
-              <form
-                class="space-y-4 sm:space-y-6"
-                @submit.prevent="handleSubmit"
-              >
-                <!-- Client Name -->
-                <div class="space-y-2">
-                  <label
-                    for="clientName"
-                    class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
-                  >
-                    اسم العميل
-                  </label>
-                  <input
-                    id="clientName"
-                    v-model="form.clientName"
-                    type="text"
-                    placeholder="العميل"
-                    readonly
-                    class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right cursor-not-allowed opacity-75"
-                  />
-                </div>
-
-                <!-- Mobile Number -->
-                <div class="space-y-2">
-                  <label
-                    for="mobileNumber"
-                    class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
-                  >
-                    رقم الجوال
-                  </label>
-                  <div
-                    class="flex flex-col sm:flex-row rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50 shadow-sm overflow-hidden opacity-75"
-                  >
-                    <div
-                      class="flex items-center justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-3 py-2.5 sm:px-4 sm:py-3 bg-gray-50 text-xs sm:text-sm text-gray-700 min-w-[90px] sm:min-w-[100px]"
-                    >
-                      <span>+966</span>
-                      <img
-                        src="/images/Country Flags.png"
-                        alt="Saudi Arabia Flag"
-                        class="w-7 h-7 sm:w-6 sm:h-6"
-                      />
-                    </div>
-                    <input
-                      id="mobileNumber"
-                      v-model="form.mobileNumber"
-                      type="tel"
-                      placeholder="رقم الجوال"
-                      readonly
-                      class="flex-1 w-full bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 text-right cursor-not-allowed opacity-75"
-                    />
-                  </div>
-                </div>
-
-                <!-- Email -->
-                <div class="space-y-2">
-                  <label
-                    for="email"
-                    class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
-                  >
-                    البريد الإلكتروني
-                  </label>
-                  <input
-                    id="email"
-                    v-model="form.email"
-                    type="email"
-                    placeholder="البريد الإلكتروني"
-                    readonly
-                    class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right cursor-not-allowed opacity-75"
-                  />
-                </div>
-
-                <!-- City -->
-                <div class="space-y-2">
-                  <label
-                    for="city"
-                    class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
-                  >
-                    المدينة
-                  </label>
-                  <div class="relative">
-                    <select
-                      id="city"
-                      v-model="form.city"
-                      disabled
-                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 sm:px-4 sm:py-3 pr-8 sm:pr-10 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 appearance-none text-right cursor-not-allowed opacity-75"
-                    >
-                      <option value="">اختر المدينة</option>
-                      <option value="riyadh">الرياض</option>
-                      <option value="jeddah">جدة</option>
-                      <option value="dammam">الدمام</option>
-                      <option value="makkah">مكة المكرمة</option>
-                      <option value="medina">المدينة المنورة</option>
-                    </select>
-                    <div
-                      class="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Location -->
-                <div class="space-y-2">
-                  <label
-                    for="location"
-                    class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
-                  >
-                    تحديد الموقع
-                  </label>
-                  <div class="relative">
-                    <input
-                      id="location"
-                      v-model="form.location"
-                      type="text"
-                      placeholder="تحديد الموقع"
-                      readonly
-                      class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 sm:px-4 sm:py-3 pr-10 sm:pr-12 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right cursor-not-allowed opacity-75"
-                    />
-                    <div
-                      class="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="w-4 h-4 sm:w-5 sm:h-5 text-[#15c472]"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Delete Account Button -->
-                <div class="pt-4 sm:pt-6 mt-4 sm:mt-6 max-w-lg mx-auto">
-                  <button
-                    type="button"
-                    class="w-full px-4 py-2.5 sm:px-6 sm:py-3 bg-red-500 text-white text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl hover:bg-red-600 transition-colors"
-                    @click="handleDeleteAccount"
-                  >
-                    حذف الحساب
-                  </button>
-                </div>
-              </form>
-            </div>
+            <ProfileTabContent
+              v-if="activeTab === 'profile'"
+              :form="form"
+              @avatar-change="handleProfileAvatarChange"
+              @submit="handleSubmit"
+              @delete-account="handleDeleteAccount"
+            />
 
             <!-- Settings Tab Content -->
             <div v-if="activeTab === 'settings'" class="space-y-6">
@@ -1002,72 +793,19 @@
             </div>
 
             <!-- Wallet Tab Content -->
-            <div v-if="activeTab === 'wallet'" class="space-y-6">
-              <div
-                class="flex flex-col items-center justify-center py-8 sm:py-12"
-              >
-                <!-- Wallet Illustration Section -->
-                <div class="relative w-full max-w-md mb-8 sm:mb-12">
-                  <div class="relative flex items-center justify-center">
-                    <!-- Wallet Illustration -->
-
-                    <!-- Wallet -->
-                    <div class="w-60 h-60">
-                      <img
-                        src="/images/wallet-img.png"
-                        alt="wallet-image"
-                        class="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Balance Text -->
-                <div class="text-center mb-4">
-                  <p class="text-gray-700 text-base sm:text-lg mb-3">
-                    رصيدك الحالي هو
-                  </p>
-                  <div class="flex items-center justify-center gap-2">
-                    <span 
-                      v-if="!isLoadingWallet"
-                      class="text-green-600 text-3xl sm:text-4xl font-bold"
-                    >
-                      {{ walletBalance }}
-                    </span>
-                    <span 
-                      v-else
-                      class="text-gray-400 text-3xl sm:text-4xl font-bold"
-                    >
-                      ...
-                    </span>
-                    <img
-                      src="/icons/green-currency.svg"
-                      alt="rial-icon"
-                      class="w-8 h-8 sm:w-10 sm:h-10"
-                    />
-                  </div>
-                </div>
-
-                <!-- Charge Button -->
-                <button
-                  type="button"
-                  @click="openChargeModal"
-                  :disabled="isChargingWallet"
-                  class="w-full max-w-xl 2xl:max-w-xl xl:max-w-lg lg:max-w-md md:max-w-sm sm:max-w-sm px-6 py-4 bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                >
-                  {{ isChargingWallet ? 'جاري الشحن...' : 'شحن' }}
-                </button>
-              </div>
-            </div>
+            <WalletTabContent
+              v-if="activeTab === 'wallet'"
+              :wallet-balance="walletBalance"
+              :is-loading-wallet="isLoadingWallet"
+              :is-charging-wallet="isChargingWallet"
+              @charge="openChargeModal"
+            />
 
             <!-- My Ads Tab Content -->
             <div v-if="activeTab === 'my-ads'" class="space-y-6">
               <!-- Add Ad Form -->
               <div v-if="isAddAdFormOpen" class="space-y-6">
                 <div class="flex items-center justify-end mb-4">
-                  <!-- <h2 class="text-xl sm:text-2xl font-bold text-gray-900">
-                    اضافة اعلان
-                  </h2> -->
                   <button
                     type="button"
                     @click="closeAddAdForm"
@@ -1626,689 +1364,103 @@
             </div>
 
             <!-- Ratings Tab Content -->
-            <div v-if="activeTab === 'ratings'" class="space-y-6">
-              <!-- Loading State -->
-              <div
-                v-if="isLoadingRatings"
-                class="flex justify-center items-center py-12"
-              >
-                <div class="text-center">
-                  <div
-                    class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"
-                  ></div>
-                  <p class="text-gray-600 text-sm">جاري التحميل...</p>
-                </div>
-              </div>
-
-              <!-- Error State -->
-              <div
-                v-else-if="ratingsError"
-                class="bg-red-50 border border-red-200 rounded-xl p-4 text-center"
-              >
-                <p class="text-red-600 text-sm">{{ ratingsError }}</p>
-                <button
-                  @click="fetchRatings(ratingsCurrentPage)"
-                  class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                >
-                  إعادة المحاولة
-                </button>
-              </div>
-
-              <!-- Reviews List -->
-              <div v-else class="space-y-4">
-                <!-- Empty State -->
-                <div
-                  v-if="paginatedReviews.length === 0"
-                  class="text-center py-12"
-                >
-                  <p class="text-gray-500 text-lg">لا توجد تقييمات حالياً</p>
-                </div>
-
-                <!-- Reviews -->
-                <div
-                  v-for="review in paginatedReviews"
-                  :key="review.id"
-                  class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6"
-                >
-                  <!-- Review Label -->
-                  <p
-                    class="text-gray-800 font-bold text-sm sm:text-base mb-2 text-right"
-                  >
-                    تقييم العميل
-                  </p>
-
-                  <!-- Customer Name -->
-                  <p
-                    class="text-gray-800 font-bold text-base sm:text-lg mb-3 text-right"
-                  >
-                    {{ review.name }}
-                  </p>
-
-                  <!-- Star Rating -->
-                  <div class="flex items-center gap-1 mb-3">
-                    <svg
-                      v-for="star in 5"
-                      :key="star"
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5"
-                      :class="
-                        star <= review.rating
-                          ? 'text-yellow-400 fill-current'
-                          : 'text-gray-300'
-                      "
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-                      />
-                    </svg>
-                  </div>
-
-                  <!-- Review Text -->
-                  <p
-                    class="text-gray-800 text-sm sm:text-base leading-relaxed text-right"
-                  >
-                    {{ review.text }}
-                  </p>
-                </div>
-              </div>
-
-              <!-- Pagination -->
-              <div
-                v-if="!isLoadingRatings && !ratingsError && totalReviews > 0"
-                class="flex justify-center pt-4"
-              >
-                <Paginator
-                  :rows="reviewsPerPage"
-                  :total-records="totalReviews"
-                  :first="reviewsFirst"
-                  @page="onReviewsPageChange"
-                  template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-                  class="p-paginator"
-                />
-              </div>
-            </div>
+            <RatingsTabContent
+              v-if="activeTab === 'ratings'"
+              :is-loading-ratings="isLoadingRatings"
+              :ratings-error="ratingsError"
+              :paginated-reviews="paginatedReviews"
+              :total-reviews="totalReviews"
+              :reviews-per-page="reviewsPerPage"
+              :reviews-first="reviewsFirst"
+              @retry="fetchRatings(ratingsCurrentPage)"
+              @page-change="onReviewsPageChange"
+            />
 
             <!-- Following Tab Content -->
-            <div v-if="activeTab === 'following'" class="space-y-6">
-              <!-- Loading State -->
-              <div
-                v-if="isLoadingFollowing"
-                class="flex justify-center items-center py-12"
-              >
-                <div class="text-center">
-                  <div
-                    class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"
-                  ></div>
-                  <p class="text-gray-600 text-sm">جاري التحميل...</p>
-                </div>
-              </div>
-
-              <!-- Error State -->
-              <div
-                v-else-if="followingError"
-                class="bg-red-50 border border-red-200 rounded-xl p-4 text-center"
-              >
-                <p class="text-red-600 text-sm">{{ followingError }}</p>
-                <button
-                  @click="fetchFollowers(followingCurrentPage)"
-                  class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                >
-                  إعادة المحاولة
-                </button>
-              </div>
-
-              <!-- Following Users List -->
-              <div v-else class="space-y-3 sm:space-y-4">
-                <!-- Empty State -->
-                <div
-                  v-if="paginatedFollowing.length === 0"
-                  class="text-center py-12"
-                >
-                  <p class="text-gray-500 text-lg">لا يوجد متابعين حالياً</p>
-                </div>
-
-                <!-- Users List -->
-                <div
-                  v-for="user in paginatedFollowing"
-                  :key="user.id"
-                  class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 flex items-center justify-between gap-3 sm:gap-4"
-                >
-                  <!-- User Info (Right side in RTL) -->
-                  <div class="flex items-center gap-3 sm:gap-4 flex-1">
-                    <!-- Profile Picture -->
-                    <img
-                      :src="user.avatar"
-                      :alt="user.name"
-                      class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border border-gray-200"
-                    />
-
-                    <!-- Name -->
-                    <p
-                      class="text-gray-800 font-semibold text-base sm:text-lg text-right"
-                    >
-                      {{ user.name }}
-                    </p>
-                  </div>
-
-                  <!-- Unfollow Button (Left side in RTL) -->
-                  <button
-                    @click="handleUnfollow(user.id)"
-                    class="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                    aria-label="إلغاء المتابعة"
-                  >
-                    <img
-                      src="/icons/cancelled-follow.svg"
-                      alt="cancelled-follow-icon"
-                      class="w-8 h-8 sm:w-7 sm:h-7"
-                    />
-                  </button>
-                </div>
-              </div>
-
-              <!-- Pagination -->
-              <div
-                v-if="
-                  !isLoadingFollowing && !followingError && totalFollowing > 0
-                "
-                class="flex justify-center pt-4"
-              >
-                <Paginator
-                  :rows="followingPerPage"
-                  :total-records="totalFollowing"
-                  :first="followingFirst"
-                  @page="onFollowingPageChange"
-                  template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-                  class="p-paginator"
-                />
-              </div>
-            </div>
+            <FollowingTabContent
+              v-if="activeTab === 'following'"
+              :is-loading-following="isLoadingFollowing"
+              :following-error="followingError"
+              :paginated-following="paginatedFollowing"
+              :total-following="totalFollowing"
+              :following-per-page="followingPerPage"
+              :following-first="followingFirst"
+              @retry="fetchFollowers(followingCurrentPage)"
+              @unfollow="handleUnfollow"
+              @page-change="onFollowingPageChange"
+            />
 
             <!-- Commission Tab Content -->
-            <div v-if="activeTab === 'commission'" class="space-y-6">
-              <div
-                class="flex flex-col items-center justify-center py-8 sm:py-12"
-              >
-                <!-- Illustration Section -->
-                <div class="relative w-full max-w-md mb-8 sm:mb-12">
-                  <div class="relative flex items-center justify-center">
-                    <!-- Calculator Illustration -->
-                    <div class="w-60 h-60 sm:w-80 sm:h-80">
-                      <img
-                        src="/images/recharge-img.svg"
-                        alt="calculator-image"
-                        class="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Payment Form Section -->
-                <div class="w-full max-w-md space-y-6">
-                  <!-- Total Amount Heading -->
-                  <div class="text-right">
-                    <h2
-                      class="text-xl sm:text-2xl font-bold text-gray-800 mb-4"
-                    >
-                      المبلغ الاجمالي
-                    </h2>
-                  </div>
-
-                  <!-- Input Field -->
-                  <div>
-                    <input
-                      v-model="commissionAmount"
-                      type="number"
-                      placeholder="ادخل المبلغ"
-                      @input="handleCommissionAmountChange"
-                      class="w-full px-4 py-3 sm:py-4 border border-gray-300 rounded-xl text-right text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-[#15c472] focus:border-transparent placeholder:text-gray-400"
-                    />
-                  </div>
-
-                  <!-- Display Amount -->
-                  <div class="flex items-center justify-center gap-2">
-                    <span class="text-green-600 text-3xl sm:text-4xl font-bold">
-                      {{
-                        calculatedFee !== null
-                          ? calculatedFee
-                          : commissionAmount || "60"
-                      }}
-                    </span>
-                    <img
-                      src="/icons/green-currency.svg"
-                      alt="rial-icon"
-                      class="w-8 h-8 sm:w-10 sm:h-10"
-                    />
-                  </div>
-
-                  <!-- Loading State for Calculation -->
-                  <div v-if="isCalculatingFee" class="text-center">
-                    <div
-                      class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-[#15c472]"
-                    ></div>
-                    <p class="text-gray-600 text-sm mt-2">
-                      جاري حساب الرسوم...
-                    </p>
-                  </div>
-
-                  <!-- Error State -->
-                  <div
-                    v-if="feeCalculationError"
-                    class="bg-red-50 border border-red-200 rounded-xl p-3 text-center"
-                  >
-                    <p class="text-red-600 text-sm">
-                      {{ feeCalculationError }}
-                    </p>
-                  </div>
-
-                  <!-- Calculated Fee Info -->
-                  <div
-                    v-if="calculatedFee !== null && commissionAmount"
-                    class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center"
-                  >
-                    <p class="text-blue-800 text-sm">
-                      المبلغ الأصلي: {{ commissionAmount }} ريال
-                    </p>
-                    <p class="text-blue-800 text-sm font-semibold">
-                      المبلغ الإجمالي بعد الرسوم: {{ calculatedFee }} ريال
-                    </p>
-                  </div>
-
-                  <!-- Pay Button -->
-                  <button
-                    type="button"
-                    @click="openCommissionPaymentModal"
-                    :disabled="
-                      isCalculatingFee ||
-                      isPayingFee ||
-                      !commissionAmount ||
-                      parseFloat(commissionAmount) <= 0
-                    "
-                    class="w-full bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    <span v-if="isPayingFee" class="animate-spin">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="w-5 h-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                        />
-                      </svg>
-                    </span>
-                    <span>{{ isPayingFee ? "جاري الدفع..." : "دفع" }}</span>
-                  </button>
-                </div>
-              </div>
-            </div>
+            <CommissionTabContent
+              v-if="activeTab === 'commission'"
+              v-model:commission-amount="commissionAmount"
+              :calculated-fee="calculatedFee"
+              :is-calculating-fee="isCalculatingFee"
+              :is-paying-fee="isPayingFee"
+              :fee-calculation-error="feeCalculationError"
+              @update:commission-amount="(value) => { commissionAmount = value; handleCommissionAmountChange(); }"
+              @pay="openCommissionPaymentModal"
+            />
 
             <!-- Packages Tab Content -->
-            <div v-if="activeTab === 'packages'" class="space-y-6">
-              <div
-                v-if="isLoadingPackages"
-                class="flex justify-center items-center py-12"
-              >
-                <div class="text-center">
-                  <div
-                    class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"
-                  ></div>
-                  <p class="text-gray-600 text-sm">جاري تحميل الباقات...</p>
-                </div>
-              </div>
-
-              <div
-                v-else-if="packagesError"
-                class="bg-red-50 border border-red-200 rounded-xl p-4 text-center"
-              >
-                <p class="text-red-600 text-sm">{{ packagesError }}</p>
-                <button
-                  @click="fetchPackages"
-                  class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                >
-                  إعادة المحاولة
-                </button>
-              </div>
-
-              <div v-else>
-                <div v-if="packages.length === 0" class="text-center py-12">
-                  <p class="text-gray-500 text-lg">
-                    لا توجد باقات متاحة حالياً
-                  </p>
-                </div>
-
-                <div
-                  v-else
-                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-6"
-                >
-                  <!-- Golden Package Card -->
-                  <div
-                    v-for="(packageItem, index) in packages"
-                    :key="index"
-                    class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <!-- Header Section -->
-                    <div class="flex items-start justify-between mb-6">
-                      <!-- Price -->
-                      <div class="flex items-center gap-1">
-                        <span
-                          class="text-3xl sm:text-4xl font-bold text-[#15c472]"
-                        >
-                          {{ packageItem.price }}
-                        </span>
-                        <img
-                          src="/icons/green-currency.svg"
-                          alt="currency"
-                          class="w-6 h-6 sm:w-8 sm:h-8"
-                        />
-                      </div>
-                      <!-- Title with Icon -->
-                      <div class="flex items-center gap-2">
-                        <span>🥇 </span>
-                        <span
-                          class="text-lg sm:text-xl font-bold text-[#FE9B0E]"
-                        >
-                          {{ packageItem.title }}
-                        </span>
-                      </div>
-                    </div>
-
-                    <!-- Features List -->
-                    <ul class="space-y-3 mb-6 text-right list-disc">
-                      <li
-                        v-for="(feature, featureIndex) in packageItem.features"
-                        :key="featureIndex"
-                        class="text-gray-700 text-sm sm:text-base"
-                      >
-                        {{ feature }}
-                      </li>
-                    </ul>
-
-                    <!-- Subscribe Button -->
-                    <button
-                      @click="handlePackageSubscribe(packageItem)"
-                      class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
-                    >
-                      اشتراك
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <PackagesTabContent
+              v-if="activeTab === 'packages'"
+              :is-loading-packages="isLoadingPackages"
+              :packages-error="packagesError"
+              :packages="packages"
+              @retry="fetchPackages"
+              @subscribe="handlePackageSubscribe"
+            />
 
             <!-- Subscription Tab Content -->
-            <div v-if="activeTab === 'subscription'" class="space-y-6">
-              <div
-                v-if="isLoadingSubscriptions"
-                class="flex justify-center items-center py-12"
-              >
-                <div class="text-center">
-                  <div
-                    class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"
-                  ></div>
-                  <p class="text-gray-600 text-sm">جاري تحميل الاشتراكات...</p>
-                </div>
-              </div>
-
-              <div
-                v-else-if="subscriptionsError"
-                class="bg-red-50 border border-red-200 rounded-xl p-4 text-center"
-              >
-                <p class="text-red-600 text-sm">{{ subscriptionsError }}</p>
-                <button
-                  @click="fetchSubscriptions"
-                  class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                >
-                  إعادة المحاولة
-                </button>
-              </div>
-
-              <div v-else>
-                <div
-                  v-if="subscriptions.length === 0"
-                  class="text-center py-12"
-                >
-                  <p class="text-gray-500 text-lg">لا توجد اشتراكات حالياً</p>
-                </div>
-
-                <div
-                  v-else
-                  class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-3 2xl:grid-cols-3 gap-6"
-                >
-                  <!-- Subscription Cards -->
-                  <div
-                    v-for="(subscription, index) in subscriptions"
-                    :key="index"
-                    class="bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <!-- Header Section -->
-                    <div class="flex items-start justify-between mb-6">
-                      <!-- Price -->
-                      <div class="flex items-center gap-1">
-                        <span
-                          class="text-3xl sm:text-4xl font-bold text-[#15c472]"
-                        >
-                          {{ subscription.price }}
-                        </span>
-                        <img
-                          src="/icons/green-currency.svg"
-                          alt="currency"
-                          class="w-6 h-6 sm:w-8 sm:h-8"
-                        />
-                      </div>
-                      <!-- Title with Medal Icon -->
-                      <div class="flex items-center gap-2">
-                        <span
-                          class="text-xl sm:text-2xl font-bold text-orange-500"
-                        >
-                          {{ subscription.title }}
-                        </span>
-                        <div class="relative">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="w-6 h-6 sm:w-7 sm:h-7 text-orange-500"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 2.18l8 4v8.82c0 4.54-3.07 8.83-8 9.81-4.93-.98-8-5.27-8-9.81V8.18l8-4z"
-                            />
-                            <path
-                              d="M5 16L3 5l5.5 3L12 4l3.5 4L21 5l-2 11H5zm2.7-1h8.6l1.1-7.4-3.5 4.5L12 8l-1.9 4.1-3.5-4.5L7.7 15z"
-                            />
-                          </svg>
-                          <span
-                            class="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center text-[10px] sm:text-xs font-bold text-orange-500"
-                          >
-                            {{ subscription.medalNumber || subscription.id }}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Features List -->
-                    <ul class="space-y-3 mb-6 text-right list-disc pr-6">
-                      <li
-                        v-for="(feature, featureIndex) in subscription.features"
-                        :key="featureIndex"
-                        class="text-gray-700 text-sm sm:text-base"
-                      >
-                        {{ feature }}
-                      </li>
-                    </ul>
-
-                    <!-- Renew Button -->
-                    <button
-                      @click="handleRenewSubscription(subscription)"
-                      class="w-full bg-gradient-to-r from-[#0A717E] to-[#15C472] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300"
-                    >
-                      تجديد
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <SubscriptionTabContent
+              v-if="activeTab === 'subscription'"
+              :is-loading-subscriptions="isLoadingSubscriptions"
+              :subscriptions-error="subscriptionsError"
+              :subscriptions="subscriptions"
+              @retry="fetchSubscriptions"
+              @renew="handleRenewSubscription"
+            />
 
 
             <!-- FAQ Tab Content -->
-            <div v-if="activeTab === 'faq'" class="space-y-6">
-              <!-- Loading State -->
-              <div
-                v-if="isLoadingFaq"
-                class="flex justify-center items-center py-12"
-              >
-                <div class="text-center">
-                  <div
-                    class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#15c472] mb-4"
-                  ></div>
-                  <p class="text-gray-600 text-sm">جاري التحميل...</p>
-                </div>
-              </div>
-
-              <!-- Error State -->
-              <div
-                v-else-if="faqError"
-                class="bg-red-50 border border-red-200 rounded-xl p-4 text-center"
-              >
-                <p class="text-red-600 text-sm">{{ faqError }}</p>
-                <button
-                  @click="fetchFAQContent"
-                  class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                >
-                  إعادة المحاولة
-                </button>
-              </div>
-
-              <!-- FAQ Accordion -->
-              <div v-else class="space-y-3">
-                <!-- Empty State -->
-                <div v-if="faqs.length === 0" class="text-center py-12">
-                  <p class="text-gray-500 text-lg">
-                    لا توجد أسئلة متكررة حالياً
-                  </p>
-                </div>
-
-                <!-- FAQs -->
-                <Accordion :value="openFaqIndex">
-                  <AccordionPanel
-                    v-for="(faq, index) in paginatedFaqs"
-                    :key="faq.id || index"
-                    :value="index.toString()"
-                  >
-                    <AccordionHeader>
-                      {{ faq.question }}
-                    </AccordionHeader>
-                    <AccordionContent>
-                      <div
-                        class="m-0 text-gray-700 leading-relaxed"
-                        v-html="faq.answer"
-                      ></div>
-                    </AccordionContent>
-                  </AccordionPanel>
-                </Accordion>
-              </div>
-
-              <!-- Pagination -->
-              <div
-                v-if="!isLoadingFaq && !faqError && totalFaqs > 0"
-                class="flex justify-center pt-4"
-              >
-                <Paginator
-                  :rows="faqPerPage"
-                  :total-records="totalFaqs"
-                  :first="faqFirst"
-                  @page="onFaqPageChange"
-                  template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-                  class="p-paginator"
-                />
-              </div>
-            </div>
+            <FAQTabContent
+              v-if="activeTab === 'faq'"
+              :is-loading-faq="isLoadingFaq"
+              :faq-error="faqError"
+              :faqs="faqs"
+              :paginated-faqs="paginatedFaqs"
+              :total-faqs="totalFaqs"
+              :faq-per-page="faqPerPage"
+              :faq-first="faqFirst"
+              v-model:open-faq-index="openFaqIndex"
+              @retry="fetchFAQContent"
+              @page-change="onFaqPageChange"
+            />
 
             <!-- Privacy Tab Content -->
-            <div v-if="activeTab === 'privacy'" class="space-y-6">
-              <div
-                class="rounded-xl p-4 sm:p-6 bg-white border border-gray-200"
-              >
-                <p
-                  v-if="isLoadingPrivacy"
-                  class="text-gray-500 text-base sm:text-lg leading-relaxed text-start mb-4"
-                >
-                  جاري التحميل...
-                </p>
-                <p
-                  v-else-if="privacyError"
-                  class="text-red-500 text-base sm:text-lg leading-relaxed text-start mb-4"
-                >
-                  {{ privacyError }}
-                </p>
-                <p
-                  v-else
-                  class="text-gray-700 text-base sm:text-lg leading-relaxed text-start mb-4 whitespace-pre-line"
-                >
-                  {{ privacyContent || "لا توجد بيانات متاحة حاليا" }}
-                </p>
-              </div>
-            </div>
+            <ContentTabContent
+              v-if="activeTab === 'privacy'"
+              :is-loading="isLoadingPrivacy"
+              :error="privacyError"
+              :content="privacyContent || ''"
+            />
 
             <!-- Terms Tab Content -->
-            <div v-if="activeTab === 'terms'" class="space-y-6">
-              <div
-                class="rounded-xl p-4 sm:p-6 bg-white border border-gray-200"
-              >
-                <p
-                  v-if="isLoadingTerms"
-                  class="text-gray-500 text-base sm:text-lg leading-relaxed text-start mb-4"
-                >
-                  جاري التحميل...
-                </p>
-                <p
-                  v-else-if="termsError"
-                  class="text-red-500 text-base sm:text-lg leading-relaxed text-start mb-4"
-                >
-                  {{ termsError }}
-                </p>
-                <p
-                  v-else
-                  class="text-gray-700 text-base sm:text-lg leading-relaxed text-start mb-4 whitespace-pre-line"
-                >
-                  {{ termsContent || "لا توجد بيانات متاحة حاليا" }}
-                </p>
-              </div>
-            </div>
+            <ContentTabContent
+              v-if="activeTab === 'terms'"
+              :is-loading="isLoadingTerms"
+              :error="termsError"
+              :content="termsContent || ''"
+            />
 
             <!-- About Us Tab Content -->
-            <div v-if="activeTab === 'about-us'" class="space-y-6">
-              <div class="space-y-6">
-                <!-- Introduction Section -->
-                <div
-                  class="rounded-xl p-4 sm:p-6 bg-white border border-gray-200"
-                >
-                  <p
-                    v-if="isLoadingAbout"
-                    class="text-gray-500 text-base sm:text-lg leading-relaxed text-start mb-4"
-                  >
-                    جاري التحميل...
-                  </p>
-                  <p
-                    v-else-if="aboutError"
-                    class="text-red-500 text-base sm:text-lg leading-relaxed text-start mb-4"
-                  >
-                    {{ aboutError }}
-                  </p>
-                  <p
-                    v-else
-                    class="text-gray-700 text-base sm:text-lg leading-relaxed text-start mb-4 whitespace-pre-line"
-                  >
-                    {{ aboutContent || "لا توجد بيانات متاحة حاليا" }}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <ContentTabContent
+              v-if="activeTab === 'about-us'"
+              :is-loading="isLoadingAbout"
+              :error="aboutError"
+              :content="aboutContent || ''"
+            />
 
             <!-- Complaints Tab Content -->
             <div v-if="activeTab === 'complaints'" class="space-y-6">
@@ -2676,504 +1828,33 @@
             </div>
 
             <!-- Join Consultant Tab Content -->
-            <div v-if="activeTab === 'join-consultant'" class="space-y-6">
-              <form
-                @submit.prevent="handleJoinConsultantSubmit"
-                class="space-y-6"
-              >
-                <!-- CV PDF Upload -->
-                <div class="space-y-2">
-                  <label
-                    for="cvFile"
-                    class="block text-sm sm:text-base font-bold text-gray-800 text-right"
-                  >
-                    ارفاق ملف السير الذاتية PDF
-                    <span class="text-red-500">*</span>
-                  </label>
-                  <label
-                    for="cvFile"
-                    class="block max-w-xs border border-gray-300 rounded-xl p-3 sm:p-4 cursor-pointer hover:border-[#15c472] transition-colors bg-white"
-                  >
-                    <input
-                      id="cvFile"
-                      type="file"
-                      accept=".pdf"
-                      @change="handleCvFileChange"
-                      class="hidden"
-                    />
-                    <div
-                      class="flex flex-col items-center justify-center gap-2"
-                    >
-                      <img
-                        src="/icons/pdf-uploader.svg"
-                        alt="pdf-uploader"
-                        class="w-4 h-4"
-                      />
-                      <span class="text-gray-600 text-xs sm:text-sm">
-                        {{ cvFileName || "إرفاق ملف" }}
-                      </span>
-                    </div>
-                  </label>
-                </div>
-
-                <!-- Consultant Proof PDF Upload -->
-                <div class="space-y-2">
-                  <label
-                    for="proofFile"
-                    class="block text-sm sm:text-base font-bold text-gray-800 text-right"
-                  >
-                    ارفاق ما يثبت انه استشاري PDF
-                    <span class="text-red-500">*</span>
-                  </label>
-                  <label
-                    for="proofFile"
-                    class="block max-w-xs border border-gray-300 rounded-xl p-3 sm:p-4 cursor-pointer hover:border-[#15c472] transition-colors bg-white"
-                  >
-                    <input
-                      id="proofFile"
-                      type="file"
-                      accept=".pdf"
-                      @change="handleProofFileChange"
-                      class="hidden"
-                    />
-                    <div
-                      class="flex flex-col items-center justify-center gap-2"
-                    >
-                      <img
-                        src="/icons/pdf-uploader.svg"
-                        alt="pdf-uploader"
-                        class="w-4 h-4"
-                      />
-                      <span class="text-gray-600 text-xs sm:text-sm">
-                        {{ proofFileName || "إرفاق ملف" }}
-                      </span>
-                    </div>
-                  </label>
-                </div>
-
-                <!-- Consultation Cost -->
-                <div class="space-y-2">
-                  <label
-                    for="consultationCost"
-                    class="block text-sm sm:text-base font-bold text-gray-800 text-right"
-                  >
-                    تكلفة الاستشارة
-                    <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="consultationCost"
-                    v-model="joinConsultantForm.consultationCost"
-                    type="text"
-                    placeholder="١٠٠ ريال"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl text-right text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-[#15c472] focus:border-transparent placeholder:text-gray-400"
-                  />
-                </div>
-
-                <!-- Submit Button -->
-                <button
-                  type="submit"
-                  :disabled="isSubmittingConsultant"
-                  class="w-full bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <span v-if="isSubmittingConsultant">جاري الإرسال...</span>
-                  <span v-else>ارسال طلب</span>
-                </button>
-              </form>
-            </div>
+            <JoinConsultantTabContent
+              v-if="activeTab === 'join-consultant'"
+              v-model:form="joinConsultantForm"
+              :cv-file-name="cvFileName"
+              :proof-file-name="proofFileName"
+              :is-submitting="isSubmittingConsultant"
+              @cv-file-change="handleCvFileChange"
+              @proof-file-change="handleProofFileChange"
+              @submit="handleJoinConsultantSubmit"
+            />
 
             <!-- Contact Us Tab Content -->
-            <div v-if="activeTab === 'contact-us'" class="space-y-6">
-              <form @submit.prevent="handleContactUsSubmit" class="space-y-6">
-                <!-- Message Title Field -->
-                <div class="space-y-2">
-                  <label
-                    for="messageTitle"
-                    class="block text-sm sm:text-base font-bold text-gray-800 text-right"
-                  >
-                    عنوان الرسالة
-                  </label>
-                  <input
-                    id="messageTitle"
-                    v-model="contactForm.messageTitle"
-                    type="text"
-                    placeholder="عنوان"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl text-right text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#15c472] focus:border-transparent placeholder:text-gray-400"
-                  />
-                </div>
-
-                <!-- Message Text Field -->
-                <div class="space-y-2">
-                  <label
-                    for="messageText"
-                    class="block text-sm sm:text-base font-bold text-gray-800 text-right"
-                  >
-                    نص الرسالة
-                  </label>
-                  <textarea
-                    id="messageText"
-                    v-model="contactForm.messageText"
-                    placeholder="نص الرسالة"
-                    rows="6"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl text-right text-sm sm:text-base resize-none focus:outline-none focus:ring-2 focus:ring-[#15c472] focus:border-transparent placeholder:text-gray-400"
-                  ></textarea>
-                </div>
-
-                <!-- Submit Button -->
-                <button
-                  type="submit"
-                  :disabled="isSendingContact"
-                  class="w-full bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  <span v-if="isSendingContact">جاري الإرسال...</span>
-                  <span v-else>ارسال</span>
-                </button>
-              </form>
-            </div>
+            <ContactUsTabContent
+              v-if="activeTab === 'contact-us'"
+              v-model:form="contactForm"
+              :is-sending="isSendingContact"
+              @submit="handleContactUsSubmit"
+            />
           </div>
 
           <!-- Sidebar Navigation (Right) -->
-          <div
-            :class="[
-              'w-full lg:w-80 shrink-0 order-1 lg:order-2',
-              isMobileMenuOpen ? 'block' : 'hidden lg:block',
-            ]"
-          >
-            <div class="p-3 sm:p-4">
-              <nav
-                class="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar"
-              >
-                <!-- 1. الملف الشخصي -->
-                <button
-                  @click="setActiveTab('profile')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors  w-full text-right',
-                    activeTab === 'profile'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/profile-tab.svg"
-                    alt="profile-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>الملف الشخصي</span>
-                </button>
-
-                <!-- 2. الاعدادات -->
-                <button
-                  @click="setActiveTab('settings')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'settings'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/settings-tab.svg"
-                    alt="settings-tab"
-                    class="w-7 h-7 sm:w-6 sm:h-6"
-                  />
-                  <span>الاعدادات</span>
-                </button>
-
-                <!-- 3. المفضلة -->
-                <!-- <button
-                  @click="setActiveTab('favorites')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'favorites'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/heart-icon.svg"
-                    alt="favorites-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>المفضلة</span>
-                </button> -->
-
-                <!-- 4. المحفظة -->
-                <button
-                  @click="setActiveTab('wallet')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'wallet'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/wallet-tab.svg"
-                    alt="wallet-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>المحفظة</span>
-                </button>
-
-                <!-- 5. اعلاناتي -->
-                <button
-                  @click="setActiveTab('my-ads')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'my-ads'
-                      ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/ads-tab.svg"
-                    alt="ads-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>اعلاناتي</span>
-                </button>
-
-                <!-- 6. تقييماتي -->
-                <button
-                  @click="setActiveTab('ratings')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'ratings'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/rating-tab.svg"
-                    alt="ratings-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>تقييماتي</span>
-                </button>
-
-                <!-- 7. المتابعة -->
-                <button
-                  @click="setActiveTab('following')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'following'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/follow-tab.svg"
-                    alt="follow-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>المتابعة</span>
-                </button>
-
-                <!-- 8. حساب عمولة التطبيق -->
-                <button
-                  @click="setActiveTab('commission')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'commission'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/cost-tab.svg"
-                    alt="cost-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>حساب عمولة التطبيق</span>
-                </button>
-
-                <!-- 9. باقاتي -->
-                <button
-                  @click="setActiveTab('packages')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'packages'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/Packages-tabs.svg"
-                    alt="Packages-tabs"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>باقاتي</span>
-                </button>
-
-                <!-- 10. اشتراكي -->
-                <button
-                  @click="setActiveTab('subscription')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'subscription'
-                      ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/subscription-tab.svg"
-                    alt="subscription-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>اشتراكي</span>
-                </button>
-
-                <!-- 11. تواصل معنا -->
-                <button
-                  @click="setActiveTab('contact-us')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'contact-us'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/contactus-tab.svg"
-                    alt="contact-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>تواصل معنا</span>
-                </button>
-
-                <!-- 12. عن المنصة -->
-                <button
-                  @click="setActiveTab('about-us')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'about-us'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/aboutus-tab.svg"
-                    alt="aboutus-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>عن المنصة</span>
-                </button>
-
-                <!-- 13. الاسئلة المتكررة -->
-                <button
-                  @click="setActiveTab('faq')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'faq'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/faq-tab.svg"
-                    alt="faq-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>الاسئلة المتكررة</span>
-                </button>
-
-                <!-- 14. سياسة الاستخدام -->
-                <button
-                  @click="setActiveTab('privacy')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'privacy'
-                      ? 'bg-[#15c472] text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/privacy-tab.svg"
-                    alt="privacy-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>سياسة الاستخدام</span>
-                </button>
-
-                <!-- 15. الشروط والاحكام -->
-                <button
-                  @click="setActiveTab('terms')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'terms'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/terms-tab.svg"
-                    alt="terms-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>الشروط والاحكام</span>
-                </button>
-
-                <!-- 16. الشكاوي المقدمة -->
-                <button
-                  @click="setActiveTab('complaints')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'complaints'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/reports-tab.svg"
-                    alt="complaints-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>الشكاوي المقدمة</span>
-                </button>
-
-                <!-- 17. الانظمام كمستشار -->
-                <button
-                  @click="setActiveTab('join-consultant')"
-                  :class="[
-                    'flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-colors w-full text-right',
-                    activeTab === 'join-consultant'
-                      ? 'bg-[#15c472] text-white'
-                      : 'bg-[#FCFCFC] text-gray-700 hover:bg-gray-50 hover:text-[#15c472]',
-                  ]"
-                >
-                  <img
-                    src="/icons/join-tab.svg"
-                    alt="consultant-tab"
-                    class="w-8 h-8 sm:w-7 sm:h-7 bg-green-200 p-1 rounded-full"
-                  />
-                  <span>الانظمام كمستشار</span>
-                </button>
-
-                <!-- 18. تسجيل الخروج (في الأسفل باللون الأحمر) -->
-                <div class="pt-2 mt-2 border-t border-gray-200">
-                  <button
-                    @click="openLogoutModal"
-                    class="flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base text-red-500 hover:bg-red-50 font-medium transition-colors w-full text-right"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="w-4 h-4 sm:w-5 sm:h-5 text-red-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                      />
-                    </svg>
-                    <span class="text-red-500">تسجيل الخروج</span>
-                  </button>
-                </div>
-              </nav>
-            </div>
-          </div>
+          <ProfileSidebar
+            :active-tab="activeTab"
+            :is-mobile-menu-open="isMobileMenuOpen"
+            @tab-change="setActiveTab"
+            @logout="openLogoutModal"
+          />
         </div>
       </div>
     </div>
@@ -3238,6 +1919,18 @@ import { useUserStore } from "~/stores/user";
 import { useAuthStore } from "~/stores/authUserStore";
 import { useMyAds } from "~/composables/useMyAds";
 import { useAdverts } from "~/composables/useAdverts";
+import ProfileSidebar from "~/components/profile/ProfileSidebar.vue";
+import ProfileTabContent from "~/components/profile/ProfileTabContent.vue";
+import WalletTabContent from "~/components/profile/WalletTabContent.vue";
+import RatingsTabContent from "~/components/profile/RatingsTabContent.vue";
+import FollowingTabContent from "~/components/profile/FollowingTabContent.vue";
+import CommissionTabContent from "~/components/profile/CommissionTabContent.vue";
+import PackagesTabContent from "~/components/profile/PackagesTabContent.vue";
+import SubscriptionTabContent from "~/components/profile/SubscriptionTabContent.vue";
+import FAQTabContent from "~/components/profile/FAQTabContent.vue";
+import ContentTabContent from "~/components/profile/ContentTabContent.vue";
+import JoinConsultantTabContent from "~/components/profile/JoinConsultantTabContent.vue";
+import ContactUsTabContent from "~/components/profile/ContactUsTabContent.vue";
 
 // Type definitions
 interface ApiResponse<T = any> {
@@ -3787,7 +2480,6 @@ const fetchCategories = async () => {
       }));
     }
   } catch (error) {
-    console.log("Categories endpoint not available, using default values");
   }
 };
 
@@ -3828,7 +2520,6 @@ const fetchCities = async () => {
       }));
     }
   } catch (error) {
-    console.log("Cities endpoint not available, using default values");
   }
 };
 
@@ -3864,7 +2555,6 @@ const fetchSubCategories = async (categoryId: string) => {
       }
     }
 
-    console.log("Fetching sub-categories for category:", categoryId);
     let response: ApiResponse<any> | null = null;
     
     try {
@@ -3877,7 +2567,6 @@ const fetchSubCategories = async (categoryId: string) => {
           },
         }
       );
-      console.log("Sub-categories response (endpoint 1):", response);
     } catch (error) {
       console.error("Sub-categories API error (endpoint 1):", error);
       response = null;
@@ -3885,7 +2574,6 @@ const fetchSubCategories = async (categoryId: string) => {
 
     // If first endpoint fails or returns error, try alternative endpoint
     if (!response || response.key !== "success") {
-      console.log("Trying alternative endpoint...");
       try {
         response = await $fetch<ApiResponse<any>>(
           `https://backend.wattani-sa.com/api/v1/categories/${categoryId}/sub-categories`,
@@ -3896,7 +2584,6 @@ const fetchSubCategories = async (categoryId: string) => {
             },
           }
         );
-        console.log("Sub-categories response (endpoint 2):", response);
       } catch (error) {
         console.error("Sub-categories API error (endpoint 2):", error);
         response = null;
@@ -3913,7 +2600,6 @@ const fetchSubCategories = async (categoryId: string) => {
       
       // If no sub-categories exist, use the category itself as sub-category
       if (subCats.length === 0) {
-        console.warn("No sub-categories found for category:", categoryId);
         subCategories.value = [{
           label: "نفس القسم",
           value: categoryId.toString()
@@ -3921,7 +2607,6 @@ const fetchSubCategories = async (categoryId: string) => {
       }
     } else {
       // If API doesn't return sub-categories or returns an error, use category as sub-category
-      console.warn("Failed to fetch sub-categories or endpoint not available. Using category as sub-category.");
       // Use the category itself as sub-category if API fails or returns no data
       // This handles cases where API requires sub_category_id but category has no sub-categories
       subCategories.value = [{
@@ -5685,11 +4370,8 @@ const getTabTitle = (): string => {
   return (tabTitles as Record<string, string>)[activeTab.value] || "الملف الشخصي";
 };
 
-const profileAvatarInput = ref(null);
 
-const handleProfileAvatarChange = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
+const handleProfileAvatarChange = (file: File | undefined) => {
   if (file) {
     // Validate file type
     if (!file.type.startsWith("image/")) {
@@ -6415,30 +5097,6 @@ const handleSettingsSubmit = async () => {
   }
 };
 
-const handleChangeMobileSubmit = () => {
-  if (
-    !changeMobileForm.newMobile.trim() ||
-    !changeMobileForm.verificationCode.trim()
-  ) {
-    toast.add({
-      severity: "warn",
-      summary: "تحذير",
-      detail: "يرجى ملء جميع الحقول المطلوبة",
-      life: 3000,
-    });
-    return;
-  }
-  // Add your form submission logic here
-  toast.add({
-    severity: "success",
-    summary: "نجح",
-    detail: "تم تغيير رقم الجوال بنجاح",
-    life: 3000,
-  });
-  // Reset form
-  changeMobileForm.newMobile = "";
-  changeMobileForm.verificationCode = "";
-};
 
 const handleChangePasswordSubmit = async () => {
   if (
@@ -6924,18 +5582,14 @@ watch(
   { immediate: true }
 );
 
-const handleCvFileChange = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
+const handleCvFileChange = (file: File | undefined) => {
   if (file) {
     cvFileName.value = file.name;
     cvFile.value = file;
   }
 };
 
-const handleProofFileChange = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
+const handleProofFileChange = (file: File | undefined) => {
   if (file) {
     proofFileName.value = file.name;
     proofFile.value = file;
@@ -7220,14 +5874,10 @@ const loadWalletBalance = async () => {
   isLoadingWallet.value = true;
   try {
     const data = await showWallet();
-    console.log("=== Wallet API Response ===", JSON.stringify(data, null, 2));
-    console.log("=== Data keys ===", Object.keys(data || {}));
     
     // Handle different possible balance field names
     const balance = data.balance || data.wallet_balance || data.amount || data.current_balance || 0;
     walletBalance.value = typeof balance === 'number' ? balance : parseFloat(balance) || 0;
-    console.log("✓ Wallet balance loaded:", walletBalance.value);
-    console.log("✓ Balance type:", typeof walletBalance.value);
   } catch (err: any) {
     console.error("Error loading wallet balance:", err);
     const isUnauthenticated =
@@ -7239,7 +5889,6 @@ const loadWalletBalance = async () => {
     // User might be viewing profile without being fully authenticated
     if (isUnauthenticated) {
       walletBalance.value = 0;
-      console.warn("User not authenticated, wallet balance set to 0");
     } else {
       toast.add({
         severity: "error",
@@ -7272,18 +5921,14 @@ const handleCharge = async (amount: string) => {
   
   try {
     const response = await chargeWallet(amount);
-    console.log("=== Charge wallet response ===", JSON.stringify(response, null, 2));
-    console.log("=== Response data ===", response?.data);
     
     // Check if response contains updated balance
     const responseData = response?.data || {};
     const newBalance = responseData.balance || responseData.wallet_balance || responseData.amount || responseData.new_balance;
     
     if (newBalance !== undefined && newBalance !== null) {
-      console.log("✓ Found balance in charge response:", newBalance);
       walletBalance.value = newBalance;
     } else {
-      console.log("⚠ No balance in charge response, reloading from API...");
       // Wait a bit for backend to update, then reload
       await new Promise(resolve => setTimeout(resolve, 500));
       await loadWalletBalance();
@@ -7551,13 +6196,6 @@ watch(
   }
 );
 
-// Debug watcher for success modal
-watch(
-  () => isSuccessModalOpen.value,
-  (isOpen) => {
-  },
-  { immediate: true }
-);
 </script>
 
 <style scoped>
