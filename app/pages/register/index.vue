@@ -128,37 +128,97 @@
               رقم الجوال
               <span class="text-red-500">*</span>
               </label>
-              <div
-                class="flex  rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] border border-transparent overflow-hidden"
-              >
-              <div
-                class="flex items-center gap-2 border-l border-gray-100 px-4 py-3 bg-gray-50 text-sm text-dark/70"
-              >
-                <select
-                  v-model="form.countryCode"
-                  class="bg-transparent focus:outline-none text-dark"
-                  aria-label="Country code"
-                >
-                  <option value="+966">+966</option>
-                  <option value="+20">+20</option>
-                  <option value="+971">+971</option>
-                  <option value="+974">+974</option>
-                </select>
-                <img
-                  src="/images/Country Flags.png"
-                  alt="Country Flag"
-                  class="w-5 h-5"
-                />
-              </div>
-                <input
-                  id="phone"
-                  v-model="form.phone"
-                  type="tel"
-                  placeholder="رقم الجوال"
-                  required
-                  @input="handlePhoneInput"
-                  class="flex-1 bg-transparent px-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right"
-                />
+              <div class="country-selector-container">
+                <div class="relative flex flex-row-reverse rounded-2xl bg-white shadow-[0_20px_45px_rgba(10,113,126,0.08)] focus-within:border-[#0ab07d] overflow-hidden">
+                  <!-- Country Code Selector -->
+                  <div class="relative">
+                    <button
+                      ref="dropdownButtonRef"
+                      type="button"
+                      @click="toggleCountryDropdown"
+                      class="flex items-center gap-2 px-3 py-3 bg-gray-50 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0ab07d] border-l border-gray-100"
+                      :disabled="isLoadingCountries"
+                    >
+                      <img
+                        v-if="selectedCountry?.image"
+                        :src="selectedCountry.image"
+                        :alt="selectedCountry?.name || 'Country Flag'"
+                        class="w-5 h-4 object-cover"
+                      />
+                      <img
+                        v-else
+                        :src="`https://flagcdn.com/16x12/${selectedCountry?.flag || 'sa'}.png`"
+                        :alt="selectedCountry?.name || 'Country Flag'"
+                        class="w-5 h-4"
+                      />
+                      <span class="text-gray-700 text-sm font-medium">{{ form.countryCode }}</span>
+                      <svg
+                        class="w-4 h-4 text-gray-500 transition-transform"
+                        :class="{ 'rotate-180': showCountryDropdown }"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <Teleport to="body">
+                      <div
+                        v-if="showCountryDropdown"
+                        class="fixed bg-white border border-gray-300 rounded-lg shadow-xl z-9999 country-dropdown overflow-y-auto"
+                        :style="dropdownStyle"
+                        @click.stop
+                      >
+                        <div class="p-2">
+                          <div class="space-y-1">
+                            <button
+                              v-for="country in countryCodes"
+                              :key="country.code"
+                              type="button"
+                              @click="selectCountry(country)"
+                              class="w-full flex items-center gap-3 px-3 py-2 hover:bg-teal-50 rounded-lg transition-colors text-right flex-row"
+                              :class="{ 'bg-teal-100': country.code === form.countryCode }"
+                            >
+                              <img
+                                v-if="country.image"
+                                :src="country.image"
+                                :alt="country.name"
+                                class="w-5 h-4 object-cover shrink-0"
+                              />
+                              <img
+                                v-else
+                                :src="`https://flagcdn.com/16x12/${country.flag}.png`"
+                                :alt="country.name"
+                                class="w-5 h-4 shrink-0"
+                              />
+                              <span class="flex-1 text-sm text-gray-700 truncate">{{ country.name }}</span>
+                              <span class="text-sm text-gray-500 font-medium shrink-0">{{ country.code }}</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </Teleport>
+                  </div>
+                  
+                  <!-- Phone Input -->
+                  <input
+                    id="phone"
+                    v-model="form.phone"
+                    @input="handlePhoneInput"
+                    type="tel"
+                    :placeholder="phonePlaceholder"
+                    required
+                    :class="[
+                      'flex-1 w-full bg-transparent pr-4 py-3 focus:outline-none text-dark placeholder:text-gray-400 text-right',
+                      phoneError ? 'border-red-500' : ''
+                    ]"
+                  />
+                </div>
+                <p v-if="phoneError" class="mt-1 text-xs text-red-500 text-right">
+                  {{ phoneError }}
+                </p>
               </div>
             </div>
 
@@ -486,7 +546,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from "vue";
+import { ref, onMounted, watch, nextTick, computed, onUnmounted } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
 import LocationModal from "~/components/modals/LocationModal.vue";
 import { fetchApiData } from "~/composables/useApiFetch";
@@ -495,6 +555,7 @@ definePageMeta({
 });
 const { showToast} = useCustomToast();
 const authStore = useAuthStore();
+const { locale } = useI18n();
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const avatarPreview = ref<string | undefined>(undefined);
@@ -505,6 +566,12 @@ const isLoading = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
 const isLocationModalOpen = ref(false);
+const isLoadingCountries = ref(false);
+const showCountryDropdown = ref(false);
+const phoneError = ref("");
+const countriesFromApi = ref<any[]>([]);
+const dropdownButtonRef = ref<HTMLElement | null>(null);
+const dropdownStyle = ref<{ top?: string; bottom?: string; left?: string; right?: string; width?: string; maxHeight?: string }>({});
 
 // Fetch cities from API
 const cities = ref<any[]>([]);
@@ -553,14 +620,194 @@ const form = ref({
   lng: "34.55550000",
   map_desc: "",
   countryCode: "+966",
+  iso: "SA",
   password: "",
   confirmPassword: "",
   acceptTerms: false,
 });
 
+// Format Saudi phone number as user types
+const formatSaudiPhone = (value: string): string => {
+  const digits = value.replace(/\D/g, '');
+  
+  if (form.value.countryCode === "+966") {
+    let cleaned = digits.startsWith('0') ? digits.slice(1) : digits;
+    cleaned = cleaned.slice(0, 9);
+    
+    if (cleaned.length > 0) {
+      if (cleaned.length <= 3) {
+        return cleaned;
+      } else if (cleaned.length <= 6) {
+        return `${cleaned.slice(0, 3)} ${cleaned.slice(3)}`;
+      } else {
+        return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
+      }
+    }
+    return cleaned;
+  }
+  
+  return digits.slice(0, 15);
+};
+
+// Validate Saudi phone number
+const validateSaudiPhone = (phone: string): boolean => {
+  if (form.value.countryCode !== "+966") {
+    return phone.trim().length > 0;
+  }
+  
+  const digits = phone.replace(/\D/g, '');
+  const cleaned = digits.startsWith('0') ? digits.slice(1) : digits;
+  
+  if (cleaned.length === 9) {
+    return cleaned.startsWith('5') || cleaned.startsWith('1');
+  }
+  
+  if (digits.length === 10) {
+    return digits.startsWith('05') || digits.startsWith('01');
+  }
+  
+  return false;
+};
+
+// Update placeholder based on country code
+const phonePlaceholder = computed(() => {
+  if (form.value.countryCode === "+966") {
+    return "5XX XXX XXX";
+  }
+  return "رقم الجوال";
+});
+
+// Fetch countries from API
+const fetchCountries = async () => {
+  isLoadingCountries.value = true;
+  try {
+    const response = await $fetch<{ key: string; msg?: string; data?: any[] }>(
+      'https://backend.wattani-sa.com/api/v1/countries',
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'lang': locale.value || 'ar',
+          'X-API-KEY': '5f43766dcd92b8c3e7639d2a8791063c',
+        },
+      }
+    );
+
+    if (response && response.key === 'success' && response.data) {
+      countriesFromApi.value = response.data.map((country: any) => ({
+        code: `+${country.country_code}`,
+        flag: country.iso?.toLowerCase() || country.iso,
+        image: country.image,
+        name: country.name,
+        iso: country.iso,
+        id: country.id,
+      }));
+    }
+  } catch (err: any) {
+    console.error('Error fetching countries:', err);
+    countriesFromApi.value = [
+      { code: "+966", flag: "sa", name: "السعودية", iso: "SA" },
+    ];
+  } finally {
+    isLoadingCountries.value = false;
+  }
+};
+
+// Country codes - use API data if available, otherwise use fallback
+const countryCodes = computed(() => {
+  if (countriesFromApi.value.length > 0) {
+    return countriesFromApi.value;
+  }
+  return [
+    { code: "+966", flag: "sa", name: "السعودية", iso: "SA" },
+    { code: "+971", flag: "ae", name: "الإمارات", iso: "AE" },
+    { code: "+965", flag: "kw", name: "الكويت", iso: "KW" },
+    { code: "+974", flag: "qa", name: "قطر", iso: "QA" },
+  ];
+});
+
+const selectedCountry = computed(() => {
+  return countryCodes.value.find(c => c.code === form.value.countryCode) ?? countryCodes.value[0];
+});
+
+const updateDropdownPosition = () => {
+  if (!dropdownButtonRef.value || !showCountryDropdown.value) return;
+  
+  const buttonRect = dropdownButtonRef.value.getBoundingClientRect();
+  const viewportHeight = window.innerHeight;
+  const dropdownHeight = 320;
+  const dropdownWidth = 256;
+  const spaceBelow = viewportHeight - buttonRect.bottom;
+  const spaceAbove = buttonRect.top;
+  
+  let top, bottom;
+  
+  if (spaceBelow >= dropdownHeight || spaceBelow > spaceAbove) {
+    top = `${buttonRect.bottom + 4}px`;
+    bottom = undefined;
+  } else {
+    bottom = `${viewportHeight - buttonRect.top + 4}px`;
+    top = undefined;
+  }
+  
+  const viewportWidth = window.innerWidth;
+  const right = `${viewportWidth - buttonRect.right}px`;
+  const left = undefined;
+  
+  dropdownStyle.value = {
+    top,
+    bottom,
+    right,
+    left,
+    width: `${dropdownWidth}px`,
+    maxHeight: `${Math.min(dropdownHeight, spaceBelow >= dropdownHeight ? spaceBelow - 8 : spaceAbove - 8)}px`,
+  };
+};
+
+const toggleCountryDropdown = () => {
+  showCountryDropdown.value = !showCountryDropdown.value;
+  if (showCountryDropdown.value) {
+    nextTick(() => {
+      updateDropdownPosition();
+    });
+  }
+};
+
+const selectCountry = (country: typeof countryCodes.value[0]) => {
+  form.value.countryCode = country.code;
+  form.value.iso = country.iso;
+  showCountryDropdown.value = false;
+  
+  if (form.value.phone) {
+    if (validateSaudiPhone(form.value.phone)) {
+      phoneError.value = "";
+    } else {
+      phoneError.value = form.value.countryCode === "+966" 
+        ? "رقم الجوال غير صحيح" 
+        : "رقم الجوال غير صحيح";
+    }
+  }
+};
+
+// Close dropdown when clicking outside
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as HTMLElement;
+  if (!target.closest('.country-selector-container') && !target.closest('.country-dropdown')) {
+    showCountryDropdown.value = false;
+  }
+};
+
 // Fetch cities on mount
 onMounted(() => {
   fetchCities();
+  fetchCountries();
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+  window.removeEventListener('resize', updateDropdownPosition);
+  window.removeEventListener('scroll', updateDropdownPosition, true);
 });
 
 const triggerFileInput = () => {
@@ -632,9 +879,40 @@ const handleLocationConfirm = (locationData: any) => {
 
 const handlePhoneInput = (event: Event) => {
   const target = event.target as HTMLInputElement;
-  // Remove all non-numeric characters
-  form.value.phone = target.value.replace(/\D/g, '');
+  const formatted = formatSaudiPhone(target.value);
+  form.value.phone = formatted;
+  
+  if (formatted.length > 0) {
+    if (validateSaudiPhone(formatted)) {
+      phoneError.value = "";
+    } else {
+      phoneError.value = form.value.countryCode === "+966" 
+        ? "رقم الجوال غير صحيح" 
+        : "رقم الجوال غير صحيح";
+    }
+  } else {
+    phoneError.value = "";
+  }
 };
+
+// Watch locale changes to refetch countries
+watch(locale, () => {
+  fetchCountries();
+});
+
+// Watch for window resize and scroll to update dropdown position
+watch(showCountryDropdown, (isOpen) => {
+  if (isOpen) {
+    window.addEventListener('resize', updateDropdownPosition);
+    window.addEventListener('scroll', updateDropdownPosition, true);
+    nextTick(() => {
+      updateDropdownPosition();
+    });
+  } else {
+    window.removeEventListener('resize', updateDropdownPosition);
+    window.removeEventListener('scroll', updateDropdownPosition, true);
+  }
+});
 
  
 
@@ -738,6 +1016,14 @@ const handleSubmit = async () => {
     showToast("error", "رقم الجوال مطلوب");
     return;
   }
+  // Validate phone number
+  if (!validateSaudiPhone(form.value.phone)) {
+    phoneError.value = form.value.countryCode === "+966" 
+      ? "رقم الجوال غير صحيح" 
+      : "رقم الجوال غير صحيح";
+    showToast("error", phoneError.value);
+    return;
+  }
   if (!form.value.city || !form.value.city.trim()) {
     showToast("error", "المدينة مطلوبة");
     return;
@@ -755,7 +1041,11 @@ const handleSubmit = async () => {
   
   const fd = new FormData();
   fd.append("name", form.value.clientName.trim());
-  fd.append("phone", form.value.phone);
+  // Extract just the phone number digits (remove spaces and formatting)
+  const phoneDigits = form.value.phone.replace(/\D/g, '');
+  // Remove leading 0 if present (for Saudi numbers)
+  const cleanPhone = phoneDigits.startsWith('0') ? phoneDigits.slice(1) : phoneDigits;
+  fd.append("phone", cleanPhone);
   if (form.value.email) {
     fd.append("email", form.value.email);
   }
@@ -767,11 +1057,13 @@ const handleSubmit = async () => {
   fd.append("map_desc", form.value.map_desc || form.value.location || "");
   fd.append("password", form.value.password);
   fd.append("password_confirmation", form.value.confirmPassword);
-  fd.append("country_code", form.value.countryCode);
+  // Remove the + sign from country code for API
+  const countryCode = form.value.countryCode.replace('+', '');
+  fd.append("country_code", countryCode);
   fd.append("device_id", "514789632");
   fd.append("device_type", "web");
   fd.append("lang", "ar");
-  fd.append("iso", "SA"); 
+  fd.append("iso", form.value.iso); 
   if (avatarFile.value) {
     fd.append("avatar", avatarFile.value);
   }
@@ -790,7 +1082,7 @@ const handleSubmit = async () => {
       authStore.updateUserData(data.data);
       navigateTo({
         name: "register-otp",
-        query: { phone: form.value.phone }
+        query: { phone: cleanPhone }
       });
     } else {
       showToast("error", data.msg);
@@ -807,4 +1099,33 @@ const handleSubmit = async () => {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Custom scrollbar for country dropdown */
+.country-dropdown {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.country-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.country-dropdown::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.country-dropdown::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.country-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Smooth scrolling */
+.country-dropdown {
+  scroll-behavior: smooth;
+}
+</style>

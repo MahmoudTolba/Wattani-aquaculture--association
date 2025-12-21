@@ -40,8 +40,8 @@
   --color-gray-950: #1c1c1c;
 
   /* ===================================== Font Scheme ===================================== */
-  --font-readax: "GE SS Two", "Readex Pro", sans-serif;
-  --font-serif: "GE SS Two", "Readex Pro", sans-serif;
+  --font-readax: "GE SS Two", sans-serif;
+  --font-serif: "GE SS Two", sans-serif;
   --main-gradient: linear-gradient(
     to top,
     theme("colors.primary.900") 0%,
@@ -94,6 +94,16 @@
 * {
   scrollbar-width: thin;
   scrollbar-color: theme("colors.primary.500") theme("colors.primary.50");
+}
+
+/* ====================================== Global Font ====================================== */
+* {
+  font-family: "GE SS Two", sans-serif;
+}
+
+html,
+body {
+  font-family: "GE SS Two", sans-serif;
 }
 
 /* ====================================== Body ====================================== */

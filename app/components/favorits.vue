@@ -103,6 +103,10 @@ const activeTab = ref(tabs[0].key);
 /* Router */
 const router = useRouter();
 
+/* Authentication */
+const { isAuthenticated } = useAuth();
+const { showToast } = useCustomToast();
+
 /* Listings (mock data) */
 const listingsByTab = reactive({
   home: createListings("سنارة سمك كبيرة", "50 ر.س"),
@@ -121,7 +125,16 @@ function setActiveTab(key) {
 }
 
 function goToDetails(listing) {
-  // navigate to product page and pass the current tab in query for breadcrumb
+  // Check if user is authenticated
+  if (!isAuthenticated.value) {
+    // Show toast message asking visitor to login
+    showToast("warn", "يرجى تسجيل الدخول لعرض التفاصيل");
+    // Optionally redirect to login page
+    router.push("/login");
+    return;
+  }
+  
+  // If authenticated, navigate to product page and pass the current tab in query for breadcrumb
   router.push({
     path: `/product/${encodeURIComponent(listing.id)}`,
     query: {

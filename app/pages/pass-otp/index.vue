@@ -57,14 +57,37 @@
               </div>
             </div>
 
+            <!-- Error Message -->
+            <div
+              v-if="errorMessage"
+              class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm text-right"
+            >
+              {{ errorMessage }}
+            </div>
+
             <!-- CTA -->
             <button
               type="submit"
-              :disabled="!isOtpComplete"
-              class="w-full rounded-2xl bg-linear-to-l from-[#15C472] from-[0.05%] to-[#0A717E] to-[99.95%] py-4 text-white text-lg font-semibold shadow-[0_15px_30px_rgba(21,196,114,0.3)] transition-all duration-300 hover:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
-              @click="navigateTo('new-password')"
+              :disabled="!isOtpComplete || isLoading"
+              class="w-full rounded-2xl bg-linear-to-l from-[#15C472] from-[0.05%] to-[#0A717E] to-[99.95%] py-4 text-white text-lg font-semibold shadow-[0_15px_30px_rgba(21,196,114,0.3)] transition-all duration-300 hover:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              تعيين
+              <span v-if="isLoading" class="animate-spin">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              </span>
+              <span>{{ isLoading ? "جاري التحقق..." : "تعيين" }}</span>
             </button>
           </form>
         </div>
@@ -88,17 +111,28 @@
 <script setup lang="ts">
 import { computed, ref, type ComponentPublicInstance } from "vue";
 import langSwitch from "~/components/langSwitch.vue";
+import { submitApiForm } from "~/composables/useApiFetch";
 
 // Use clean auth layout (no nav/footer, just page content)
 definePageMeta({
   layout: 'auth-clean'
 });
 
-const OTP_LENGTH = 6;
+const { showToast } = useCustomToast();
+const route = useRoute();
+
+// Get phone, country_code, and iso from query parameters
+const phone = ref<string>(route.query.phone as string || "");
+const countryCode = ref<string>(route.query.country_code as string || "");
+const iso = ref<string>(route.query.iso as string || "");
+
+const OTP_LENGTH = 4;
 const otpDigits = ref<string[]>(Array(OTP_LENGTH).fill(""));
 const otpInputRefs = ref<(HTMLInputElement | null)[]>(
   Array(OTP_LENGTH).fill(null)
 );
+const isLoading = ref(false);
+const errorMessage = ref("");
 
 const setOtpInputRef = (
   el: Element | ComponentPublicInstance | null,
@@ -166,16 +200,67 @@ const isOtpComplete = computed(() =>
   otpDigits.value.every((digit) => digit !== "")
 );
 
-const handleSubmit = (event: Event) => {
-  // const form = event.target as HTMLFormElement;
-  // if (!form.checkValidity()) {
-  //   form.reportValidity();
-  //   return;
-  // }
+const handleSubmit = async (event: Event) => {
+  event.preventDefault();
+  
   if (!isOtpComplete.value) return;
+  
+  // Validate required parameters
+  if (!phone.value || !countryCode.value || !iso.value) {
+    errorMessage.value = "معلومات غير مكتملة. يرجى العودة إلى الصفحة السابقة";
+    showToast("error", "معلومات غير مكتملة. يرجى العودة إلى الصفحة السابقة");
+    return;
+  }
+  
+  // Reset error message
+  errorMessage.value = "";
+  
   const otpValue = otpDigits.value.join("");
-  console.log("Submitted OTP:", otpValue);
-  navigateTo("/");
+  
+  // Create FormData with all required parameters
+  const fd = new FormData();
+  fd.append("code", otpValue);
+  fd.append("phone", phone.value);
+  fd.append("country_code", countryCode.value);
+  fd.append("iso", iso.value);
+  
+  isLoading.value = true;
+  
+  try {
+    const { data, error }: any = await submitApiForm("forget-password-check-code", fd);
+    
+    if (error) {
+      const errorMsg = (error as any)?.msg || "حدث خطأ أثناء التحقق من رمز التحقق";
+      errorMessage.value = errorMsg;
+      showToast("error", errorMsg);
+      return;
+    }
+    
+    if (data && data.key === "success") {
+      showToast("success", data.msg || "تم التحقق من رمز التحقق بنجاح");
+      // Navigate to new password page with required parameters
+      navigateTo({
+        path: "/new-password",
+        query: {
+          code: otpValue,
+          phone: phone.value,
+          country_code: countryCode.value,
+          iso: iso.value,
+        },
+      });
+    } else {
+      const errorMsg = data?.msg || "رمز التحقق غير صحيح";
+      errorMessage.value = errorMsg;
+      showToast("error", errorMsg);
+    }
+  } catch (err: any) {
+    console.error("Error verifying OTP code:", err);
+    const errorMsg = err?.data?.msg || "حدث خطأ أثناء التحقق من رمز التحقق";
+    errorMessage.value = errorMsg;
+    showToast("error", errorMsg);
+  } finally {
+    isLoading.value = false;
+  }
 };
 </script>
 

@@ -147,10 +147,11 @@
             <div class="w-full">
               <button
                 v-if="!isOrderCancelled"
-                @click="cancelOrder"
-                class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                @click="openCancelOrderModal"
+                :disabled="isCancellingOrder"
+                class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                الغاء الطلب
+                {{ isCancellingOrder ? "جاري الإلغاء..." : "الغاء الطلب" }}
               </button>
               <button
                 v-else
@@ -656,10 +657,11 @@
           <div class="px-6 pb-6">
             <button
               type="button"
-              class="w-full bg-linear-to-r from-[#0A717E] to-[#15C472] text-white font-semibold py-3 rounded-lg shadow-sm hover:opacity-90 transition-all duration-200"
+              class="w-full bg-linear-to-r from-[#0A717E] to-[#15C472] text-white font-semibold py-3 rounded-lg shadow-sm hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              :disabled="isProcessingPayment"
               @click="handlePayment"
             >
-              تأكيد
+              {{ isProcessingPayment ? "جاري المعالجة..." : "تأكيد" }}
             </button>
           </div>
         </div>
@@ -744,6 +746,88 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- Cancellation Modal -->
+    <Teleport to="body">
+      <div
+        v-if="isCancellationModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cancellation-modal-title"
+        @click.self="closeCancelOrderModal"
+      >
+        <div
+          class="w-full max-w-2xl rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden"
+        >
+          <!-- Header -->
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2
+              id="cancellation-modal-title"
+              class="text-xl font-bold text-black text-right"
+            >
+              إلغاء الطلب
+            </h2>
+          </div>
+
+          <!-- Content -->
+          <div class="p-6">
+            <p class="text-gray-700 mb-4 text-right">
+              يرجى اختيار سبب إلغاء الطلب:
+            </p>
+            <!-- Cancellation Reasons -->
+            <div class="space-y-3">
+              <div
+                v-for="reason in cancellationReasons"
+                :key="reason.id || reason.reason_id"
+                @click="selectedCancellationReason = reason.id || reason.reason_id"
+                class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all"
+                :class="
+                  selectedCancellationReason === (reason.id || reason.reason_id)
+                    ? 'bg-gray-50 border-2 border-[#15C472]'
+                    : 'bg-gray-50 border-2 border-gray-200'
+                "
+              >
+                <label
+                  :for="`reason-${reason.id || reason.reason_id}`"
+                  class="flex-1 flex items-center justify-start cursor-pointer"
+                >
+                  <span class="text-black font-medium text-right">
+                    {{ reason.reason || reason.name || reason.reason_ar || reason.name_ar }}
+                  </span>
+                </label>
+                <input
+                  type="radio"
+                  :id="`reason-${reason.id || reason.reason_id}`"
+                  :value="reason.id || reason.reason_id"
+                  v-model="selectedCancellationReason"
+                  class="w-5 h-5 cursor-pointer accent-[#15C472]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer with buttons -->
+          <div class="px-6 pb-6 flex gap-3">
+            <button
+              type="button"
+              class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 rounded-lg transition-colors"
+              @click="closeCancelOrderModal"
+            >
+              إلغاء
+            </button>
+            <button
+              type="button"
+              class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg shadow-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              :disabled="isCancellingOrder || !selectedCancellationReason"
+              @click="cancelOrder"
+            >
+              {{ isCancellingOrder ? "جاري الإلغاء..." : "تأكيد الإلغاء" }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -783,12 +867,17 @@ const orderData = ref(null);
 const isLoadingOrder = ref(false);
 const orderError = ref(null);
 
-const buildAuthHeaders = () => {
+const buildAuthHeaders = (includeContentType = true) => {
   const headers = {
-    "Content-Type": "application/json",
+    "X-API-KEY": "5f43766dcd92b8c3e7639d2a8791063c",
+    lang: "ar",
     Accept: "application/json",
     "X-Requested-With": "XMLHttpRequest",
   };
+
+  if (includeContentType) {
+    headers["Content-Type"] = "application/json";
+  }
 
   let token = null;
   try {
@@ -823,7 +912,7 @@ const fetchCourseOrder = async () => {
 
   try {
     const response = await $fetch(
-      `https://backend.wattani-sa.com/api/v1/course-orders/${courseId.value}`,
+      `https://backend.wattani-sa.com/api/v1/course-orders/${orderId}`,
       {
         method: "GET",
         headers: buildAuthHeaders(),
@@ -897,10 +986,15 @@ function getStatusClass(status) {
 
 // Order cancellation state
 const isOrderCancelled = ref(false);
+const cancellationReasons = ref([]);
+const selectedCancellationReason = ref(null);
+const isCancellationModalOpen = ref(false);
+const isCancellingOrder = ref(false);
 
 // Payment modal state
 const isPaymentModalOpen = ref(false);
 const selectedPaymentMethod = ref("wallet");
+const isProcessingPayment = ref(false);
 
 // Rating modal state
 const isRatingModalOpen = ref(false);
@@ -913,14 +1007,101 @@ const userRating = ref({
 });
 const isSubmittingRating = ref(false);
 
+// Fetch cancellation reasons
+const fetchCancellationReasons = async () => {
+  try {
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/course-order-cancellation-reasons",
+      {
+        method: "GET",
+        headers: buildAuthHeaders(),
+      }
+    );
+
+    if (response?.key === "success" && response?.data) {
+      cancellationReasons.value = Array.isArray(response.data)
+        ? response.data
+        : response.data.reasons || [];
+    }
+  } catch (err) {
+    console.error("Error fetching cancellation reasons:", err);
+    // Set default reasons if API fails
+    cancellationReasons.value = [
+      { id: 1, reason: "غير مناسب" },
+      { id: 2, reason: "غير متاح" },
+      { id: 3, reason: "أسباب أخرى" },
+    ];
+  }
+};
+
 // Cancel order function
-const cancelOrder = () => {
-  // Add your cancel order logic here
-  // Handle order cancellation
-  console.log("Order cancelled:", orderId);
-  // Change button to payment button
-  isOrderCancelled.value = true;
-  // You can navigate back or show a success message
+const openCancelOrderModal = async () => {
+  if (cancellationReasons.value.length === 0) {
+    await fetchCancellationReasons();
+  }
+  isCancellationModalOpen.value = true;
+};
+
+const closeCancelOrderModal = () => {
+  isCancellationModalOpen.value = false;
+  selectedCancellationReason.value = null;
+};
+
+const cancelOrder = async () => {
+  if (!selectedCancellationReason.value) {
+    toast.add({
+      severity: "warn",
+      summary: "تنبيه",
+      detail: "يرجى اختيار سبب الإلغاء",
+      life: 3000,
+    });
+    return;
+  }
+
+  isCancellingOrder.value = true;
+
+  try {
+    const response = await $fetch(
+      `https://backend.wattani-sa.com/api/v1/course-orders/${orderId}/cancel`,
+      {
+        method: "POST",
+        headers: buildAuthHeaders(),
+        body: {
+          cancellation_reason_id: selectedCancellationReason.value,
+        },
+      }
+    );
+
+    if (response?.key === "success") {
+      toast.add({
+        severity: "success",
+        summary: "تم",
+        detail: response?.msg || "تم إلغاء الطلب بنجاح",
+        life: 3000,
+      });
+      isOrderCancelled.value = true;
+      closeCancelOrderModal();
+      // Refresh order data
+      await fetchCourseOrder();
+    } else {
+      throw new Error(response?.msg || "فشل في إلغاء الطلب");
+    }
+  } catch (err) {
+    console.error("Error cancelling order:", err);
+    const errorMessage =
+      err?.data?.msg ||
+      err?.data?.message ||
+      err?.message ||
+      "حدث خطأ أثناء إلغاء الطلب";
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: errorMessage,
+      life: 3000,
+    });
+  } finally {
+    isCancellingOrder.value = false;
+  }
 };
 
 // Payment modal functions
@@ -934,14 +1115,62 @@ const closePaymentModal = () => {
   selectedPaymentMethod.value = "wallet";
 };
 
-const handlePayment = () => {
-  // Add your payment logic here
-  console.log("Processing payment for order:", orderId);
-  console.log("Selected payment method:", selectedPaymentMethod.value);
-  // After successful payment, close the modal and reset button to red
-  closePaymentModal();
-  isOrderCancelled.value = false;
-  // You might want to show a success message or navigate to a success page
+const handlePayment = async () => {
+  if (!selectedPaymentMethod.value) {
+    toast.add({
+      severity: "warn",
+      summary: "تنبيه",
+      detail: "يرجى اختيار طريقة الدفع",
+      life: 3000,
+    });
+    return;
+  }
+
+  isProcessingPayment.value = true;
+
+  try {
+    // Map payment method to API payment_methods value
+    // wallet = 1, electronic = 2 (based on the API example showing payment_methods=2)
+    const paymentMethodId = selectedPaymentMethod.value === "wallet" ? 1 : 2;
+
+    const response = await $fetch(
+      `https://backend.wattani-sa.com/api/v1/course-orders/${orderId}/pay?payment_methods=${paymentMethodId}`,
+      {
+        method: "POST",
+        headers: buildAuthHeaders(),
+      }
+    );
+
+    if (response?.key === "success") {
+      toast.add({
+        severity: "success",
+        summary: "تم",
+        detail: response?.msg || "تم معالجة الدفع بنجاح",
+        life: 3000,
+      });
+      closePaymentModal();
+      isOrderCancelled.value = false;
+      // Refresh order data
+      await fetchCourseOrder();
+    } else {
+      throw new Error(response?.msg || "فشل في معالجة الدفع");
+    }
+  } catch (err) {
+    console.error("Error processing payment:", err);
+    const errorMessage =
+      err?.data?.msg ||
+      err?.data?.message ||
+      err?.message ||
+      "حدث خطأ أثناء معالجة الدفع";
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: errorMessage,
+      life: 3000,
+    });
+  } finally {
+    isProcessingPayment.value = false;
+  }
 };
 
 // Rating modal functions
@@ -1008,8 +1237,11 @@ const submitRating = async () => {
     // Remove Content-Type header to let browser set it with boundary for FormData
     const { 'Content-Type': _, ...formHeaders } = headers;
     
+    // Use the course ID for rating endpoint
+    const courseIdForRating = orderData.value?.courseId || courseId.value;
+    
     const response = await $fetch(
-      'https://backend.wattani-sa.com/api/v1/rate',
+      `https://backend.wattani-sa.com/api/v1/courses/${courseIdForRating}/rate`,
       {
         method: "POST",
         headers: formHeaders,
@@ -1092,13 +1324,22 @@ watch(
 watch(
   () => isRatingModalOpen.value,
   (isOpen) => {
-    updateBodyOverflow(isOpen || isPaymentModalOpen.value);
+    updateBodyOverflow(isOpen || isPaymentModalOpen.value || isCancellationModalOpen.value);
   },
   { immediate: true }
 );
 
-onMounted(() => {
-  fetchCourseOrder();
+// Watch for cancellation modal
+watch(
+  () => isCancellationModalOpen.value,
+  (isOpen) => {
+    updateBodyOverflow(isOpen || isPaymentModalOpen.value || isRatingModalOpen.value);
+  },
+  { immediate: true }
+);
+
+onMounted(async () => {
+  await fetchCourseOrder();
   if (isPaymentModalOpen.value || isRatingModalOpen.value) {
     updateBodyOverflow(true);
   }

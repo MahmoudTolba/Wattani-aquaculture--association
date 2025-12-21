@@ -6,7 +6,7 @@ const MyPreset = definePreset(Aura, {
   // Global design tokens that affect the entire theme
   designTokens: {
     fontFamily: {
-      sans: "Readex Pro, sans-serif", // Main font family
+      sans: '"GE SS Two", sans-serif', // Main font family
       // serif: "Georgia, serif", // Optional: serif font
       // mono: "Courier New, monospace", // Optional: monospace font
     },

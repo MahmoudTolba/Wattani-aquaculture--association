@@ -19,7 +19,22 @@
 
       <!-- Orders Grid -->
       <section class="mb-4 sm:mb-6">
+        <!-- Loading State -->
+        <div v-if="isLoading" class="text-center py-12">
+          <p class="text-lg text-gray-500">جاري التحميل...</p>
+        </div>
+
+        <!-- Error State -->
         <div
+          v-else-if="error"
+          class="text-center py-12 text-red-500"
+        >
+          <p class="text-lg">{{ error }}</p>
+        </div>
+
+        <!-- Orders Grid -->
+        <div
+          v-else
           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
         >
           <article
@@ -81,7 +96,7 @@
 
         <!-- Empty State -->
         <div
-          v-if="paginatedOrders.length === 0"
+          v-if="!isLoading && !error && paginatedOrders.length === 0"
           class="text-center py-12 text-gray-500"
         >
           <p class="text-lg">لا توجد طلبات في هذا القسم</p>
@@ -89,9 +104,8 @@
       </section>
 
       <!-- Pagination -->
-      <section class="mb-4 sm:mb-6 flex justify-center overflow-x-auto">
+      <section v-if="!isLoading && !error && totalOrders > rows" class="mb-4 sm:mb-6 flex justify-center overflow-x-auto">
         <Paginator
-          v-if="totalOrders > rows"
           :rows="rows"
           :total-records="totalOrders"
           :first="first"
@@ -105,11 +119,15 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
 import { useRouter } from "#imports";
+import { useUserStore } from "~/stores/user";
+import { storeToRefs } from "pinia";
 import Paginator from "primevue/paginator";
 
 const router = useRouter();
+const userStore = useUserStore();
+const { token } = storeToRefs(userStore);
 
 // Navigation Tabs
 const tabs = [
@@ -119,34 +137,167 @@ const tabs = [
   { key: "canceled", label: "ملغية" },
 ];
 
+// Tab to filter mapping
+const tabToFilterMap = {
+  new: "new",
+  current: "current",
+  finished: "completed",
+  canceled: "cancelled",
+};
+
 // Active Tab
 const activeTab = ref("new");
 
-// Set active tab method
-const setActiveTab = (key) => {
-  activeTab.value = key;
-  // Reset pagination when switching tabs
-  first.value = 0;
-};
+// Loading and error states
+const isLoading = ref(false);
+const error = ref(null);
+
+// Orders Data
+const ordersByTab = ref({
+  new: [],
+  current: [],
+  finished: [],
+  canceled: [],
+});
 
 // Pagination State
 const rows = ref(9); // Items per page
 const first = ref(0); // First item index
 
-// Orders Data - using composable
-// TODO: When API is ready, make this async and use await
-// Example: const ordersByTab = await createOrdersData("معلق", "new", 15)
-const { createOrders: createOrdersData } = useOrders();
-
-const ordersByTab = {
-  new: createOrdersData("معلق", "new", 15),
-  current: createOrdersData("تم القبول", "current", 12),
-  finished: createOrdersData("منتهي", "finished", 8),
-  canceled: createOrdersData("ملغي", "canceled", 5),
+// Set active tab method
+const setActiveTab = async (key) => {
+  activeTab.value = key;
+  // Reset pagination when switching tabs
+  first.value = 0;
+  // Fetch orders for the new tab if not already loaded
+  if (ordersByTab.value[key].length === 0) {
+    await fetchOrders(key);
+  }
 };
 
+// Build authentication headers
+const buildAuthHeaders = () => {
+  const headers = {
+    "X-API-KEY": "5f43766dcd92b8c3e7639d2a8791063c",
+    lang: "ar",
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "X-Requested-With": "XMLHttpRequest",
+  };
+
+  // Try to get token from store first
+  let authToken = token.value;
+
+  // Fallback to localStorage if not in store
+  if (!authToken && typeof window !== "undefined") {
+    try {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        authToken = parsedUser?.token || parsedUser?.access_token;
+      }
+    } catch (e) {
+      console.error("Error getting token from localStorage:", e);
+    }
+  }
+
+  if (authToken) {
+    headers["Authorization"] = `Bearer ${authToken}`;
+  }
+
+  return headers;
+};
+
+// Transform API order to component format
+const transformOrder = (apiOrder) => {
+  return {
+    id: apiOrder.id || apiOrder.order_id || `order-${apiOrder.id}`,
+    orderNumber: apiOrder.order_number || apiOrder.id?.toString() || "غير محدد",
+    status: getStatusLabel(apiOrder.status || apiOrder.order_status),
+    department: apiOrder.course?.name_ar || apiOrder.department || "دورات وطني",
+    price: apiOrder.price || apiOrder.total_price || apiOrder.amount || "0",
+    image: apiOrder.image || apiOrder.course?.image || apiOrder.thumbnail || "/images/card-img.jpg",
+    description: apiOrder.description || apiOrder.course?.description_ar || "",
+    location: apiOrder.location || apiOrder.address || "",
+    date: apiOrder.created_at || apiOrder.date || "",
+    contactNumber: apiOrder.contact_number || apiOrder.phone || "",
+    courseName: apiOrder.course?.name_ar || apiOrder.course_name || "",
+  };
+};
+
+// Get status label in Arabic
+const getStatusLabel = (status) => {
+  const statusMap = {
+    new: "معلق",
+    current: "تم القبول",
+    completed: "منتهي",
+    finished: "منتهي",
+    cancelled: "ملغي",
+    canceled: "ملغي",
+  };
+  return statusMap[status] || status || "غير محدد";
+};
+
+// Fetch orders from API
+const fetchOrders = async (tabKey) => {
+  const filter = tabToFilterMap[tabKey];
+  if (!filter) return;
+
+  isLoading.value = true;
+  error.value = null;
+
+  try {
+    const response = await $fetch(
+      `https://backend.wattani-sa.com/api/v1/my-course-orders?filter=${filter}`,
+      {
+        method: "GET",
+        headers: buildAuthHeaders(),
+      }
+    );
+
+    // Handle unauthenticated response
+    if (response && response.key === "unauthenticated") {
+      error.value = response.msg || "يرجى اعادة تسجيل الدخول";
+      ordersByTab.value[tabKey] = [];
+      return;
+    }
+
+    // Handle success response
+    if (response && response.key === "success") {
+      const ordersData = response.data || [];
+      // Handle paginated response
+      const orders = Array.isArray(ordersData) 
+        ? ordersData 
+        : (ordersData.data || ordersData.orders || []);
+      
+      ordersByTab.value[tabKey] = orders.map(transformOrder);
+    } else {
+      error.value = response?.msg || "فشل في جلب الطلبات";
+      ordersByTab.value[tabKey] = [];
+    }
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+    error.value = err?.data?.msg || err?.message || "حدث خطأ أثناء جلب الطلبات";
+    ordersByTab.value[tabKey] = [];
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Watch for tab changes and fetch data
+watch(activeTab, (newTab) => {
+  if (ordersByTab.value[newTab].length === 0) {
+    fetchOrders(newTab);
+  }
+});
+
+// Fetch initial data on mount
+onMounted(async () => {
+  await fetchOrders(activeTab.value);
+});
+
 const currentOrders = computed(() => {
-  return ordersByTab[activeTab.value] || ordersByTab.new;
+  return ordersByTab.value[activeTab.value] || [];
 });
 
 // Total orders count
