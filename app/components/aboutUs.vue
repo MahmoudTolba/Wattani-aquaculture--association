@@ -15,9 +15,7 @@
         <p v-else-if="error" class="leading-[52px] text-xl text-red-500">
           {{ error }}
         </p>
-        <p v-else-if="aboutData?.content" class="leading-[52px] text-xl">
-          {{ aboutData.content }}
-        </p>
+        <div v-else-if="hasContent" class="leading-[52px] text-xl" v-html="aboutData.content"></div>
         <p v-else class="leading-[52px] text-xl">
           هي جمعية تعاونية سعودية تعمل على تطوير وتنمية قطاع الاستزراع المائي في
           المملكة العربية السعودية، بما يواكب أهداف رؤية المملكة 2030 نحو تحقيق
@@ -52,6 +50,17 @@ import { computed, onMounted } from 'vue';
 const { landingPageData, isLoading, error, fetchLandingPageData } = useLandingPage();
 
 const aboutData = computed(() => landingPageData.value?.about);
+
+// Check if content has meaningful text (not just empty HTML tags)
+const hasContent = computed(() => {
+  if (!aboutData.value?.content) return false;
+  // Strip HTML tags and check if there's actual text content
+  const textContent = aboutData.value.content
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
+    .trim();
+  return textContent.length > 0;
+});
 
 // Fetch content on component mount
 onMounted(async () => {

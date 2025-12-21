@@ -56,11 +56,14 @@
           <div class="relative">
             <input
               id="main-search"
+              v-model="searchQuery"
               type="search"
               :placeholder="searchPlaceholder"
               class="w-full rounded-full border border-gray-200 bg-white text-sm text-gray-700 focus:border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none resize-none text-right transition pr-10 pl-4 py-2"
               :class="{ 'text-right': isRTL }"
               dir="auto"
+              @input="handleSearchInput"
+              @keyup.enter="handleSearch"
             />
             <span
               class="absolute inset-y-0 flex items-center text-gray-400"
@@ -154,11 +157,14 @@
               <div class="relative">
                 <input
                   id="mobile-search"
+                  v-model="searchQuery"
                   type="search"
                   :placeholder="searchPlaceholder"
                   class="w-full rounded-full border border-gray-200 bg-white text-sm text-gray-700 focus:border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none resize-none text-right transition pr-10 pl-4 py-2"
                   :class="{ 'text-right': isRTL }"
                   dir="auto"
+                  @input="handleSearchInput"
+                  @keyup.enter="handleSearch"
                 />
                 <span
                   class="absolute inset-y-0 flex items-center text-gray-400"
@@ -342,8 +348,11 @@ import { useRouter, useRoute } from "#imports";
 import CommitmentModal from "~/components/CommitmentModal.vue";
 import { useUserStore } from "~/stores/user";
 import { useNotificationsStore } from "~/stores/notifications";
+import { useAdverts } from "~/composables/useAdverts";
+
 const userStore = useUserStore();
 const notificationsStore = useNotificationsStore();
+const { searchAdverts } = useAdverts();
 
 const router = useRouter();
 const route = useRoute();
@@ -352,6 +361,9 @@ const windowWidth = ref(0);
 const isCommitmentModalOpen = ref(false);
 const mobileMenuRef = ref(null);
 const mobileMenuButtonRef = ref(null);
+const searchQuery = ref("");
+const isSearching = ref(false);
+let searchTimeout = null;
 
 const updateWindowWidth = () => {
   windowWidth.value = window.innerWidth;
@@ -397,6 +409,9 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener("resize", updateWindowWidth);
   document.removeEventListener("click", handleClickOutside);
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
 });
 const { locale } = useI18n();
 
@@ -490,6 +505,58 @@ const closeCommitmentModal = () => {
 const handleAgree = () => {
   isCommitmentModalOpen.value = false;
   router.push("/CreateAds");
+};
+
+// Search functionality
+const handleSearchInput = () => {
+  // Clear previous timeout
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+  
+  // Debounce search - wait 500ms after user stops typing
+  searchTimeout = setTimeout(() => {
+    if (searchQuery.value.trim()) {
+      handleSearch();
+    }
+  }, 500);
+};
+
+const handleSearch = async () => {
+  if (!searchQuery.value.trim()) {
+    return;
+  }
+
+  isSearching.value = true;
+  isMobileMenuOpen.value = false; // Close mobile menu on search
+
+  try {
+    // Call the search API
+    const results = await searchAdverts({
+      search: searchQuery.value.trim(),
+    });
+
+    // Navigate to services page with search query
+    await router.push({
+      path: "/services",
+      query: {
+        search: searchQuery.value.trim(),
+        tab: "benefits", // Default to benefits tab for search results
+      },
+    });
+  } catch (error) {
+    console.error("Error searching adverts:", error);
+    // Still navigate to services page even if API fails
+    await router.push({
+      path: "/services",
+      query: {
+        search: searchQuery.value.trim(),
+        tab: "benefits",
+      },
+    });
+  } finally {
+    isSearching.value = false;
+  }
 };
 </script>
 <style scoped>

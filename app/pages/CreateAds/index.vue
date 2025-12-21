@@ -315,8 +315,6 @@ const { addAd, updateAd } = useMyAds();
 const { user } = useAuth();
 const {
   getAdvert,
-  createAdvert,
-  updateAdvert,
   deleteAdvert,
   isLoading: isAdvertLoading,
 } = useAdverts();
@@ -785,10 +783,18 @@ const handleSubmit = async () => {
       }
     });
 
+    // TODO: Implement new API for creating/updating adverts
+    // Replace this section with your new API implementation
+    
     let response;
     if (isEditMode.value && advertId.value) {
-      // Update existing advert
-      response = await updateAdvert(advertId.value, formData);
+      // TODO: Update existing advert with new API
+      // Example:
+      // response = await $fetch('YOUR_NEW_API_ENDPOINT/update', {
+      //   method: 'POST',
+      //   headers: { ... },
+      //   body: formData
+      // });
       
       toast.add({
         severity: "success",
@@ -809,8 +815,13 @@ const handleSubmit = async () => {
       // Navigate to profile page
       await navigateTo('/profile?tab=my-ads');
     } else {
-      // Create new advert
-      response = await createAdvert(formData);
+      // TODO: Create new advert with new API
+      // Example:
+      // response = await $fetch('YOUR_NEW_API_ENDPOINT/create', {
+      //   method: 'POST',
+      //   headers: { ... },
+      //   body: formData
+      // });
       
       toast.add({
         severity: "success",
