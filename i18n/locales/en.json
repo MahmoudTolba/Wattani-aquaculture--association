@@ -203,15 +203,52 @@
   },
   "contact-us": {
     "title": "Contact Us",
-    "description": "We are here to help you. Please contact us for any questions or concerns.",
+    "description": "Wattani Aquaculture Association is a Saudi cooperative association working to develop and grow the aquaculture sector in the Kingdom of Saudi Arabia, in line with the goals of Saudi Vision 2030 towards achieving food security and environmental sustainability.",
     "name": "Name",
     "name_placeholder": "Enter your name",
     "phone": "Phone",
     "phone_placeholder": "Enter your phone",
+    "phone_placeholder_saudi": "5XX XXX XXX",
     "message": "Message",
     "message_placeholder": "Enter your message",
     "send": "Send",
-    "sending": "Sending..."
+    "sending": "Sending...",
+    "subject_prefix": "Message from",
+    "errors": {
+      "required_fields": "Please fill in all required fields",
+      "phone_saudi": "Please enter a valid Saudi phone number (05XXXXXXXX or 01XXXXXXXX)",
+      "phone_invalid": "Please enter a valid phone number",
+      "send_failed": "Failed to send message",
+      "send_error": "An error occurred while sending the message. Please try again."
+    },
+    "success": {
+      "message_sent": "Message sent successfully!"
+    },
+    "toast": {
+      "warning": "Warning",
+      "error": "Error",
+      "success": "Success"
+    },
+    "countries": {
+      "sa": "Saudi Arabia",
+      "ae": "United Arab Emirates",
+      "kw": "Kuwait",
+      "qa": "Qatar",
+      "bh": "Bahrain",
+      "om": "Oman",
+      "lb": "Lebanon",
+      "jo": "Jordan",
+      "eg": "Egypt",
+      "ma": "Morocco",
+      "dz": "Algeria",
+      "tn": "Tunisia",
+      "us": "United States",
+      "gb": "United Kingdom",
+      "fr": "France",
+      "de": "Germany",
+      "in": "India",
+      "cn": "China"
+    }
   },
   "create-ads": {
     "title": "Create Ads",
