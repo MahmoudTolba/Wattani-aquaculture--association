@@ -15,23 +15,42 @@
       >
         {{ error }}
       </p>
+      <div
+        v-else-if="hasContent"
+        class="text-gray-700 text-base sm:text-lg leading-relaxed text-start mb-4"
+        v-html="content"
+      ></div>
       <p
         v-else
-        class="text-gray-700 text-base sm:text-lg leading-relaxed text-start mb-4 whitespace-pre-line"
+        class="text-gray-500 text-base sm:text-lg leading-relaxed text-start mb-4"
       >
-        {{ content || "لا توجد بيانات متاحة حاليا" }}
+        لا توجد بيانات متاحة حاليا
       </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 interface Props {
   isLoading: boolean;
   error: string | null;
   content: string;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+// Check if content has meaningful text (not just empty HTML tags)
+const hasContent = computed(() => {
+  if (!props.content) return false;
+  // Strip HTML tags and check if there's actual text content
+  const textContent = props.content
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
+    .replace(/&[a-z]+;/gi, ' ') // Replace other HTML entities
+    .trim();
+  return textContent.length > 0;
+});
 </script>
 

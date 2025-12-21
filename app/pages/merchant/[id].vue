@@ -35,7 +35,7 @@
           <div
             class="absolute top-4 sm:top-5 left-4 sm:left-5 flex items-center gap-1 text-gray-500 text-sm"
           >
-            <span class="font-bold pt-1">4.5</span>
+            <span class="font-bold pt-1">{{ merchant.rating }}</span>
             <img
               src="/icons/rating-star.svg"
               alt="star-icon"
@@ -43,12 +43,15 @@
             />
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-4">
+          <div v-if="isLoadingMerchant" class="flex items-center justify-center p-8">
+            <div class="w-8 h-8 border-4 border-[#15C472] border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <div v-else class="flex flex-col sm:flex-row gap-4">
             <!-- Profile Image -->
             <div class="shrink-0">
               <img
-                src="/images/card-user.jpg"
-                alt="Merchant Profile"
+                :src="merchant.image"
+                :alt="merchant.name"
                 class="w-full sm:w-32 sm:h-32 rounded-xl object-cover shadow-sm"
               />
             </div>
@@ -57,33 +60,37 @@
             <div class="grow flex flex-col gap-3">
               <!-- Name -->
               <h2 class="text-lg sm:text-xl font-bold text-gray-900 text-right">
-                عبد العزيز الجبيري
+                {{ merchant.name }}
               </h2>
 
               <!-- Contact Buttons Row -->
               <div class="flex flex-wrap gap-2 justify-start">
                 <!-- Mobile Button -->
                 <button
+                  v-if="merchant.phone"
                   class="flex items-center gap-2 bg-white border border-gray-100 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors shadow-sm"
+                  @click="window.location.href = `tel:${merchant.phone}`"
                 >
                   <img
                     src="/icons/phone-icon.svg"
                     alt="phone-icon"
                     class="w-4 h-4 text-[#15C472]"
                   />
-                  <span>رقم جوال المعلن</span>
+                  <span>{{ merchant.phone }}</span>
                 </button>
 
                 <!-- Email Button -->
                 <button
+                  v-if="merchant.email"
                   class="flex items-center gap-2 bg-white border border-gray-100 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors shadow-sm"
+                  @click="window.location.href = `mailto:${merchant.email}`"
                 >
                   <img
                     src="/icons/email-icon.svg"
                     alt="email-icon"
                     class="w-4 h-4 text-[#15C472]"
                   />
-                  <span>البريد الالكتروني</span>
+                  <span>{{ merchant.email }}</span>
                 </button>
               </div>
 
@@ -104,21 +111,28 @@
 
                 <!-- Follow Button -->
                 <button
-                  class="flex items-center gap-2 bg-white border border-gray-100 px-4 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:text-teal-600 hover:bg-teal-50 transition-colors shadow-sm"
+                  class="flex items-center gap-2 bg-white border border-gray-100 px-4 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:text-teal-600 hover:bg-teal-50 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   @click="toggleFollow"
+                  :disabled="isLoadingFollow"
                 >
+                  <div
+                    v-if="isLoadingFollow"
+                    class="w-4 h-4 border-2 border-[#15C472] border-t-transparent rounded-full animate-spin"
+                  ></div>
                   <img
+                    v-else
                     src="/icons/follow.svg"
                     alt="follow-icon"
                     class="w-4 h-4 text-[#15C472]"
                   />
-                  <span>{{ isFollowing ? "الغاء المتابعة" : "متابعة" }}</span>
+                  <span>{{ isLoadingFollow ? "جاري التحميل..." : (isFollowing ? "الغاء المتابعة" : "متابعة") }}</span>
                 </button>
                 <button
+                  v-if="merchant.consultation_price"
                   class="flex items-center gap-2 bg-white border border-gray-100 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors shadow-sm"
                 >
                   <span> سعر الاستشارة </span>
-                  <span class="text-xs font-bold text-[#15C472]"> 20 </span>
+                  <span class="text-xs font-bold text-[#15C472]"> {{ merchant.consultation_price }} </span>
                   <img
                     src="/icons/green-currency.svg"
                     alt="email-icon"
@@ -133,8 +147,27 @@
         <div
           class="bg-[#F8F9FA] rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 flex flex-col justify-center gap-4 sm:gap-5 hover:shadow-md transition-shadow order-2 lg:order-1"
         >
-          <!-- Location 1 -->
+          <!-- Locations -->
           <div
+            v-for="(location, index) in merchant.locations"
+            :key="index"
+            class="flex items-center justify-end lg:justify-start gap-3 text-gray-800"
+          >
+            <div class="w-8 flex justify-center">
+              <img
+                src="/icons/located.svg"
+                alt="location-icon"
+                class="w-5 h-5 sm:w-6 sm:h-6 text-teal-500"
+              />
+            </div>
+            <span class="text-base sm:text-lg font-medium text-right flex-1"
+              >{{ location.address || location.name || location }}</span
+            >
+          </div>
+
+          <!-- Default location if no locations from API -->
+          <div
+            v-if="merchant.locations.length === 0"
             class="flex items-center justify-end lg:justify-start gap-3 text-gray-800"
           >
             <div class="w-8 flex justify-center">
@@ -149,25 +182,11 @@
             >
           </div>
 
-          <!-- Location 2 -->
-          <div
-            class="flex items-center justify-end lg:justify-start gap-3 text-gray-800"
-          >
-            <div class="w-8 flex justify-center">
-              <img
-                src="/icons/located.svg"
-                alt="location-icon"
-                class="w-5 h-5 sm:w-6 sm:h-6 text-teal-500"
-              />
-            </div>
-            <span class="text-base sm:text-lg font-medium text-right flex-1"
-              >٢١ شارع إبراهيم الزاوي الرياض</span
-            >
-          </div>
-
           <!-- WhatsApp -->
           <a
-            href="#"
+            v-if="merchant.whatsapp"
+            :href="`https://wa.me/${merchant.whatsapp.replace(/[^0-9]/g, '')}`"
+            target="_blank"
             class="flex items-center justify-end lg:justify-start gap-3 text-gray-800 cursor-pointer group"
           >
             <div class="w-8 flex justify-center">
@@ -418,7 +437,7 @@
 </template>
 
 <script setup>
-import { computed, ref, nextTick, reactive } from "vue";
+import { computed, ref, nextTick, reactive, onMounted, watch } from "vue";
 import { useRoute } from "#imports";
 import { useToast } from "primevue/usetoast";
 
@@ -426,6 +445,295 @@ const route = useRoute();
 const toast = useToast();
 const { id } = route.params;
 const from = route.query.from;
+
+// Loading states
+const isLoadingMerchant = ref(false);
+const isLoadingReviews = ref(false);
+const isLoadingProducts = ref(false);
+const isLoadingFollow = ref(false);
+
+// Merchant data
+const merchant = ref({
+  id: null,
+  name: "",
+  image: "/images/card-user.jpg",
+  rating: 4.5,
+  phone: "",
+  email: "",
+  whatsapp: "",
+  locations: [],
+  consultation_price: 20,
+  is_following: false,
+});
+
+// Build auth headers helper
+const buildAuthHeaders = () => {
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "X-Requested-With": "XMLHttpRequest",
+  };
+
+  let token = null;
+  try {
+    const userStore = useState("auth.user");
+    token = userStore?.value?.token || userStore?.value?.access_token || null;
+  } catch (e) {
+    // ignore if store not available
+  }
+
+  if (!token && process.client) {
+    try {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        token = parsedUser?.token || parsedUser?.access_token;
+      }
+    } catch (e) {
+      console.error("Error getting token from localStorage:", e);
+    }
+  }
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  return headers;
+};
+
+// Fetch merchant details
+const fetchMerchantDetails = async () => {
+  isLoadingMerchant.value = true;
+  try {
+    // Determine endpoint based on the 'from' parameter
+    // If from=experts, use consultants endpoint, otherwise use users endpoint
+    const endpoint =
+      from === "experts"
+        ? `https://backend.wattani-sa.com/api/v1/consultants/${id}`
+        : `https://backend.wattani-sa.com/api/v1/users/${id}`;
+
+    const response = await $fetch(endpoint, {
+      method: "GET",
+      headers: buildAuthHeaders(),
+    });
+
+    if (response && response.key === "success" && response.data) {
+      const data = response.data;
+      
+      // Handle consultant data structure
+      if (from === "experts") {
+        merchant.value = {
+          id: data.id || id,
+          name: data.name || data.user?.name || data.full_name || "غير معروف",
+          image: data.image || data.avatar || data.user?.avatar || data.photo || "/images/card-user.jpg",
+          rating: data.rating || data.avg_rating || data.rate || 4.5,
+          phone: data.phone || data.mobile || data.user?.phone || "",
+          email: data.email || data.user?.email || "",
+          whatsapp: data.whatsapp || data.whatsapp_number || data.user?.whatsapp || "",
+          locations: data.locations || data.addresses || (data.location ? [data.location] : []),
+          consultation_price: data.consultation_cost || data.consultation_price || data.price || 20,
+          is_following: data.is_following || false,
+        };
+      } else {
+        // Handle regular user data structure
+        merchant.value = {
+          id: data.id || id,
+          name: data.name || data.full_name || "غير معروف",
+          image: data.image || data.avatar || "/images/card-user.jpg",
+          rating: data.rating || data.avg_rating || 4.5,
+          phone: data.phone || data.mobile || "",
+          email: data.email || "",
+          whatsapp: data.whatsapp || data.whatsapp_number || "",
+          locations: data.locations || data.addresses || [],
+          consultation_price: data.consultation_price || data.price || 20,
+          is_following: data.is_following || false,
+        };
+      }
+      
+      isFollowing.value = merchant.value.is_following;
+    } else if (response?.key === "unauthenticated") {
+      toast.add({
+        severity: "warn",
+        summary: "تنبيه",
+        detail: response?.msg || "يرجى تسجيل الدخول لعرض بيانات التاجر",
+        life: 3000,
+      });
+    } else {
+      toast.add({
+        severity: "warn",
+        summary: "تنبيه",
+        detail: response?.msg || "فشل في جلب بيانات التاجر",
+        life: 3000,
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching merchant details:", error);
+    
+    // Handle unauthenticated error specifically
+    if (error?.data?.key === "unauthenticated" || error?.statusCode === 401) {
+      toast.add({
+        severity: "warn",
+        summary: "تنبيه",
+        detail: error?.data?.msg || "يرجى تسجيل الدخول لعرض بيانات التاجر",
+        life: 3000,
+      });
+    } else {
+      toast.add({
+        severity: "error",
+        summary: "خطأ",
+        detail: error?.data?.msg || error?.message || "حدث خطأ أثناء جلب بيانات التاجر",
+        life: 3000,
+      });
+    }
+  } finally {
+    isLoadingMerchant.value = false;
+  }
+};
+
+// Fetch merchant reviews
+const fetchReviews = async () => {
+  isLoadingReviews.value = true;
+  try {
+    // Use consultants endpoint for reviews if from=experts
+    const endpoint =
+      from === "experts"
+        ? `https://backend.wattani-sa.com/api/v1/consultants/${id}/reviews`
+        : `https://backend.wattani-sa.com/api/v1/users/${id}/reviews`;
+
+    const response = await $fetch(endpoint, {
+      method: "GET",
+      headers: buildAuthHeaders(),
+    });
+
+    if (response && response.key === "success" && response.data) {
+      const reviewsData = Array.isArray(response.data)
+        ? response.data
+        : response.data.data || [];
+      reviews.value = reviewsData.map((review) => ({
+        name: review.user?.name || review.name || "مستخدم",
+        rating: review.rating || 0,
+        text: review.comment || review.text || "",
+        isNew: false,
+      }));
+    }
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    // Don't show error toast for reviews, just use empty array
+  } finally {
+    isLoadingReviews.value = false;
+  }
+};
+
+// Fetch merchant products/services
+const fetchProducts = async () => {
+  isLoadingProducts.value = true;
+  try {
+    // Determine endpoint based on active tab
+    let endpoint = "";
+    
+    // If we're viewing a consultant (from=experts) and the active tab is "experts",
+    // we don't need to fetch consultants again - we're already viewing one
+    // Instead, we can fetch their consultations/services or skip
+    if (from === "experts" && activeMainTab.value === "experts") {
+      // For consultant's own page, maybe fetch consultations or skip
+      // For now, skip fetching and use empty array or existing data
+      isLoadingProducts.value = false;
+      return;
+    }
+    
+    switch (activeMainTab.value) {
+      case "benefits":
+        endpoint = `https://backend.wattani-sa.com/api/v1/adverts?user_id=${id}`;
+        break;
+      case "experts":
+        // When viewing a regular user's page and experts tab is selected
+        // Try to fetch their consultations if available, otherwise skip
+        endpoint = `https://backend.wattani-sa.com/api/v1/consultations?user_id=${id}`;
+        break;
+      case "courses":
+        endpoint = `https://backend.wattani-sa.com/api/v1/courses?user_id=${id}`;
+        break;
+      default:
+        endpoint = `https://backend.wattani-sa.com/api/v1/adverts?user_id=${id}`;
+    }
+
+    const response = await $fetch(endpoint, {
+      method: "GET",
+      headers: buildAuthHeaders(),
+    });
+
+    if (response && response.key === "success" && response.data) {
+      const productsData = Array.isArray(response.data)
+        ? response.data
+        : response.data.data || [];
+
+      // Transform API response to match product structure
+      const transformedProducts = productsData.map((item, index) => ({
+        id: item.id || `${activeMainTab.value}-${index}`,
+        title: item.title || item.name || "عنوان غير محدد",
+        price: item.price || item.consultation_cost || "0 ر.س",
+        rating: item.rating || item.avg_rating || "4.5",
+        image: item.image || item.photo || item.avatar || "/images/card-img.jpg",
+        location: item.location || item.city || "مدينة الرياض",
+        timeAgo: item.created_at
+          ? formatTimeAgo(item.created_at)
+          : "منذ ٦ ساعات",
+        owner: {
+          name: merchant.value.name || "عبد العزيز الجبيري",
+          avatar: merchant.value.image || "/images/card-user.jpg",
+        },
+        isFav: item.is_favorite || false,
+      }));
+
+      // Update products based on active tab
+      if (activeProductTab.value === "all") {
+        productsByMainTab[activeMainTab.value].all = transformedProducts;
+      } else {
+        // If you have category filtering, implement it here
+        productsByMainTab[activeMainTab.value].all = transformedProducts;
+      }
+    } else if (response?.key === "exception" || response?.key === "error") {
+      // Handle 404 or other errors silently for products
+      console.warn("Products endpoint returned error:", response?.msg);
+      // Keep existing products or use empty array
+      productsByMainTab[activeMainTab.value].all = [];
+    }
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    // Don't show error toast, just keep existing products or use empty array
+    // If it's a 404, that's expected for some endpoints
+    if (error?.statusCode !== 404) {
+      console.warn("Non-404 error fetching products:", error);
+    }
+    productsByMainTab[activeMainTab.value].all = [];
+  } finally {
+    isLoadingProducts.value = false;
+  }
+};
+
+// Helper function to format time ago
+const formatTimeAgo = (dateString) => {
+  // Simple implementation - you can use a library like date-fns or moment
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+  
+  if (diffInHours < 1) return "منذ أقل من ساعة";
+  if (diffInHours < 24) return `منذ ${diffInHours} ساعة`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 7) return `منذ ${diffInDays} يوم`;
+  const diffInWeeks = Math.floor(diffInDays / 7);
+  return `منذ ${diffInWeeks} أسبوع`;
+};
+
+// Load data on mount
+onMounted(async () => {
+  await Promise.all([
+    fetchMerchantDetails(),
+    fetchReviews(),
+    fetchProducts(),
+  ]);
+});
 
 // Report Modal State
 const isReportModalOpen = ref(false);
@@ -448,8 +756,51 @@ const handleReportSubmit = (reportData) => {
 // Follow State
 const isFollowing = ref(false);
 
-const toggleFollow = () => {
-  isFollowing.value = !isFollowing.value;
+const toggleFollow = async () => {
+  isLoadingFollow.value = true;
+
+  try {
+    const response = await $fetch(
+      "https://backend.wattani-sa.com/api/v1/users/toggle-follow",
+      {
+        method: "POST",
+        headers: buildAuthHeaders(),
+        body: {
+          user_id: id,
+        },
+      }
+    );
+
+    if (response && response.key === "success") {
+      isFollowing.value = !isFollowing.value;
+      merchant.value.is_following = isFollowing.value;
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: isFollowing.value
+          ? "تمت المتابعة بنجاح"
+          : "تم إلغاء المتابعة بنجاح",
+        life: 3000,
+      });
+    } else {
+      toast.add({
+        severity: "warn",
+        summary: "تنبيه",
+        detail: response?.msg || "فشل في تحديث حالة المتابعة",
+        life: 3000,
+      });
+    }
+  } catch (error) {
+    console.error("Error toggling follow:", error);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: error?.data?.msg || error?.message || "حدث خطأ أثناء تحديث حالة المتابعة",
+      life: 3000,
+    });
+  } finally {
+    isLoadingFollow.value = false;
+  }
 };
 
 // Reviews State
@@ -490,7 +841,7 @@ const setRating = (value) => {
   }
 };
 
-const submitReview = () => {
+const submitReview = async () => {
   // Basic Validation
   if (currentRating.value === 0) {
     toast.add({
@@ -511,31 +862,75 @@ const submitReview = () => {
     return;
   }
 
-  // Add new review
-  const newReview = {
-    name: "مستخدم جديد",
-    rating: currentRating.value,
-    text: reviewText.value.trim(),
-    isNew: true,
-  };
+  try {
+    // Use consultants endpoint for reviews if from=experts
+    const endpoint =
+      from === "experts"
+        ? `https://backend.wattani-sa.com/api/v1/consultants/${id}/reviews`
+        : `https://backend.wattani-sa.com/api/v1/users/${id}/reviews`;
 
-  reviews.value.push(newReview);
+    const response = await $fetch(endpoint, {
+      method: "POST",
+      headers: buildAuthHeaders(),
+      body: {
+        rating: currentRating.value,
+        comment: reviewText.value.trim(),
+      },
+    });
 
-  // Reset form
-  reviewText.value = "";
-  setRating(0);
-  hoverRating.value = 0;
+    if (response && response.key === "success") {
+      // Add new review to list
+      const newReview = {
+        name: "مستخدم جديد",
+        rating: currentRating.value,
+        text: reviewText.value.trim(),
+        isNew: true,
+      };
 
-  // Scroll to new review
-  nextTick(() => {
-    const reviewElements = document.querySelectorAll(".animate-fade-in");
-    if (reviewElements.length > 0) {
-      reviewElements[reviewElements.length - 1].scrollIntoView({
-        behavior: "smooth",
-        block: "center",
+      reviews.value.push(newReview);
+
+      // Reset form
+      reviewText.value = "";
+      setRating(0);
+      hoverRating.value = 0;
+
+      toast.add({
+        severity: "success",
+        summary: "نجح",
+        detail: "تم إضافة التقييم بنجاح",
+        life: 3000,
+      });
+
+      // Scroll to new review
+      nextTick(() => {
+        const reviewElements = document.querySelectorAll(".animate-fade-in");
+        if (reviewElements.length > 0) {
+          reviewElements[reviewElements.length - 1].scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }
+      });
+
+      // Refresh reviews from API
+      await fetchReviews();
+    } else {
+      toast.add({
+        severity: "warn",
+        summary: "تنبيه",
+        detail: response?.msg || "فشل في إضافة التقييم",
+        life: 3000,
       });
     }
-  });
+  } catch (error) {
+    console.error("Error submitting review:", error);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: error?.data?.msg || error?.message || "حدث خطأ أثناء إضافة التقييم",
+      life: 3000,
+    });
+  }
 };
 
 // Main Category Tabs
@@ -546,6 +941,11 @@ const mainTabs = [
 ];
 
 const activeMainTab = ref(from || "benefits");
+
+// Watch for tab changes to fetch products
+watch(activeMainTab, () => {
+  fetchProducts();
+});
 
 // Products Section
 const productTabs = [

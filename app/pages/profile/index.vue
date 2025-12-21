@@ -1842,9 +1842,6 @@
             <!-- Contact Us Tab Content -->
             <ContactUsTabContent
               v-if="activeTab === 'contact-us'"
-              v-model:form="contactForm"
-              :is-sending="isSendingContact"
-              @submit="handleContactUsSubmit"
             />
           </div>
 
