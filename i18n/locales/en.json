@@ -149,6 +149,7 @@
   "footer": {
     "copyright": "Wattani © 2025",
     "all_rights_reserved": "All rights reserved",
+    "description": "This text can be replaced with<br />another text in the same space",
     "home": "Home",
     "about-us": "About us",
     "services": "Services",
@@ -156,7 +157,49 @@
     "privacy": "Privacy policy",
     "terms": "Terms of service",
     "faq": "FAQ",
-    "support": "Support"
+    "support": "Support",
+    "app_store": "App Store",
+    "google_play": "Google Play"
+  },
+  "faq_page": {
+    "title": "Frequently Asked Questions",
+    "loading": "Loading...",
+    "retry": "Retry",
+    "load_error": "Failed to load content",
+    "error_message": "An error occurred while loading content. Please try again."
+  },
+  "favorites": {
+    "title": "Favorites",
+    "loading": "Loading favorites...",
+    "retry": "Retry",
+    "empty": "No items in favorites currently",
+    "save_ad": "Save ad",
+    "fallbacks": {
+      "title": "Title not available",
+      "location": "Location not specified",
+      "user": "User",
+      "time": "Some time ago"
+    },
+    "errors": {
+      "unauthenticated": "Please login to view favorites",
+      "load_error": "An error occurred while loading favorites. Please try again.",
+      "ad_id_missing": "Ad ID not found",
+      "update_error": "An error occurred while updating favorites"
+    },
+    "success": {
+      "removed": "Ad removed from favorites"
+    },
+    "toast": {
+      "error": "Error",
+      "success": "Success"
+    }
+  },
+  "about-us": {
+    "title": "About us",
+    "heading": "Wattani Aquaculture Association",
+    "loading": "Loading...",
+    "fallback_description": "A Saudi cooperative association working to develop and grow the aquaculture sector in the Kingdom of Saudi Arabia, in line with the goals of Saudi Vision 2030 towards achieving food security and environmental sustainability. The association seeks to empower farmers and producers in the field of aquaculture by providing technical and advisory support, promoting innovation in production technologies, and providing a cooperative work environment that contributes to raising the efficiency and quality of local products. \"Wattani\" also works to encourage sustainable projects in inland waters and expand the investment base in this vital sector, to be a fundamental pillar in achieving economic development and providing job opportunities for the local community.",
+    "image_alt": "Fish Image"
   },
   "contact-us": {
     "title": "Contact Us",
@@ -196,5 +239,91 @@
     "location_content": "Map content area / location selection",
     "submit": "Submit",
     "close": "Close"
-}
+  },
+  "notifications": {
+    "title": "Notifications",
+    "delete_all": "Delete All",
+    "loading": "Loading notifications...",
+    "no_notifications": "No notifications currently",
+    "retry": "Retry",
+    "delete_notification": "Delete Notification",
+    "delete_confirm_title": "Delete Notifications",
+    "delete_confirm_message": "Are you sure you want to delete all notifications?",
+    "confirm_delete": "Confirm Delete",
+    "deleting": "Deleting...",
+    "cancel": "Cancel",
+    "error": {
+      "title": "Error",
+      "loading": "An error occurred while loading notifications. Please try again.",
+      "unauthenticated": "Please login to view notifications",
+      "delete": "An error occurred while deleting the notification",
+      "delete_all": "An error occurred while deleting notifications",
+      "update": "An error occurred while updating the notification"
+    },
+    "success": {
+      "title": "Success",
+      "deleted": "Notification deleted successfully",
+      "deleted_all": "All notifications deleted successfully",
+      "marked_read": "Notification marked as read"
+    },
+    "date": {
+      "now": "Now",
+      "minutes_ago": "{count} minutes ago",
+      "hours_ago": "{count} hours ago",
+      "days_ago": "{count} days ago",
+      "default": "Notification"
+    }
+  },
+  "modals": {
+    "delete_ad": {
+      "title": "Are you sure you want to delete the ad?",
+      "delete_button": "Delete Product",
+      "deleting": "Deleting...",
+      "cancel": "Cancel"
+    },
+    "delete_account": {
+      "title": "Are you sure you want to delete your account?",
+      "yes": "Yes",
+      "no": "No",
+      "deleting": "Deleting..."
+    },
+    "package_payment": {
+      "title": "Select Payment Method",
+      "wallet": "Wallet",
+      "electronic": "Electronic Payment",
+      "confirm": "Confirm",
+      "processing": "Processing..."
+    },
+    "commission_payment": {
+      "title": "Select Payment Method",
+      "wallet": "Wallet",
+      "electronic": "Electronic Payment",
+      "confirm": "Confirm"
+    },
+    "location": {
+      "title": "Select Location",
+      "close": "Close",
+      "cancel": "Cancel",
+      "save_location": "Save Location",
+      "location_details": "Location Details",
+      "latitude": "Latitude:",
+      "longitude": "Longitude:",
+      "address": "Address:",
+      "confirm": "Confirm"
+    },
+    "logout": {
+      "title": "Are you sure you want to log out?",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "charge_wallet": {
+      "title": "Charge",
+      "subtitle": "Charge your wallet",
+      "placeholder": "Charge wallet",
+      "charge": "Charge"
+    },
+    "success": {
+      "default_title": "Subscription successful"
+    }
+  }
 }

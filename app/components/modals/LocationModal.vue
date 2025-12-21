@@ -17,14 +17,15 @@
           <h2
             id="location-modal-title"
             class="text-xl sm:text-2xl font-semibold text-gray-900"
+            :class="isRTL ? 'text-right' : 'text-left'"
           >
-            تحديد الموقع
+            {{ t('modals.location.title') }}
           </h2>
           <button
             type="button"
             class="text-gray-500 hover:text-gray-700 transition p-2 rounded-lg hover:bg-gray-100"
             @click="$emit('update:modelValue', false)"
-            aria-label="إغلاق"
+            :aria-label="t('modals.location.close')"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -51,13 +52,13 @@
         </div>
         
         <!-- Footer with action buttons -->
-        <div class="p-4 sm:p-6 border-t border-gray-200 flex items-center justify-end gap-3">
+        <div class="p-4 sm:p-6 border-t border-gray-200 flex items-center gap-3" :class="isRTL ? 'justify-end' : 'justify-start'">
           <button
             type="button"
             class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition"
             @click="$emit('update:modelValue', false)"
           >
-            إلغاء
+            {{ t('modals.location.cancel') }}
           </button>
           <button
             type="button"
@@ -65,7 +66,7 @@
             class="px-5 py-2 text-sm font-semibold text-white bg-[#15c472] rounded-lg shadow hover:bg-[#12a866] transition disabled:opacity-50 disabled:cursor-not-allowed"
             @click="confirmLocation"
           >
-            حفظ الموقع
+            {{ t('modals.location.save_location') }}
           </button>
         </div>
       </div>
@@ -83,7 +84,7 @@
           @click.stop
         >
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">تفاصيل الموقع</h3>
+            <h3 class="text-lg font-semibold text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">{{ t('modals.location.location_details') }}</h3>
             <button
               type="button"
               class="text-gray-400 hover:text-gray-600 transition"
@@ -108,33 +109,33 @@
           
           <div class="space-y-3">
             <div>
-              <label class="text-sm font-medium text-gray-700">خط العرض:</label>
-              <p class="text-sm text-gray-900">{{ selectedLocation.lat.toFixed(6) }}</p>
+              <label class="text-sm font-medium text-gray-700" :class="isRTL ? 'text-right' : 'text-left'">{{ t('modals.location.latitude') }}</label>
+              <p class="text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">{{ selectedLocation.lat.toFixed(6) }}</p>
             </div>
             <div>
-              <label class="text-sm font-medium text-gray-700">خط الطول:</label>
-              <p class="text-sm text-gray-900">{{ selectedLocation.lng.toFixed(6) }}</p>
+              <label class="text-sm font-medium text-gray-700" :class="isRTL ? 'text-right' : 'text-left'">{{ t('modals.location.longitude') }}</label>
+              <p class="text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">{{ selectedLocation.lng.toFixed(6) }}</p>
             </div>
             <div v-if="selectedLocation.address">
-              <label class="text-sm font-medium text-gray-700">العنوان:</label>
-              <p class="text-sm text-gray-900">{{ selectedLocation.address }}</p>
+              <label class="text-sm font-medium text-gray-700" :class="isRTL ? 'text-right' : 'text-left'">{{ t('modals.location.address') }}</label>
+              <p class="text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">{{ selectedLocation.address }}</p>
             </div>
           </div>
           
-          <div class="mt-6 flex gap-3">
+          <div class="mt-6 flex gap-3" :class="isRTL ? 'flex-row' : 'flex-row-reverse'">
             <button
               type="button"
               class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
               @click="closeLocationDialog"
             >
-              إلغاء
+              {{ t('modals.location.cancel') }}
             </button>
             <button
               type="button"
               class="flex-1 px-4 py-2 bg-[#15c472] text-white rounded-lg text-sm font-medium hover:bg-[#12a866] transition"
               @click="confirmLocation"
             >
-              تأكيد
+              {{ t('modals.location.confirm') }}
             </button>
           </div>
         </div>
@@ -144,7 +145,10 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted, nextTick } from "vue";
+import { ref, watch, onMounted, onUnmounted, nextTick, computed } from "vue";
+
+const { t, locale } = useI18n();
+const isRTL = computed(() => locale.value === "ar");
 
 let L = null;
 

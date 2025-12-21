@@ -2,14 +2,14 @@
   <div>
     <div class="mt-8">
       <div>
-        <div class="privacy-policy">
+        <div class="privacy-policy" :class="{ 'rtl': isRTL, 'ltr': !isRTL }">
           <div class="container">
             <!-- Loading State -->
             <div v-if="isLoading" class="policy-content bg-white p-6 rounded-md shadow-md">
               <div class="flex items-center justify-center min-h-[400px]">
                 <div class="text-center">
                   <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#0a9687] mb-4"></div>
-                  <p class="text-gray-600">جاري التحميل...</p>
+                  <p class="text-gray-600">{{ t('faq_page.loading') }}</p>
                 </div>
               </div>
             </div>
@@ -22,7 +22,7 @@
                   @click="fetchFAQContent"
                   class="px-6 py-2 bg-[#0a9687] text-white rounded-md hover:bg-[#088a7b] transition"
                 >
-                  إعادة المحاولة
+                  {{ t('faq_page.retry') }}
                 </button>
               </div>
             </div>
@@ -30,7 +30,7 @@
             <!-- Content -->
             <div v-else-if="faqItems && faqItems.length > 0" class="policy-content bg-white p-6 rounded-md shadow-md">
               <h1 class="text-center mb-6 text-3xl font-bold text-gray-800">
-                الأسئلة المتكررة
+                {{ t('faq_page.title') }}
               </h1>
               <div class="card">
                 <Accordion>
@@ -57,11 +57,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import Accordion from "primevue/accordion";
 import AccordionPanel from "primevue/accordionpanel";
 import AccordionHeader from "primevue/accordionheader";
 import AccordionContent from "primevue/accordioncontent";
+
+const { t, locale } = useI18n();
+const isRTL = computed(() => locale.value === "ar");
 
 // Reactive state
 const isLoading = ref(false);
@@ -157,11 +160,11 @@ const fetchFAQContent = async () => {
     if (response && response.key === 'success' && response.data) {
       faqItems.value = parseFAQHTML(response.data);
     } else {
-      throw new Error(response?.msg || 'فشل في تحميل المحتوى');
+      throw new Error(response?.msg || t('faq_page.load_error'));
     }
   } catch (err) {
     console.error('Error fetching FAQ content:', err);
-    error.value = err?.data?.message || err?.message || err?.data?.msg || 'حدث خطأ أثناء تحميل المحتوى. الرجاء المحاولة مرة أخرى.';
+    error.value = err?.data?.message || err?.message || err?.data?.msg || t('faq_page.error_message');
   } finally {
     isLoading.value = false;
   }
@@ -175,10 +178,17 @@ onMounted(() => {
 
 <style scoped>
 .privacy-policy {
-  direction: rtl;
   min-height: calc(100vh - 150px);
   padding: 2rem 0;
   background-color: #f9fafb;
+}
+
+.privacy-policy.rtl {
+  direction: rtl;
+}
+
+.privacy-policy.ltr {
+  direction: ltr;
 }
 
 .container {

@@ -2,30 +2,22 @@
   <section class="container mx-auto py-16 px-6">
     <div class="grid md:grid-cols-2 gap-15">
       <!-- Text -->
-      <div class="text-right">
+      <div :class="isRTL ? 'text-right' : 'text-left'">
         <h3 class="text-gray-500 text-lg mb-2 leading-7">
-          {{ aboutData?.title || 'من نحن' }}
+          {{ aboutData?.title || t('about-us.title') }}
         </h3>
         <h1 class="text-3xl font-bold mb-6 leading-tight">
-          جمعية وطني للاستزراع المائي
+          {{ t('about-us.heading') }}
         </h1>
         <p v-if="isLoading" class="leading-[52px] text-xl text-gray-400">
-          جاري التحميل...
+          {{ t('about-us.loading') }}
         </p>
         <p v-else-if="error" class="leading-[52px] text-xl text-red-500">
           {{ error }}
         </p>
         <div v-else-if="hasContent" class="leading-[52px] text-xl" v-html="aboutData.content"></div>
         <p v-else class="leading-[52px] text-xl">
-          هي جمعية تعاونية سعودية تعمل على تطوير وتنمية قطاع الاستزراع المائي في
-          المملكة العربية السعودية، بما يواكب أهداف رؤية المملكة 2030 نحو تحقيق
-          الأمن الغذائي والاستدامة البيئية. تسعى الجمعية إلى تمكين المزارعين
-          والمنتجين في مجال الاستزراع المائي من خلال تقديم الدعم الفني
-          والإرشادي، وتعزيز الابتكار في تقنيات الإنتاج، وتوفير بيئة عمل تعاونية
-          تسهم في رفع كفاءة وجودة المنتجات المحلية. كما تعمل "وطني" على تشجيع
-          المشاريع المستدامة في المياه الداخلية وتوسيع قاعدة الاستثمارات في هذا
-          القطاع الحيوي، لتكون ركيزة أساسية في تحقيق التنمية الاقتصادية وتوفير
-          فرص العمل للمجتمع المحلي.
+          {{ t('about-us.fallback_description') }}
         </p>
       </div>
       <!-- Image -->
@@ -35,7 +27,7 @@
         ></div>
         <img
           src="/images/aboutus-img.png"
-          alt="Fish Image"
+          :alt="t('about-us.image_alt')"
           class="rounded-xl shadow-lg w-full h-[80%] object-cover"
         />
       </div>
@@ -45,6 +37,9 @@
 
 <script setup>
 import { computed, onMounted } from 'vue';
+
+const { t, locale } = useI18n();
+const isRTL = computed(() => locale.value === "ar");
 
 // Landing page data
 const { landingPageData, isLoading, error, fetchLandingPageData } = useLandingPage();

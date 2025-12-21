@@ -16,18 +16,17 @@
         </NuxtLink>
 
         <p
-          class="text-white leading-relaxed text-center sm:text-right text-sm md:text-base"
-        >
-          هذا النص يمكن استبداله بنص<br />
-          آخر في نفس المساحة
-        </p>
+          class="text-white leading-relaxed text-sm md:text-base"
+          :class="isRTL ? 'text-center sm:text-right' : 'text-center sm:text-left'"
+          v-html="t('footer.description')"
+        ></p>
       </div>
 
       <!-- Links Groups -->
       <div
         v-for="(group, index) in linksGroups"
         :key="index"
-        class="text-center sm:text-right"
+        :class="isRTL ? 'text-center sm:text-right' : 'text-center sm:text-left'"
       >
         <ul
           class="text-white space-y-3 md:space-y-4 text-base md:text-lg font-light"
@@ -50,14 +49,14 @@
           to="#"
           class="cursor-pointer w-36 md:w-40 hover:opacity-80 transition"
         >
-          <img src="/images/appstore.svg" alt="App Store" class="w-full" />
+          <img src="/images/appstore.svg" :alt="t('footer.app_store')" class="w-full" />
         </NuxtLink>
 
         <NuxtLink
           to="#"
           class="cursor-pointer w-36 md:w-40 hover:opacity-80 transition"
         >
-          <img src="/images/googleplay.png" alt="Google Play" class="w-full" />
+          <img src="/images/googleplay.png" :alt="t('footer.google_play')" class="w-full" />
         </NuxtLink>
       </div>
     </div>
@@ -65,8 +64,10 @@
 </template>
 
 <script setup>
-const { t } = useI18n();
-const linksGroups = [
+const { t, locale } = useI18n();
+const isRTL = computed(() => locale.value === "ar");
+
+const linksGroups = computed(() => [
   [
     { name: t("footer.home"), path: "/" },
     { name: t("footer.about-us"), path: "/aboutUs" },
@@ -79,5 +80,5 @@ const linksGroups = [
     { name: t("footer.privacy"), path: "/privacy" },
     { name: t("footer.support"), path: "/support" },
   ],
-];
+]);
 </script>

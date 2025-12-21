@@ -13,14 +13,14 @@
         @click.stop
       >
         <!-- Header -->
-        <div class="px-6 py-4 text-right">
+        <div class="px-6 py-4" :class="isRTL ? 'text-right' : 'text-left'">
           <h2
             id="charge-modal-title"
             class="text-xl sm:text-2xl font-bold text-black"
           >
-            الشحن
+            {{ t('modals.charge_wallet.title') }}
           </h2>
-          <p class="text-sm sm:text-base text-gray-700 mt-1">اشحن محفظتك</p>
+          <p class="text-sm sm:text-base text-gray-700 mt-1">{{ t('modals.charge_wallet.subtitle') }}</p>
         </div>
 
         <!-- Content -->
@@ -30,8 +30,9 @@
             <input
               v-model="localAmount"
               type="number"
-              placeholder="شحن المحفظة"
-              class="w-full px-4 py-3 sm:py-4 border border-gray-300 rounded-xl text-right text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-[#15c472] focus:border-transparent placeholder:text-gray-400"
+              :placeholder="t('modals.charge_wallet.placeholder')"
+              class="w-full px-4 py-3 sm:py-4 border border-gray-300 rounded-xl text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-[#15c472] focus:border-transparent placeholder:text-gray-400"
+              :class="isRTL ? 'text-right' : 'text-left'"
             />
           </div>
 
@@ -41,7 +42,7 @@
             @click="handleCharge"
             class="w-full bg-gradient-to-r from-teal-600 to-green-500 text-white text-base sm:text-lg font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:from-teal-700 hover:to-green-600 transition-all duration-300"
           >
-            شحن
+            {{ t('modals.charge_wallet.charge') }}
           </button>
         </div>
       </div>
@@ -50,7 +51,10 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
+
+const { t, locale } = useI18n();
+const isRTL = computed(() => locale.value === "ar");
 
 const props = defineProps({
   modelValue: {

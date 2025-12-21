@@ -1,11 +1,11 @@
 <template>
-  <div dir="rtl">
+  <div :dir="locale === 'ar' ? 'rtl' : 'ltr'">
     <Toast position="top-center" />
     <!-- start of notification content -->
     <div class="notifications-container p-10 mx-10 bg-white font-sans">
       <div class="header flex justify-between items-center mb-5">
         <h1 class="title text-xl">
-          الإشعارات
+          {{ t('notifications.title') }}
           <span
             v-if="notificationsStore.unreadCount > 0"
             class="unread-badge inline-block bg-red-500 text-white text-sm px-2 py-1 rounded-full mr-2"
@@ -24,14 +24,14 @@
             alt="delete-icon"
             class="bg-[#D92D2026] p-2 rounded-md"
           />
-          حذف الكل
+          {{ t('notifications.delete_all') }}
         </button>
       </div>
 
       <!-- Loading State -->
       <div v-if="isLoading" class="text-center py-8">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
-        <p class="text-gray-500 mt-4">جاري تحميل الإشعارات...</p>
+        <p class="text-gray-500 mt-4">{{ t('notifications.loading') }}</p>
       </div>
 
       <!-- Error State -->
@@ -41,7 +41,7 @@
           @click="() => loadNotifications(1)"
           class="bg-gradient-to-r from-[#00a859] to-[#15c472] text-white py-2 px-6 rounded-lg hover:opacity-90 transition"
         >
-          إعادة المحاولة
+          {{ t('notifications.retry') }}
         </button>
       </div>
 
@@ -76,19 +76,19 @@
             </div>
             
             <!-- Notification Text in Middle -->
-            <div class="flex-1 text-right">
+            <div class="flex-1" :class="locale === 'ar' ? 'text-right' : 'text-left'">
               <p class="text-sm text-gray-800 font-medium">
                 {{ getNotificationTitle(notification) }}
               </p>
             </div>
             
-            <!-- Trash Icon on Left (RTL) -->
+            <!-- Trash Icon -->
             <div class="flex-shrink-0">
               <button
                 class="delete-single-btn bg-transparent border-none cursor-pointer p-0"
                 @click="deleteSingle(notification.id)"
                 :disabled="isDeleting"
-                title="حذف الإشعار"
+                :title="t('notifications.delete_notification')"
               >
                 <img
                   src="/icons/trash-icon.svg"
@@ -99,7 +99,7 @@
             </div>
           </li>
         </ul>
-        <p v-else class="text-center text-gray-400 py-6">لا توجد إشعارات حاليا</p>
+        <p v-else class="text-center text-gray-400 py-6">{{ t('notifications.no_notifications') }}</p>
         
         <Paginator
           v-if="totalRecords > rows"
@@ -123,9 +123,9 @@
           <img src="/icons/delete-modal.svg" alt="delete" class="w-24 h-24" />
           <div class="space-y-2">
             <p class="text-xl font-semibold text-gray-900">
-              حذف الاشعارات
+              {{ t('notifications.delete_confirm_title') }}
             </p>
-            <p class="text-gray-500 text-base">هل انت متأكد من حذف جميع الاشعارات؟</p>
+            <p class="text-gray-500 text-base">{{ t('notifications.delete_confirm_message') }}</p>
           </div>
           <div class="flex flex-col sm:flex-row-reverse gap-4 w-full mt-6">
             <button
@@ -133,14 +133,14 @@
               @click="confirmDeleteAll"
               :disabled="isDeleting"
             >
-              {{ isDeleting ? 'جاري الحذف...' : 'تأكيد حذف الاشعارات' }}
+              {{ isDeleting ? t('notifications.deleting') : t('notifications.confirm_delete') }}
             </button>
             <button
               class="bg-gradient-to-r from-[#00a859] to-[#15c472] text-white py-4 px-8 rounded-lg shadow-sm hover:opacity-90 transition font-medium"
               @click="showDeleteConfirm = false"
               :disabled="isDeleting"
             >
-              الرجوع
+              {{ t('notifications.cancel') }}
             </button>
           </div>
         </div>
@@ -159,6 +159,7 @@ import { useNotificationsStore } from "~/stores/notifications";
 import { useNotifications } from "~/composables/useNotifications";
 import { useToast } from "primevue/usetoast";
 
+const { t, locale } = useI18n();
 const notificationsStore = useNotificationsStore() as any;
 const { 
   fetchNotifications, 
@@ -203,7 +204,7 @@ const getNotificationTitle = (notification: any) => {
   }
   
   // Fallback to message or default
-  return notification.message || notification.body || 'إشعار';
+  return notification.message || notification.body || t('notifications.date.default');
 };
 
 const loadNotifications = async (page: number = currentPage.value) => {
@@ -239,15 +240,15 @@ const loadNotifications = async (page: number = currentPage.value) => {
       err?.data?.key === "unauthenticated" ||
       err?.data?.msg?.includes("يرجى اعادة تسجيل الدخول");
     error.value = isUnauthenticated
-      ? "يرجى تسجيل الدخول لعرض الإشعارات"
+      ? t('notifications.error.unauthenticated')
       : err?.data?.msg ||
         err?.message ||
-        "حدث خطأ أثناء تحميل الإشعارات. الرجاء المحاولة مرة أخرى.";
+        t('notifications.error.loading');
     
     // Show error toast
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('notifications.error.title'),
       detail: error.value,
       life: 3000,
     });
@@ -291,16 +292,16 @@ const markNotificationAsRead = async (notificationId: string) => {
     
     toast.add({
       severity: "success",
-      summary: "نجح",
-      detail: "تم تحديد الإشعار كمقروء",
+      summary: t('notifications.success.title'),
+      detail: t('notifications.success.marked_read'),
       life: 2000,
     });
   } catch (err: any) {
     console.error("Error marking notification as read:", err);
     toast.add({
       severity: "error",
-      summary: "خطأ",
-      detail: "حدث خطأ أثناء تحديث الإشعار",
+      summary: t('notifications.error.title'),
+      detail: t('notifications.error.update'),
       life: 3000,
     });
   }
@@ -329,16 +330,16 @@ const deleteSingle = async (notificationId: string) => {
     
     toast.add({
       severity: "success",
-      summary: "نجح",
-      detail: "تم حذف الإشعار بنجاح",
+      summary: t('notifications.success.title'),
+      detail: t('notifications.success.deleted'),
       life: 2000,
     });
   } catch (err: any) {
     console.error("Error deleting notification:", err);
     toast.add({
       severity: "error",
-      summary: "خطأ",
-      detail: "حدث خطأ أثناء حذف الإشعار",
+      summary: t('notifications.error.title'),
+      detail: t('notifications.error.delete'),
       life: 3000,
     });
   } finally {
@@ -361,16 +362,16 @@ const confirmDeleteAll = async () => {
     
     toast.add({
       severity: "success",
-      summary: "نجح",
-      detail: "تم حذف جميع الإشعارات بنجاح",
+      summary: t('notifications.success.title'),
+      detail: t('notifications.success.deleted_all'),
       life: 2000,
     });
   } catch (err: any) {
     console.error("Error deleting all notifications:", err);
     toast.add({
       severity: "error",
-      summary: "خطأ",
-      detail: "حدث خطأ أثناء حذف الإشعارات",
+      summary: t('notifications.error.title'),
+      detail: t('notifications.error.delete_all'),
       life: 3000,
     });
   } finally {
@@ -394,12 +395,13 @@ const formatDate = (dateString: string) => {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return "الآن";
-  if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
-  if (diffHours < 24) return `منذ ${diffHours} ساعة`;
-  if (diffDays < 7) return `منذ ${diffDays} يوم`;
+  if (diffMins < 1) return t('notifications.date.now');
+  if (diffMins < 60) return t('notifications.date.minutes_ago', { count: diffMins });
+  if (diffHours < 24) return t('notifications.date.hours_ago', { count: diffHours });
+  if (diffDays < 7) return t('notifications.date.days_ago', { count: diffDays });
   
-  return date.toLocaleDateString("ar-SA", {
+  const localeCode = locale.value === 'ar' ? 'ar-SA' : 'en-US';
+  return date.toLocaleDateString(localeCode, {
     year: "numeric",
     month: "long",
     day: "numeric",

@@ -18,8 +18,9 @@
           <h2
             id="delete-ad-modal-title"
             class="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mb-4 sm:mb-6"
+            :class="isRTL ? 'text-right' : 'text-left'"
           >
-            هل انت متاكد من مسح الاعلان
+            {{ t('modals.delete_ad.title') }}
           </h2>
 
           <!-- Icon -->
@@ -29,30 +30,30 @@
             >
               <img
                 src="/icons/trash-icon.svg"
-                alt="delete-icon"
+                :alt="t('modals.delete_ad.delete_button')"
                 class="w-full h-full object-contain text-[#A6282A]"
               />
             </div>
           </div>
 
           <!-- Buttons -->
-          <div class="flex gap-2 sm:gap-3 md:gap-4">
-            <!-- Delete Button (Right) -->
+          <div class="flex gap-2 sm:gap-3 md:gap-4" :class="isRTL ? 'flex-row' : 'flex-row-reverse'">
+            <!-- Delete Button -->
             <button
               type="button"
               @click="$emit('confirm')"
               :disabled="loading"
               class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-[#A6282A] text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {{ loading ? "جاري الحذف..." : "حذف المنتج" }}
+              {{ loading ? t('modals.delete_ad.deleting') : t('modals.delete_ad.delete_button') }}
             </button>
-            <!-- Back Button (Left) -->
+            <!-- Back Button -->
             <button
               type="button"
               @click="$emit('update:modelValue', false)"
-              class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-white border-2 border-[#15c472] text-gray-800 text-sm sm:text-base font-semibold rounded-lg hover:bg-gray-50 transition-colors order-1"
+              class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-white border-2 border-[#15c472] text-gray-800 text-sm sm:text-base font-semibold rounded-lg hover:bg-gray-50 transition-colors"
             >
-              رجوع
+              {{ t('modals.delete_ad.cancel') }}
             </button>
           </div>
         </div>
@@ -62,7 +63,10 @@
 </template>
 
 <script setup>
-import { watch } from "vue";
+import { watch, computed } from "vue";
+
+const { t, locale } = useI18n();
+const isRTL = computed(() => locale.value === "ar");
 
 const props = defineProps({
   modelValue: {

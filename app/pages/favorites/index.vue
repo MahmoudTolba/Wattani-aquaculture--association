@@ -2,12 +2,14 @@
   <div>
     <Toast position="top-center" />
     <div class="min-h-screen p-10">
-      <h1 class="text-3xl font-bold mb-8 text-gray-800">المفضلة</h1>
+      <h1 class="text-3xl font-bold mb-8 text-gray-800" :class="isRTL ? 'text-right' : 'text-left'">
+        {{ t('favorites.title') }}
+      </h1>
       
       <!-- Loading State -->
       <div v-if="isLoading" class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
-        <p class="text-gray-500 mt-4">جاري تحميل المفضلة...</p>
+        <p class="text-gray-500 mt-4">{{ t('favorites.loading') }}</p>
       </div>
 
       <!-- Error State -->
@@ -17,14 +19,14 @@
           @click="() => loadFavorites(1)"
           class="bg-gradient-to-r from-[#00a859] to-[#15c472] text-white py-2 px-6 rounded-lg hover:opacity-90 transition"
         >
-          إعادة المحاولة
+          {{ t('favorites.retry') }}
         </button>
       </div>
 
       <!-- Cards Grid -->
       <div v-else>
         <div v-if="listings.length === 0" class="text-center py-12">
-          <p class="text-gray-400 text-lg">لا توجد عناصر في المفضلة حاليا</p>
+          <p class="text-gray-400 text-lg">{{ t('favorites.empty') }}</p>
         </div>
         
         <div v-else class="cards-grid mb-8">
@@ -43,7 +45,7 @@
             <button
               class="card__fav"
               type="button"
-              aria-label="حفظ الإعلان"
+              :aria-label="t('favorites.save_ad')"
               @click.stop="toggleFav(listing)"
               :disabled="isToggling === (listing.id || listing.advert_id)"
             >
@@ -127,6 +129,9 @@ import Toast from "primevue/toast";
 import { useFavorites } from "~/composables/useFavorites";
 import { useToast } from "primevue/usetoast";
 
+const { t, locale } = useI18n();
+const isRTL = computed(() => locale.value === "ar");
+
 const router = useRouter();
 const { fetchFavorites, toggleFavorite } = useFavorites();
 const toast = useToast();
@@ -174,14 +179,14 @@ const loadFavorites = async (page: number = currentPage.value) => {
     // Map API data to component format
     listings.value = favoritesArray.map((item: any) => ({
       id: item.id || item.advert_id,
-      title: item.title || item.name || 'عنوان غير متاح',
+      title: item.title || item.name || t('favorites.fallbacks.title'),
       price: item.price || item.price_per_unit || '0',
       rating: item.rating || item.rate || "4.5",
       image: item.image || item.photo || item.thumbnail || "/images/card-img.jpg",
-      location: item.location || item.city || item.address || "موقع غير محدد",
-      timeAgo: item.created_at ? formatTimeAgo(item.created_at) : "منذ وقت",
+      location: item.location || item.city || item.address || t('favorites.fallbacks.location'),
+      timeAgo: item.created_at ? formatTimeAgo(item.created_at) : t('favorites.fallbacks.time'),
       owner: {
-        name: item.owner?.name || item.user?.name || item.seller?.name || "مستخدم",
+        name: item.owner?.name || item.user?.name || item.seller?.name || t('favorites.fallbacks.user'),
         avatar: item.owner?.avatar || item.user?.avatar || item.seller?.avatar || "/images/card-user.jpg",
       },
       isFav: true, // All items in favorites are favorited
@@ -197,17 +202,18 @@ const loadFavorites = async (page: number = currentPage.value) => {
     console.error("Error loading favorites:", err);
     const isUnauthenticated =
       err?.data?.key === "unauthenticated" ||
-      err?.data?.msg?.includes("يرجى اعادة تسجيل الدخول");
+      err?.data?.msg?.includes("يرجى اعادة تسجيل الدخول") ||
+      err?.data?.msg?.includes("Please login");
     
     error.value = isUnauthenticated
-      ? "يرجى تسجيل الدخول لعرض المفضلة"
+      ? t('favorites.errors.unauthenticated')
       : err?.data?.msg ||
         err?.message ||
-        "حدث خطأ أثناء تحميل المفضلة. الرجاء المحاولة مرة أخرى.";
+        t('favorites.errors.load_error');
     
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('favorites.toast.error'),
       detail: error.value,
       life: 3000,
     });
@@ -228,8 +234,8 @@ const toggleFav = async (listing: any) => {
   if (!listingId) {
     toast.add({
       severity: "error",
-      summary: "خطأ",
-      detail: "معرف الإعلان غير موجود",
+      summary: t('favorites.toast.error'),
+      detail: t('favorites.errors.ad_id_missing'),
       life: 3000,
     });
     return;
@@ -246,8 +252,8 @@ const toggleFav = async (listing: any) => {
     
     toast.add({
       severity: "success",
-      summary: "نجح",
-      detail: "تم إزالة الإعلان من المفضلة",
+      summary: t('favorites.toast.success'),
+      detail: t('favorites.success.removed'),
       life: 2000,
     });
     
@@ -259,8 +265,8 @@ const toggleFav = async (listing: any) => {
     console.error("Error toggling favorite:", err);
     toast.add({
       severity: "error",
-      summary: "خطأ",
-      detail: err?.data?.msg || err?.message || "حدث خطأ أثناء تحديث المفضلة",
+      summary: t('favorites.toast.error'),
+      detail: err?.data?.msg || err?.message || t('favorites.errors.update_error'),
       life: 3000,
     });
   } finally {
@@ -270,7 +276,7 @@ const toggleFav = async (listing: any) => {
 
 // Format time ago
 const formatTimeAgo = (dateString: string) => {
-  if (!dateString) return "منذ وقت";
+  if (!dateString) return t('favorites.fallbacks.time');
   
   const date = new Date(dateString);
   const now = new Date();
@@ -279,12 +285,13 @@ const formatTimeAgo = (dateString: string) => {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return "الآن";
-  if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
-  if (diffHours < 24) return `منذ ${diffHours} ساعة`;
-  if (diffDays < 7) return `منذ ${diffDays} يوم`;
+  if (diffMins < 1) return t('notifications.date.now');
+  if (diffMins < 60) return t('notifications.date.minutes_ago', { count: diffMins });
+  if (diffHours < 24) return t('notifications.date.hours_ago', { count: diffHours });
+  if (diffDays < 7) return t('notifications.date.days_ago', { count: diffDays });
   
-  return date.toLocaleDateString("ar-SA", {
+  const localeCode = isRTL.value ? 'ar-SA' : 'en-US';
+  return date.toLocaleDateString(localeCode, {
     year: "numeric",
     month: "long",
     day: "numeric",

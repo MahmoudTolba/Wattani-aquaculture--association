@@ -16,9 +16,10 @@
         <div class="px-6 py-4 border-b border-gray-200">
           <h2
             id="commission-payment-modal-title"
-            class="text-xl font-bold text-black text-right"
+            class="text-xl font-bold text-black"
+            :class="isRTL ? 'text-right' : 'text-left'"
           >
-            تحديد طريقة الدفع
+            {{ t('modals.commission_payment.title') }}
           </h2>
         </div>
 
@@ -30,22 +31,24 @@
             <div
               @click="localPaymentMethod = 'wallet'"
               class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all"
-              :class="
+              :class="[
                 localPaymentMethod === 'wallet'
                   ? 'bg-gray-50 border-2 border-[#15C472]'
-                  : 'bg-gray-50 border-2 border-gray-200'
-              "
+                  : 'bg-gray-50 border-2 border-gray-200',
+                isRTL ? 'flex-row' : 'flex-row-reverse'
+              ]"
             >
               <label
                 for="commission-wallet"
-                class="flex-1 flex items-center gap-2 justify-start cursor-pointer"
+                class="flex-1 flex items-center gap-2 cursor-pointer"
+                :class="isRTL ? 'justify-start' : 'justify-end'"
               >
                 <img
                   src="/icons/wallet-icon.svg"
-                  alt="wallet"
+                  :alt="t('modals.commission_payment.wallet')"
                   class="w-8 h-8"
                 />
-                <span class="text-black font-medium text-right">المحفظة</span>
+                <span class="text-black font-medium" :class="isRTL ? 'text-right' : 'text-left'">{{ t('modals.commission_payment.wallet') }}</span>
               </label>
               <input
                 type="radio"
@@ -60,24 +63,24 @@
             <div
               @click="localPaymentMethod = 'electronic'"
               class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all"
-              :class="
+              :class="[
                 localPaymentMethod === 'electronic'
                   ? 'bg-gray-50 border-2 border-[#15C472]'
-                  : 'bg-gray-50 border-2 border-gray-200'
-              "
+                  : 'bg-gray-50 border-2 border-gray-200',
+                isRTL ? 'flex-row' : 'flex-row-reverse'
+              ]"
             >
               <label
                 for="commission-electronic"
-                class="flex-1 flex items-center justify-start gap-2 cursor-pointer"
+                class="flex-1 flex items-center gap-2 cursor-pointer"
+                :class="isRTL ? 'justify-start' : 'justify-end'"
               >
                 <img
                   src="/icons/epay-icon.svg"
-                  alt="electronic payment"
+                  :alt="t('modals.commission_payment.electronic')"
                   class="w-8 h-8"
                 />
-                <span class="text-black font-medium text-right"
-                  >دفع الكتروني</span
-                >
+                <span class="text-black font-medium" :class="isRTL ? 'text-right' : 'text-left'">{{ t('modals.commission_payment.electronic') }}</span>
               </label>
               <input
                 type="radio"
@@ -97,7 +100,7 @@
             class="w-full bg-gradient-to-r from-[#0A717E] to-[#15C472] text-white font-semibold py-3 rounded-lg shadow-sm hover:opacity-90 transition-all duration-200"
             @click="handleConfirm"
           >
-            تأكيد
+            {{ t('modals.commission_payment.confirm') }}
           </button>
         </div>
       </div>
@@ -106,7 +109,10 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
+
+const { t, locale } = useI18n();
+const isRTL = computed(() => locale.value === "ar");
 
 const props = defineProps({
   modelValue: {

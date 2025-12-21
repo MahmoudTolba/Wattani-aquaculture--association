@@ -18,8 +18,9 @@
           <h2
             id="logout-modal-title"
             class="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mb-4 sm:mb-6"
+            :class="isRTL ? 'text-right' : 'text-left'"
           >
-            هل انت متاكد من تسجيل الخروج
+            {{ t('modals.logout.title') }}
           </h2>
 
           <!-- Icon -->
@@ -29,29 +30,29 @@
             >
               <img
                 src="/icons/logout-modal.svg"
-                alt="logout-icon"
+                :alt="t('modals.logout.title')"
                 class="w-full h-full object-contain"
               />
             </div>
           </div>
 
           <!-- Buttons -->
-          <div class="flex gap-2 sm:gap-3 md:gap-4">
-            <!-- Yes Button (Right) -->
+          <div class="flex gap-2 sm:gap-3 md:gap-4" :class="isRTL ? 'flex-row' : 'flex-row-reverse'">
+            <!-- Yes Button -->
             <button
               type="button"
               @click="$emit('confirm')"
               class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-red-700 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-red-800 transition-colors"
             >
-              نعم
+              {{ t('modals.logout.yes') }}
             </button>
-            <!-- No Button (Left) -->
+            <!-- No Button -->
             <button
               type="button"
               @click="$emit('update:modelValue', false)"
-              class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-white border-2 border-[#15c472] text-gray-800 text-sm sm:text-base font-semibold rounded-lg hover:bg-gray-50 transition-colors order-1"
+              class="flex-1 px-3 py-2 sm:px-4 sm:py-2.5 md:py-3 bg-white border-2 border-[#15c472] text-gray-800 text-sm sm:text-base font-semibold rounded-lg hover:bg-gray-50 transition-colors"
             >
-              لا
+              {{ t('modals.logout.no') }}
             </button>
           </div>
         </div>
@@ -61,7 +62,10 @@
 </template>
 
 <script setup>
-import { watch } from "vue";
+import { watch, computed } from "vue";
+
+const { t, locale } = useI18n();
+const isRTL = computed(() => locale.value === "ar");
 
 const props = defineProps({
   modelValue: {

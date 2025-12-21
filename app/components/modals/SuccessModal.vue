@@ -19,8 +19,9 @@
           <h2
             id="success-modal-title"
             class="text-xl sm:text-2xl font-bold text-gray-900 mb-6"
+            :class="isRTL ? 'text-right' : 'text-left'"
           >
-            {{ title }}
+            {{ title || t('modals.success.default_title') }}
           </h2>
 
           <!-- Loading Spinner -->
@@ -38,7 +39,10 @@
 </template>
 
 <script setup>
-import { watch } from "vue";
+import { watch, computed } from "vue";
+
+const { t, locale } = useI18n();
+const isRTL = computed(() => locale.value === "ar");
 
 const props = defineProps({
   modelValue: {
@@ -47,7 +51,7 @@ const props = defineProps({
   },
   title: {
     type: String,
-    default: "تم الاشتراك بنجاح",
+    default: "",
   },
   autoClose: {
     type: Boolean,

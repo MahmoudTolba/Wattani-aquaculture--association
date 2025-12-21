@@ -16,9 +16,10 @@
         <div class="px-6 py-4 border-b border-gray-200">
           <h2
             id="payment-modal-title"
-            class="text-xl font-bold text-black text-right"
+            class="text-xl font-bold text-black"
+            :class="isRTL ? 'text-right' : 'text-left'"
           >
-            تحديد طريقة الدفع
+            {{ t('modals.package_payment.title') }}
           </h2>
         </div>
 
@@ -30,22 +31,24 @@
             <div
               @click="localPaymentMethod = 'wallet'"
               class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all"
-              :class="
+              :class="[
                 localPaymentMethod === 'wallet'
                   ? 'bg-gray-50 border-2 border-[#15C472]'
-                  : 'bg-gray-50 border-2 border-gray-200'
-              "
+                  : 'bg-gray-50 border-2 border-gray-200',
+                isRTL ? 'flex-row' : 'flex-row-reverse'
+              ]"
             >
               <label
                 for="package-wallet"
-                class="flex-1 flex items-center gap-2 justify-start cursor-pointer"
+                class="flex-1 flex items-center gap-2 cursor-pointer"
+                :class="isRTL ? 'justify-start' : 'justify-end'"
               >
                 <img
                   src="/icons/wallet-icon.svg"
-                  alt="wallet"
+                  :alt="t('modals.package_payment.wallet')"
                   class="w-8 h-8"
                 />
-                <span class="text-black font-medium text-right">المحفظة</span>
+                <span class="text-black font-medium" :class="isRTL ? 'text-right' : 'text-left'">{{ t('modals.package_payment.wallet') }}</span>
               </label>
               <input
                 type="radio"
@@ -60,24 +63,24 @@
             <div
               @click="localPaymentMethod = 'electronic'"
               class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all"
-              :class="
+              :class="[
                 localPaymentMethod === 'electronic'
                   ? 'bg-gray-50 border-2 border-[#15C472]'
-                  : 'bg-gray-50 border-2 border-gray-200'
-              "
+                  : 'bg-gray-50 border-2 border-gray-200',
+                isRTL ? 'flex-row' : 'flex-row-reverse'
+              ]"
             >
               <label
                 for="package-electronic"
-                class="flex-1 flex items-center justify-start gap-2 cursor-pointer"
+                class="flex-1 flex items-center gap-2 cursor-pointer"
+                :class="isRTL ? 'justify-start' : 'justify-end'"
               >
                 <img
                   src="/icons/epay-icon.svg"
-                  alt="electronic payment"
+                  :alt="t('modals.package_payment.electronic')"
                   class="w-8 h-8"
                 />
-                <span class="text-black font-medium text-right"
-                  >دفع الكتروني</span
-                >
+                <span class="text-black font-medium" :class="isRTL ? 'text-right' : 'text-left'">{{ t('modals.package_payment.electronic') }}</span>
               </label>
               <input
                 type="radio"
@@ -103,7 +106,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             </span>
-            <span>{{ loading ? "جاري المعالجة..." : "تأكيد" }}</span>
+            <span>{{ loading ? t('modals.package_payment.processing') : t('modals.package_payment.confirm') }}</span>
           </button>
         </div>
       </div>
@@ -112,7 +115,10 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
+
+const { t, locale } = useI18n();
+const isRTL = computed(() => locale.value === "ar");
 
 const props = defineProps({
   modelValue: {
