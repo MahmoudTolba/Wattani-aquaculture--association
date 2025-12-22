@@ -65,7 +65,7 @@
                       : 'bg-[#FCFCFC] border-2 border-[#15c472] text-[#15c472] hover:bg-gray-50',
                   ]"
                 >
-                  البيانات الشخصية
+                  {{ t('profile.settings.personal_info') }}
                 </button>
                 <button
                   @click="settingsSubTab = 'change-mobile'"
@@ -76,7 +76,7 @@
                       : 'bg-[#FCFCFC] border-2 border-[#15c472] text-[#15c472] hover:bg-gray-50',
                   ]"
                 >
-                  تغيير رقم الجوال
+                  {{ t('profile.settings.change_mobile') }}
                 </button>
                 <button
                   @click="settingsSubTab = 'change-password'"
@@ -87,7 +87,7 @@
                       : 'bg-[#FCFCFC] border-2 border-[#15c472] text-[#15c472] hover:bg-gray-50',
                   ]"
                 >
-                  تغيير كلمة المرور
+                  {{ t('profile.settings.change_password') }}
                 </button>
               </div>
 
@@ -148,13 +148,13 @@
                       for="settingsClientName"
                       class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
                     >
-                      اسم العميل
+                      {{ t('profile.settings.client_name') }}
                     </label>
                     <input
                       id="settingsClientName"
                       v-model="settingsForm.clientName"
                       type="text"
-                      placeholder="العميل"
+                      :placeholder="t('profile.settings.client_name_placeholder')"
                       class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
                     />
                   </div>
@@ -165,7 +165,7 @@
                       for="settingsMobileNumber"
                       class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
                     >
-                      رقم الجوال
+                      {{ t('profile.settings.mobile_number') }}
                     </label>
                     <div
                       class="flex flex-col sm:flex-row rounded-lg sm:rounded-xl border border-gray-200 bg-white shadow-sm focus-within:border-[#15c472] focus-within:ring-2 focus-within:ring-[#15c472]/20 overflow-visible sm:overflow-hidden"
@@ -232,7 +232,7 @@
                                 <input
                                   v-model="countrySearchQuery"
                                   type="text"
-                                  placeholder="ابحث عن دولة..."
+                                  :placeholder="t('profile.settings.search_country')"
                                   class="w-full px-3 py-2 pr-8 text-sm text-right border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 focus:border-[#15c472]"
                                   @click.stop
                                 />
@@ -296,19 +296,19 @@
                                 v-if="isLoadingCountries"
                                 class="px-3 py-4 text-xs text-gray-500 text-center"
                               >
-                                جاري التحميل...
+                                {{ t('profile.settings.loading') }}
                               </div>
                               <div
                                 v-if="!isLoadingCountries && countries.length === 0"
                                 class="px-3 py-4 text-xs text-gray-500 text-center"
                               >
-                                لا توجد دول متاحة
+                                {{ t('profile.settings.no_countries') }}
                               </div>
                               <div
                                 v-if="!isLoadingCountries && countries.length > 0 && filteredCountries.length === 0"
                                 class="px-3 py-4 text-xs text-gray-500 text-center"
                               >
-                                لم يتم العثور على نتائج
+                                {{ t('profile.settings.no_results') }}
                               </div>
                             </div>
                           </div>
@@ -330,13 +330,13 @@
                       for="settingsEmail"
                       class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
                     >
-                      البريد الإلكتروني
+                      {{ t('profile.settings.email') }}
                     </label>
                     <input
                       id="settingsEmail"
                       v-model="settingsForm.email"
                       type="email"
-                      placeholder="البريد الإلكتروني"
+                      :placeholder="t('profile.settings.email_placeholder')"
                       class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
                     />
                   </div>
@@ -347,7 +347,7 @@
                       for="settingsCity"
                       class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
                     >
-                      المدينة
+                      {{ t('profile.settings.city') }}
                     </label>
                     <div class="relative">
                       <select
@@ -355,12 +355,12 @@
                         v-model="settingsForm.city"
                         class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 pr-8 sm:pr-10 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 appearance-none text-right"
                       >
-                        <option value="">اختر المدينة</option>
-                        <option value="riyadh">الرياض</option>
-                        <option value="jeddah">جدة</option>
-                        <option value="dammam">الدمام</option>
-                        <option value="makkah">مكة المكرمة</option>
-                        <option value="medina">المدينة المنورة</option>
+                        <option value="">{{ t('profile.settings.select_city') }}</option>
+                        <option value="riyadh">{{ t('profile.cities.riyadh') }}</option>
+                        <option value="jeddah">{{ t('profile.cities.jeddah') }}</option>
+                        <option value="dammam">{{ t('profile.cities.dammam') }}</option>
+                        <option value="makkah">{{ t('profile.cities.makkah') }}</option>
+                        <option value="medina">{{ t('profile.cities.medina') }}</option>
                       </select>
                       <div
                         class="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
@@ -389,14 +389,14 @@
                       for="settingsLocation"
                       class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
                     >
-                      تحديد الموقع
+                      {{ t('profile.settings.location') }}
                     </label>
                     <div class="relative">
                       <input
                         id="settingsLocation"
                         v-model="settingsForm.location"
                         type="text"
-                        placeholder="تحديد الموقع"
+                        :placeholder="t('profile.settings.location_placeholder')"
                         class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 pr-10 sm:pr-12 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
                       />
                       <div
@@ -432,8 +432,8 @@
                       :disabled="isUpdatingProfile"
                       class="w-full bg-gradient-to-r from-[#15c472] to-[#12a866] text-white text-sm sm:text-base font-semibold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-lg hover:opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <span v-if="isUpdatingProfile">جاري التحديث...</span>
-                      <span v-else>حفظ</span>
+                      <span v-if="isUpdatingProfile">{{ t('profile.settings.updating') }}</span>
+                      <span v-else>{{ t('profile.settings.save') }}</span>
                     </button>
                   </div>
                 </form>
@@ -448,10 +448,10 @@
                 >
                   <div class="text-center space-y-2">
                     <h2 class="text-2xl sm:text-3xl font-bold text-[#15c472]">
-                      كود التحقق
+                      {{ t('profile.change_mobile.verification_code') }}
                     </h2>
                     <p class="text-gray-600 text-sm sm:text-base">
-                      تغيير رقم الجوال
+                      {{ t('profile.change_mobile.change_mobile_title') }}
                     </p>
                   </div>
 
@@ -461,7 +461,7 @@
                       class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#15c472] mb-2"
                     ></div>
                     <p class="text-gray-600 text-sm">
-                      جاري إرسال رمز التحقق...
+                      {{ t('profile.change_mobile.sending_code') }}
                     </p>
                   </div>
 
@@ -538,7 +538,7 @@
                       for="newMobile"
                       class="block text-sm sm:text-base font-medium text-gray-700 text-right"
                     >
-                      رقم الجوال *
+                      {{ t('profile.change_mobile.mobile_number_required') }}
                     </label>
                     <div
                       class="flex flex-col sm:flex-row rounded-lg sm:rounded-xl border border-gray-200 bg-white shadow-sm focus-within:border-[#15c472] focus-within:ring-2 focus-within:ring-[#15c472]/20 overflow-hidden"
@@ -578,7 +578,7 @@
                         id="newMobile"
                         v-model="changeMobileForm.newMobile"
                         type="tel"
-                        placeholder="رقم الجوال"
+                        :placeholder="t('profile.change_mobile.mobile_number_placeholder')"
                         @input="handleNewMobileInput"
                         :disabled="isSendingNewPhoneCode"
                         class="flex-1 w-full bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 text-right disabled:opacity-50 disabled:cursor-not-allowed"
@@ -618,9 +618,9 @@
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           ></path>
                         </svg>
-                        جاري الإرسال...
+                        {{ t('profile.change_mobile.sending') }}
                       </span>
-                      <span v-else>التالي</span>
+                      <span v-else>{{ t('profile.change_mobile.next') }}</span>
                     </button>
                   </div>
                 </div>
@@ -632,10 +632,10 @@
                 >
                   <div class="text-center space-y-2">
                     <h2 class="text-2xl sm:text-3xl font-bold text-[#15c472]">
-                      كود التحقق
+                      {{ t('profile.change_mobile.verification_code') }}
                     </h2>
                     <p class="text-gray-600 text-sm sm:text-base">
-                      تغيير رقم الجوال
+                      {{ t('profile.change_mobile.change_mobile_title') }}
                     </p>
                   </div>
 
@@ -694,9 +694,9 @@
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           ></path>
                         </svg>
-                        جاري التحقق...
+                        {{ t('profile.change_mobile.verifying') }}
                       </span>
-                      <span v-else>تحقق</span>
+                      <span v-else>{{ t('profile.change_mobile.verify') }}</span>
                     </button>
                   </div>
                 </div>
@@ -717,14 +717,14 @@
                       for="currentPassword"
                       class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
                     >
-                      كلمة المرور الحالية
+                      {{ t('profile.change_password.current_password') }}
                     </label>
                     <div class="relative">
                       <input
                         id="currentPassword"
                         v-model="changePasswordForm.currentPassword"
                         :type="showCurrentPassword ? 'text' : 'password'"
-                        placeholder="أدخل كلمة المرور الحالية"
+                        :placeholder="t('profile.change_password.current_password_placeholder')"
                         class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 pr-10 sm:pr-12 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
                       />
                       <button
@@ -778,14 +778,14 @@
                       for="newPassword"
                       class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
                     >
-                      كلمة المرور الجديدة
+                      {{ t('profile.change_password.new_password') }}
                     </label>
                     <div class="relative">
                       <input
                         id="newPassword"
                         v-model="changePasswordForm.newPassword"
                         :type="showNewPassword ? 'text' : 'password'"
-                        placeholder="أدخل كلمة المرور الجديدة"
+                        :placeholder="t('profile.change_password.new_password_placeholder')"
                         class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 pr-10 sm:pr-12 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
                       />
                       <button
@@ -839,14 +839,14 @@
                       for="confirmPassword"
                       class="block text-xs sm:text-sm font-medium text-gray-700 text-right"
                     >
-                      تأكيد كلمة المرور الجديدة
+                      {{ t('profile.change_password.confirm_password') }}
                     </label>
                     <div class="relative">
                       <input
                         id="confirmPassword"
                         v-model="changePasswordForm.confirmPassword"
                         :type="showConfirmPassword ? 'text' : 'password'"
-                        placeholder="أعد إدخال كلمة المرور الجديدة"
+                        :placeholder="t('profile.change_password.confirm_password_placeholder')"
                         class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3 pr-10 sm:pr-12 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#15c472] focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 text-right"
                       />
                       <button
@@ -918,7 +918,7 @@
                         </svg>
                       </span>
                       <span>{{
-                        isChangingPassword ? "جاري التحديث..." : "حفظ"
+                        isChangingPassword ? t('profile.change_password.updating') : t('profile.change_password.save')
                       }}</span>
                     </button>
                   </div>
@@ -944,7 +944,7 @@
                     type="button"
                     @click="closeAddAdForm"
                     class="text-gray-500 hover:text-gray-700 transition-colors"
-                    aria-label="رجوع"
+                    :aria-label="t('profile.my_ads.back')"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -969,14 +969,14 @@
                     <div
                       class="flex items-center justify-start text-sm font-medium text-gray-800"
                     >
-                      تحديد القسم
+                      {{ t('profile.my_ads.select_department') }}
                       <span class="text-red-500 ms-1">*</span>
                     </div>
                     <select
                       v-model="adForm.categoryId"
                       class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                     >
-                      <option value="" disabled>اختر القسم</option>
+                      <option value="" disabled>{{ t('profile.my_ads.select_department_placeholder') }}</option>
                       <option
                         v-for="option in departments"
                         :key="option.value"
@@ -992,7 +992,7 @@
                     <div
                       class="flex items-center justify-start text-sm font-medium text-gray-800"
                     >
-                      تحديد القسم الفرعي
+                      {{ t('profile.my_ads.select_sub_department') }}
                       <span class="text-red-500 ms-1">*</span>
                     </div>
                     <select
@@ -1002,7 +1002,7 @@
                       :disabled="!adForm.categoryId || isLoadingSubCategories"
                     >
                       <option value="" disabled>
-                        {{ isLoadingSubCategories ? "جاري التحميل..." : (!adForm.categoryId ? "اختر القسم أولاً" : (subCategories.length ? "اختر القسم الفرعي" : "لا توجد أقسام فرعية")) }}
+                        {{ isLoadingSubCategories ? t('profile.my_ads.loading_sub_categories') : (!adForm.categoryId ? t('profile.my_ads.select_department_first') : (subCategories.length ? t('profile.my_ads.select_sub_department_placeholder') : t('profile.my_ads.no_sub_categories'))) }}
                       </option>
                       <option
                         v-for="option in subCategories"
@@ -1013,7 +1013,7 @@
                       </option>
                     </select>
                     <p v-if="adForm.categoryId && !isLoadingSubCategories && !subCategories.length" class="text-xs text-red-500">
-                      لا توجد أقسام فرعية متاحة لهذا القسم. يرجى اختيار قسم آخر.
+                      {{ t('profile.my_ads.no_sub_categories') }}
                     </p>
                   </div>
 
@@ -1023,13 +1023,13 @@
                       <div
                         class="flex items-center justify-start text-sm font-medium text-gray-800"
                       >
-                        اسم الاعلان بالعربية
+                        {{ t('profile.my_ads.ad_title_ar') }}
                         <span class="text-red-500 ms-1">*</span>
                       </div>
                       <input
                         v-model="adForm.titleAr"
                         type="text"
-                        placeholder="اسم الاعلان بالعربية"
+                        :placeholder="t('profile.my_ads.ad_title_ar_placeholder')"
                         class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                         required
                       />
@@ -1039,13 +1039,13 @@
                       <div
                         class="flex items-center justify-start text-sm font-medium text-gray-800"
                       >
-                        اسم الاعلان بالإنجليزية
+                        {{ t('profile.my_ads.ad_title_en') }}
                         <span class="text-red-500 ms-1">*</span>
                       </div>
                       <input
                         v-model="adForm.titleEn"
                         type="text"
-                        placeholder="اسم الاعلان بالإنجليزية"
+                        :placeholder="t('profile.my_ads.ad_title_en_placeholder')"
                         class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                         required
                       />
@@ -1057,13 +1057,13 @@
                     <div
                       class="flex items-center justify-start text-sm font-medium text-gray-800"
                     >
-                      تحديد تكلفة الاعلان
+                      {{ t('profile.my_ads.ad_cost') }}
                       <span class="text-red-500 ms-1">*</span>
                     </div>
                     <input
                       v-model="adForm.price"
                       type="text"
-                      placeholder="التكلفة"
+                      :placeholder="t('profile.my_ads.cost_placeholder')"
                       class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                       required
                     />
@@ -1074,7 +1074,7 @@
                     <div
                       class="flex items-center justify-start text-sm font-medium text-gray-800"
                     >
-                      المدينة
+                      {{ t('profile.my_ads.city') }}
                       <span class="text-red-500 ms-1">*</span>
                     </div>
                     <select
@@ -1082,7 +1082,7 @@
                       class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                       required
                     >
-                      <option value="" disabled>اختر المدينة</option>
+                      <option value="" disabled>{{ t('profile.my_ads.select_city') }}</option>
                       <option
                         v-for="option in cities"
                         :key="option.value"
@@ -1098,7 +1098,7 @@
                     <div
                       class="flex items-center justify-start text-sm font-medium text-gray-800"
                     >
-                      تحديد الموقع
+                      {{ t('profile.my_ads.location') }}
                       <span class="text-red-500 ms-1">*</span>
                     </div>
                     <div class="relative">
@@ -1115,7 +1115,7 @@
                       <input
                         v-model="adForm.location"
                         type="text"
-                        placeholder="تحديد الموقع"
+                        :placeholder="t('profile.my_ads.location_placeholder')"
                         class="w-full rounded-xl border border-gray-200 pe-10 ps-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 cursor-pointer focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                         readonly
                         @click="openLocationModal"
@@ -1133,13 +1133,13 @@
                     <div
                       class="flex items-center justify-start text-sm font-medium text-gray-800"
                     >
-                      نص الاعلان بالعربية
+                      {{ t('profile.my_ads.ad_description_ar') }}
                       <span class="text-red-500 ms-1">*</span>
                     </div>
                     <textarea
                       v-model="adForm.descriptionAr"
                       rows="5"
-                      placeholder="وصف"
+                      :placeholder="t('profile.my_ads.ad_description_ar_placeholder')"
                       class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                       required
                     ></textarea>
@@ -1150,13 +1150,13 @@
                     <div
                       class="flex items-center justify-start text-sm font-medium text-gray-800"
                     >
-                      نص الاعلان بالإنجليزية
+                      {{ t('profile.my_ads.ad_description_en') }}
                       <span class="text-red-500 ms-1">*</span>
                     </div>
                     <textarea
                       v-model="adForm.descriptionEn"
                       rows="5"
-                      placeholder="وصف"
+                      :placeholder="t('profile.my_ads.ad_description_en_placeholder')"
                       class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                       required
                     ></textarea>
@@ -1252,7 +1252,7 @@
                       :disabled="isLoadingAd"
                       class="w-full bg-linear-to-l from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-4 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-102 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {{ isLoadingAd ? "جاري الإرسال..." : (selectedAdToEdit ? "تعديل" : "اضافة") }}
+                      {{ isLoadingAd ? t('profile.my_ads.sending') : (selectedAdToEdit ? t('profile.my_ads.edit') : t('profile.my_ads.add')) }}
                     </button>
                   </div>
                 </form>
@@ -1268,7 +1268,7 @@
                       <input
                         v-model="advertSearchQuery"
                         type="text"
-                        placeholder="ابحث في الإعلانات..."
+                        :placeholder="t('profile.my_ads.search_ads')"
                         class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                         @input="handleAdvertSearch"
                       />
@@ -1277,7 +1277,7 @@
                       @click="addAdvertisement"
                       class="px-6 py-3 bg-teal-500 text-white text-sm font-semibold rounded-xl hover:bg-teal-600 transition-colors whitespace-nowrap"
                     >
-                      إضافة إعلان جديد
+                      {{ t('profile.my_ads.add_new_ad') }}
                     </button>
                   </div>
 
@@ -1288,7 +1288,7 @@
                       class="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
                       @change="handleCategoryFilter"
                     >
-                      <option value="">جميع الأقسام</option>
+                      <option value="">{{ t('profile.my_ads.all_departments') }}</option>
                       <option
                         v-for="dept in departments"
                         :key="dept.value"
@@ -1304,7 +1304,7 @@
                       :disabled="!advertFilterCategory"
                       @change="handleSubcategoryFilter"
                     >
-                      <option value="">جميع الأقسام الفرعية</option>
+                      <option value="">{{ t('profile.my_ads.all_sub_departments') }}</option>
                       <option
                         v-for="subCat in subCategories"
                         :key="subCat.value"
@@ -1319,27 +1319,27 @@
                       @click="clearAdvertFilters"
                       class="px-4 py-3 bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-300 transition-colors whitespace-nowrap"
                     >
-                      إعادة تعيين
+                      {{ t('profile.my_ads.reset') }}
                     </button>
                   </div>
                 </div>
 
                 <!-- Loading State -->
                 <div v-if="isLoadingMyAdverts || isLoadingAdvertSearch" class="flex justify-center items-center py-12">
-                  <div class="text-gray-500">جاري تحميل الإعلانات...</div>
+                  <div class="text-gray-500">{{ t('profile.my_ads.loading_ads') }}</div>
                 </div>
                 
                 <!-- Empty State -->
                 <div v-else-if="filteredAds.length === 0" class="flex flex-col items-center justify-center py-12">
                   <p class="text-gray-500 text-lg mb-4">
-                    {{ advertSearchQuery || advertFilterCategory || advertFilterSubcategory ? "لا توجد نتائج" : "لا توجد إعلانات" }}
+                    {{ advertSearchQuery || advertFilterCategory || advertFilterSubcategory ? t('profile.my_ads.no_results') : t('profile.my_ads.no_ads') }}
                   </p>
                   <button
                     v-if="!advertSearchQuery && !advertFilterCategory && !advertFilterSubcategory"
                     @click="addAdvertisement"
                     class="px-6 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
                   >
-                    إضافة إعلان جديد
+                    {{ t('profile.my_ads.add_new_ad_button') }}
                   </button>
                 </div>
                 
@@ -1395,7 +1395,7 @@
                         <button
                           @click="viewAdRatings(ad.id)"
                           class="flex items-center gap-1 hover:opacity-80 transition-opacity"
-                          :title="`${ad.ratingsCount || 0} تقييم`"
+                          :title="t('profile.my_ads.ratings_count', { count: ad.ratingsCount || 0 })"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -1619,7 +1619,7 @@
                       d="M15 19l-7-7 7-7"
                     />
                   </svg>
-                  <span>العودة</span>
+                  <span>{{ t('profile.contact_us.back') }}</span>
                 </button>
 
                 <!-- New Complaint Form -->
@@ -1679,7 +1679,7 @@
               <div v-else-if="selectedComplaint || isLoadingComplaintDetails" class="space-y-6">
                 <!-- Loading State -->
                 <div v-if="isLoadingComplaintDetails" class="flex justify-center items-center py-12">
-                  <div class="text-gray-600 text-lg">جاري تحميل التفاصيل...</div>
+                  <div class="text-gray-600 text-lg">{{ t('profile.contact_us.loading_details') }}</div>
                 </div>
 
                 <!-- Error State -->
@@ -1703,7 +1703,7 @@
                         d="M15 19l-7-7 7-7"
                       />
                     </svg>
-                    <span>العودة</span>
+                    <span>{{ t('profile.contact_us.back') }}</span>
                   </button>
                 </div>
 
@@ -1728,7 +1728,7 @@
                       d="M15 19l-7-7 7-7"
                     />
                   </svg>
-                  <span>العودة</span>
+                  <span>{{ t('profile.contact_us.back') }}</span>
                 </button>
 
                 <!-- Header Section -->
@@ -1753,7 +1753,7 @@
                   <h2
                     class="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-start border-b border-gray-200 pb-4"
                   >
-                    تفاصيل الشكوى
+                    {{ t('profile.complaints.complaint_details') }}
                   </h2>
                   <div class="space-y-3">
                     <!-- Complaint Number -->
@@ -1761,7 +1761,7 @@
                       class="flex items-center justify-between py-3 border-b border-gray-200"
                     >
                       <span class="text-gray-600 text-sm sm:text-base"
-                        >رقم الشكوى</span
+                        >{{ t('profile.complaints.complaint_number_label') }}</span
                       >
                       <span
                         class="text-gray-800 font-semibold text-sm sm:text-base"
@@ -1774,7 +1774,7 @@
                       class="flex items-center justify-between py-3 border-b border-gray-200"
                     >
                       <span class="text-gray-600 text-sm sm:text-base"
-                        >تاريخ الشكوي</span
+                        >{{ t('profile.complaints.complaint_date') }}</span
                       >
                       <span
                         class="text-gray-800 font-semibold text-sm sm:text-base"
@@ -1787,11 +1787,11 @@
                       class="flex items-center justify-between py-3 border-b border-gray-200"
                     >
                       <span class="text-gray-600 text-sm sm:text-base"
-                        >عنوان الشكوي</span
+                        >{{ t('profile.complaints.complaint_subject') }}</span
                       >
                       <span
                         class="text-gray-800 font-semibold text-sm sm:text-base"
-                        >{{ selectedComplaint.subject || selectedComplaint.address || "لا يوجد عنوان" }}</span
+                        >{{ selectedComplaint.subject || selectedComplaint.address || t('profile.complaints.no_subject') }}</span
                       >
                     </div>
 
@@ -1800,7 +1800,7 @@
                       class="flex items-center justify-between py-3 border-b border-gray-200"
                     >
                       <span class="text-gray-600 text-sm sm:text-base"
-                        >حالة الشكوى</span
+                        >{{ t('profile.complaints.complaint_status') }}</span
                       >
                       <span
                         class="text-gray-800 font-semibold text-sm sm:text-base"
@@ -1817,7 +1817,7 @@
                   <h2
                     class="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-start border-b border-gray-200 pb-4"
                   >
-                    تفاصيل الشكوى
+                    {{ t('profile.complaints.description') }}
                   </h2>
                   <p
                     class="text-gray-700 text-sm sm:text-base leading-relaxed text-right"
@@ -1825,7 +1825,7 @@
                     {{
                       selectedComplaint.description ||
                       selectedComplaint.subject ||
-                      "لا يوجد وصف متاح"
+                      t('profile.complaints.no_description')
                     }}
                   </p>
                 </div>
@@ -1837,7 +1837,7 @@
                   <h2
                     class="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-start border-b border-gray-200 pb-4"
                   >
-                    رد الادارة
+                    {{ t('profile.complaints.admin_response') }}
                   </h2>
                   <p
                     class="text-gray-700 text-sm sm:text-base leading-relaxed text-right"
@@ -2001,7 +2001,7 @@
     />
 
     <!-- Success Modal -->
-    <SuccessModal v-model="isSuccessModalOpen" title="تم الاشتراك بنجاح" />
+    <SuccessModal v-model="isSuccessModalOpen" :title="t('profile.success.subscription_successful')" />
 
     <!-- Package Payment Modal -->
     <PackagePaymentModal
@@ -2151,6 +2151,8 @@ interface PaginationEvent {
 
 type PaymentMethod = string | { id: number; name: string };
 
+const { t, locale } = useI18n();
+const isRTL = computed(() => locale.value === "ar");
 const toast = useToast();
 const userStore = useUserStore();
 const { user, login } = useAuth();
@@ -2384,7 +2386,7 @@ const fetchFAQContent = async () => {
       "حدث خطأ أثناء تحميل الأسئلة المتكررة. الرجاء المحاولة مرة أخرى.";
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: faqError.value,
       life: 3000,
     });
@@ -2522,7 +2524,7 @@ const fetchRatings = async (page: number = 1) => {
       "حدث خطأ أثناء تحميل التقييمات. الرجاء المحاولة مرة أخرى.";
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: ratingsError.value,
       life: 3000,
     });
@@ -2830,7 +2832,7 @@ const editAd = async (adId: number) => {
     console.error("Error loading advert for editing:", error);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: error?.data?.msg || error?.message || "فشل في تحميل بيانات الإعلان",
       life: 3000,
     });
@@ -2872,7 +2874,7 @@ const fetchMyAdverts = async () => {
     if (error?.data?.key !== 'unauthenticated') {
       toast.add({
         severity: "error",
-        summary: "خطأ",
+        summary: t('profile.toast.error'),
         detail: error?.data?.msg || error?.message || "فشل في جلب الإعلانات",
         life: 3000,
       });
@@ -3060,7 +3062,7 @@ const viewAdRatings = async (advertId: number) => {
     console.error("Error fetching ratings:", error);
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "فشل في جلب التقييمات",
       life: 3000,
     });
@@ -3087,7 +3089,7 @@ const confirmDeleteAd = async () => {
     // Show success message
     toast.add({
       severity: "success",
-      summary: "نجح",
+      summary: t('profile.toast.success'),
       detail: "تم حذف الإعلان بنجاح",
       life: 3000,
     });
@@ -3106,7 +3108,7 @@ const confirmDeleteAd = async () => {
     // Show error message
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail:
         error?.data?.msg ||
         error?.data?.message ||
@@ -3226,7 +3228,7 @@ const handleAdSubmit = async () => {
   ) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "يرجى ملء جميع الحقول المطلوبة",
       life: 3000,
     });
@@ -3245,7 +3247,7 @@ const handleAdSubmit = async () => {
       if (!selectedSubCat) {
         toast.add({
           severity: "warn",
-          summary: "تحذير",
+          summary: t('profile.toast.warning'),
           detail: "يرجى اختيار قسم فرعي صحيح ينتمي للقسم الرئيسي المختار",
           life: 3000,
         });
@@ -3259,7 +3261,7 @@ const handleAdSubmit = async () => {
   if (!selectedAdToEdit.value && !subCategories.value.length && !isLoadingSubCategories.value) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "لا توجد أقسام فرعية متاحة. يرجى اختيار قسم آخر أو الانتظار حتى يتم تحميل الأقسام الفرعية",
       life: 3000,
     });
@@ -3270,7 +3272,7 @@ const handleAdSubmit = async () => {
   if (!adForm.locationData || !adForm.locationData.lat || !adForm.locationData.lng) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "يرجى تحديد الموقع على الخريطة",
       life: 3000,
     });
@@ -3331,7 +3333,7 @@ const handleAdSubmit = async () => {
       
       toast.add({
         severity: "success",
-        summary: "نجح",
+        summary: t('profile.toast.success'),
         detail: "تم تحديث الإعلان بنجاح",
         life: 3000,
       });
@@ -3361,7 +3363,7 @@ const handleAdSubmit = async () => {
       if (createdAdvert) {
         toast.add({
           severity: "success",
-          summary: "نجح",
+          summary: t('profile.toast.success'),
           detail: "تم إنشاء الإعلان بنجاح",
           life: 3000,
         });
@@ -3419,7 +3421,7 @@ const handleAdSubmit = async () => {
     
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: errorMessage,
       life: 5000,
     });
@@ -3518,7 +3520,7 @@ const fetchFollowers = async (page: number = 1) => {
       "حدث خطأ أثناء تحميل المتابعين. الرجاء المحاولة مرة أخرى.";
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: followingError.value,
       life: 3000,
     });
@@ -3663,7 +3665,7 @@ const handleUnfollow = async (userId: number) => {
     if (!token) {
       toast.add({
         severity: "error",
-        summary: "خطأ",
+        summary: t('profile.toast.error'),
         detail: "يرجى تسجيل الدخول أولاً",
         life: 3000,
       });
@@ -3701,7 +3703,7 @@ const handleUnfollow = async (userId: number) => {
 
       toast.add({
         severity: "success",
-        summary: "نجح",
+        summary: t('profile.toast.success'),
         detail: response.msg || "تم إلغاء المتابعة بنجاح",
         life: 3000,
       });
@@ -3715,7 +3717,7 @@ const handleUnfollow = async (userId: number) => {
     console.error("Error unfollowing user:", err);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
         detail:
         (err as any)?.data?.msg ||
         (err as any)?.message ||
@@ -4029,7 +4031,7 @@ const fetchComplaints = async () => {
       "حدث خطأ أثناء تحميل الشكاوى. الرجاء المحاولة مرة أخرى.";
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: complaintsError.value,
       life: 3000,
     });
@@ -4112,7 +4114,7 @@ const fetchComplaintDetails = async (complaintId: number) => {
       "حدث خطأ أثناء تحميل تفاصيل الشكوى. الرجاء المحاولة مرة أخرى.";
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: complaintDetailsError.value,
       life: 3000,
     });
@@ -4132,7 +4134,7 @@ const handleNewComplaintSubmit = async () => {
   if (!newComplaintForm.title.trim() || !newComplaintForm.message.trim()) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "يرجى ملء جميع الحقول المطلوبة",
       life: 3000,
     });
@@ -4188,7 +4190,7 @@ const handleNewComplaintSubmit = async () => {
     if (response && response.key === "success") {
       toast.add({
         severity: "success",
-        summary: "نجح",
+        summary: t('profile.toast.success'),
         detail: response.msg || "تم إرسال الشكوى بنجاح",
         life: 3000,
       });
@@ -4207,17 +4209,17 @@ const handleNewComplaintSubmit = async () => {
       await new Promise(resolve => setTimeout(resolve, 500));
       await fetchComplaints();
     } else {
-      throw new Error(response?.msg || "فشل في إرسال الشكوى");
+      throw new Error(response?.msg || t('profile.errors.send_complaint_failed'));
     }
   } catch (error: any) {
     console.error("Error submitting complaint:", error);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail:
         error?.data?.msg ||
         error?.message ||
-        "حدث خطأ أثناء إرسال الشكوى. الرجاء المحاولة مرة أخرى.",
+        t('profile.errors.send_complaint_error'),
       life: 3000,
     });
   }
@@ -4407,7 +4409,7 @@ const fetchCountries = async () => {
     console.error("Error fetching countries:", error);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: "فشل في جلب قائمة الدول",
       life: 3000,
     });
@@ -4583,27 +4585,24 @@ const cvFile = ref<File | null>(null);
 const proofFile = ref<File | null>(null);
 const isSubmittingConsultant = ref(false);
 
-const tabTitles = {
-  profile: "الملف الشخصي",
-  settings: "الاعدادات",
-  wallet: "المحفظة",
-  "my-ads": "اعلاناتي",
-  ratings: "تقييماتي",
-  following: "المتابعة",
-  commission: "حساب عمولة التطبيق",
-  packages: "باقاتي",
-  subscription: "اشتراكي",
-  faq: "الاسئلة المتكررة",
-  privacy: "سياسة الاستخدام",
-  terms: "الشروط والاحكام",
-  complaints: "الشكاوي المقدمة",
-  "join-consultant": "الانظمام كمستشار",
-  "contact-us": "تواصل معنا",
-  "about-us": "عن المنصة",
-};
-
 const getTabTitle = (): string => {
-  return (tabTitles as Record<string, string>)[activeTab.value] || "الملف الشخصي";
+  const tabMap: Record<string, string> = {
+    'profile': 'profile.tabs.profile',
+    'settings': 'profile.tabs.settings',
+    'wallet': 'profile.tabs.wallet',
+    'my-ads': 'profile.tabs.my_ads',
+    'ratings': 'profile.tabs.ratings',
+    'following': 'profile.tabs.following',
+    'commission': 'profile.tabs.commission',
+    'packages': 'profile.tabs.packages',
+    'subscription': 'profile.tabs.subscription',
+    'faq': 'profile.tabs.faq',
+    'content': 'profile.tabs.content',
+    'join-consultant': 'profile.tabs.join_consultant',
+    'contact-us': 'profile.tabs.contact_us',
+  };
+  const tabKey = tabMap[activeTab.value] || 'profile.tabs.profile';
+  return t(tabKey);
 };
 
 
@@ -4613,8 +4612,8 @@ const handleProfileAvatarChange = (file: File | undefined) => {
     if (!file.type.startsWith("image/")) {
       toast.add({
         severity: "error",
-        summary: "خطأ",
-        detail: "الرجاء اختيار صورة",
+        summary: t('profile.toast.error'),
+        detail: t('profile.validation.select_image'),
         life: 3000,
       });
       return;
@@ -4624,7 +4623,7 @@ const handleProfileAvatarChange = (file: File | undefined) => {
     if (file.size > 5 * 1024 * 1024) {
       toast.add({
         severity: "error",
-        summary: "خطأ",
+        summary: t('profile.toast.error'),
         detail: "حجم الصورة يجب أن يكون أقل من 5 ميجابايت",
         life: 3000,
       });
@@ -4743,7 +4742,7 @@ const sendOldPhoneCode = async () => {
     if (!token) {
       toast.add({
         severity: "error",
-        summary: "خطأ",
+        summary: t('profile.toast.error'),
         detail: "يرجى تسجيل الدخول أولاً",
         life: 3000,
       });
@@ -4770,23 +4769,23 @@ const sendOldPhoneCode = async () => {
       hasSentOldPhoneCode.value = true;
       toast.add({
         severity: "success",
-        summary: "نجح",
-        detail: response.msg || "تم إرسال رمز التحقق إلى رقم الجوال الحالي",
+        summary: t('profile.toast.success'),
+        detail: response.msg || t('profile.success.verification_code_sent'),
         life: 3000,
       });
     } else {
-      throw new Error(response?.msg || "فشل في إرسال رمز التحقق");
+      throw new Error(response?.msg || t('profile.errors.enter_mobile'));
     }
   } catch (err: any) {
     console.error("Error sending old phone code:", err);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
         detail:
         (err as any)?.data?.msg ||
         (err as any)?.message ||
         (err as any)?.data?.message ||
-        "حدث خطأ أثناء إرسال رمز التحقق. الرجاء المحاولة مرة أخرى.",
+        t('profile.errors.enter_mobile'),
       life: 3000,
     });
   } finally {
@@ -4799,8 +4798,8 @@ const handleVerifyCode = async () => {
   if (code.length !== 4) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
-      detail: "يرجى إدخال رمز التحقق المكون من 4 أرقام",
+      summary: t('profile.toast.warning'),
+      detail: t('profile.validation.verification_code_length'),
       life: 3000,
     });
     return;
@@ -4843,7 +4842,7 @@ const handleVerifyCode = async () => {
     if (!token) {
       toast.add({
         severity: "error",
-        summary: "خطأ",
+        summary: t('profile.toast.error'),
         detail: "يرجى تسجيل الدخول أولاً",
         life: 3000,
       });
@@ -4876,7 +4875,7 @@ const handleVerifyCode = async () => {
 
       toast.add({
         severity: "success",
-        summary: "نجح",
+        summary: t('profile.toast.success'),
         detail: response.msg || "تم التحقق من الكود بنجاح",
         life: 3000,
       });
@@ -4887,7 +4886,7 @@ const handleVerifyCode = async () => {
     console.error("Error verifying old phone code:", err);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
         detail:
         (err as any)?.data?.msg ||
         (err as any)?.message ||
@@ -4904,8 +4903,8 @@ const handleNextStep = async () => {
   if (!changeMobileForm.newMobile.trim()) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
-      detail: "يرجى إدخال رقم الجوال",
+      summary: t('profile.toast.warning'),
+      detail: t('profile.errors.enter_mobile'),
       life: 3000,
     });
     return;
@@ -4916,8 +4915,8 @@ const handleNextStep = async () => {
   if (mobileNumber.length !== 9) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
-      detail: "يرجى إدخال رقم جوال صحيح (9 أرقام)",
+      summary: t('profile.toast.warning'),
+      detail: t('profile.validation.valid_mobile'),
       life: 3000,
     });
     return;
@@ -4960,7 +4959,7 @@ const handleNextStep = async () => {
     if (!token) {
       toast.add({
         severity: "error",
-        summary: "خطأ",
+        summary: t('profile.toast.error'),
         detail: "يرجى تسجيل الدخول أولاً",
         life: 3000,
       });
@@ -4994,23 +4993,23 @@ const handleNextStep = async () => {
 
       toast.add({
         severity: "success",
-        summary: "نجح",
+        summary: t('profile.toast.success'),
         detail: response.msg || "تم إرسال رمز التحقق إلى الرقم الجديد",
         life: 3000,
       });
     } else {
-      throw new Error(response?.msg || "فشل في إرسال رمز التحقق");
+      throw new Error(response?.msg || t('profile.errors.enter_mobile'));
     }
   } catch (err) {
     console.error("Error sending new phone code:", err);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
         detail:
         (err as any)?.data?.msg ||
         (err as any)?.message ||
         (err as any)?.data?.message ||
-        "حدث خطأ أثناء إرسال رمز التحقق. الرجاء المحاولة مرة أخرى.",
+        t('profile.errors.enter_mobile'),
       life: 3000,
     });
   } finally {
@@ -5023,8 +5022,8 @@ const handleVerifyNewCode = async () => {
   if (code.length !== 4) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
-      detail: "يرجى إدخال رمز التحقق المكون من 4 أرقام",
+      summary: t('profile.toast.warning'),
+      detail: t('profile.validation.verification_code_length'),
       life: 3000,
     });
     return;
@@ -5067,7 +5066,7 @@ const handleVerifyNewCode = async () => {
     if (!token) {
       toast.add({
         severity: "error",
-        summary: "خطأ",
+        summary: t('profile.toast.error'),
         detail: "يرجى تسجيل الدخول أولاً",
         life: 3000,
       });
@@ -5100,8 +5099,8 @@ const handleVerifyNewCode = async () => {
 
       toast.add({
         severity: "success",
-        summary: "نجح",
-        detail: response.msg || "تم التحقق من الكود بنجاح وتم تغيير رقم الجوال",
+        summary: t('profile.toast.success'),
+        detail: response.msg || t('profile.success.code_verified_mobile_changed'),
         life: 3000,
       });
 
@@ -5125,7 +5124,7 @@ const handleVerifyNewCode = async () => {
     console.error("Error verifying new phone code:", err);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
         detail:
         (err as any)?.data?.msg ||
         (err as any)?.message ||
@@ -5174,8 +5173,8 @@ const handleSettingsAvatarChange = (event: Event) => {
     if (!file.type.startsWith("image/")) {
       toast.add({
         severity: "error",
-        summary: "خطأ",
-        detail: "الرجاء اختيار صورة",
+        summary: t('profile.toast.error'),
+        detail: t('profile.validation.select_image'),
         life: 3000,
       });
       return;
@@ -5185,7 +5184,7 @@ const handleSettingsAvatarChange = (event: Event) => {
     if (file.size > 5 * 1024 * 1024) {
       toast.add({
         severity: "error",
-        summary: "خطأ",
+        summary: t('profile.toast.error'),
         detail: "حجم الصورة يجب أن يكون أقل من 5 ميجابايت",
         life: 3000,
       });
@@ -5215,7 +5214,7 @@ const handleSettingsSubmit = async () => {
   ) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "يرجى ملء جميع الحقول المطلوبة",
       life: 3000,
     });
@@ -5244,7 +5243,7 @@ const handleSettingsSubmit = async () => {
     if (!token) {
       toast.add({
         severity: "error",
-        summary: "خطأ",
+        summary: t('profile.toast.error'),
         detail: "يرجى تسجيل الدخول أولاً",
         life: 3000,
       });
@@ -5306,8 +5305,8 @@ const handleSettingsSubmit = async () => {
 
       toast.add({
         severity: "success",
-        summary: "نجح",
-        detail: response.msg || "تم تحديث البيانات الشخصية بنجاح",
+        summary: t('profile.toast.success'),
+        detail: response.msg || t('profile.success.personal_info_updated'),
         life: 3000,
       });
 
@@ -5320,7 +5319,7 @@ const handleSettingsSubmit = async () => {
     console.error("Error updating profile:", error);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail:
         (error as any)?.data?.msg ||
         (error as any)?.data?.message ||
@@ -5342,7 +5341,7 @@ const handleChangePasswordSubmit = async () => {
   ) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "يرجى ملء جميع الحقول المطلوبة",
       life: 3000,
     });
@@ -5351,7 +5350,7 @@ const handleChangePasswordSubmit = async () => {
   if (changePasswordForm.newPassword !== changePasswordForm.confirmPassword) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "كلمة المرور الجديدة وتأكيدها غير متطابقين",
       life: 3000,
     });
@@ -5362,7 +5361,7 @@ const handleChangePasswordSubmit = async () => {
   if (changePasswordForm.newPassword.length < 6) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
       life: 3000,
     });
@@ -5403,7 +5402,7 @@ const handleChangePasswordSubmit = async () => {
     toast.add({
       severity: "warn",
       summary: "تنبيه",
-      detail: "يرجى تسجيل الدخول قبل تغيير كلمة المرور.",
+      detail: t('profile.errors.login_required_password'),
       life: 3000,
     });
     return;
@@ -5448,12 +5447,12 @@ const handleChangePasswordSubmit = async () => {
       // Show success message
       toast.add({
         severity: "success",
-        summary: "نجح",
-        detail: response.msg || "تم تغيير كلمة المرور بنجاح",
+        summary: t('profile.toast.success'),
+        detail: response.msg || t('profile.success.password_changed'),
         life: 3000,
       });
     } else {
-      throw new Error(response?.msg || "فشل في تغيير كلمة المرور");
+      throw new Error(response?.msg || t('profile.errors.change_password_failed'));
     }
   } catch (error: any) {
     console.error("Error changing password:", error);
@@ -5461,11 +5460,11 @@ const handleChangePasswordSubmit = async () => {
       error?.data?.message ||
       (error as any)?.data?.msg ||
       (error as any)?.message ||
-      "حدث خطأ أثناء تغيير كلمة المرور. الرجاء المحاولة مرة أخرى.";
+      t('profile.errors.change_password_error');
 
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: errorMessage,
       life: 3000,
     });
@@ -5492,7 +5491,7 @@ const handlePackagePaymentConfirm = async (paymentMethod: PaymentMethod) => {
   if (!packageId) {
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: "معرف الباقة غير موجود",
       life: 3000,
     });
@@ -5537,7 +5536,7 @@ const handlePackagePaymentConfirm = async (paymentMethod: PaymentMethod) => {
     if (!token) {
       toast.add({
         severity: "error",
-        summary: "خطأ",
+        summary: t('profile.toast.error'),
         detail: "يرجى تسجيل الدخول أولاً",
         life: 3000,
       });
@@ -5563,7 +5562,7 @@ const handlePackagePaymentConfirm = async (paymentMethod: PaymentMethod) => {
     if (response && response.key === "success") {
       toast.add({
         severity: "success",
-        summary: "نجح",
+        summary: t('profile.toast.success'),
         detail: response.msg || "تم الاشتراك في الباقة بنجاح",
         life: 3000,
       });
@@ -5594,7 +5593,7 @@ const handlePackagePaymentConfirm = async (paymentMethod: PaymentMethod) => {
     console.error("Error subscribing to package:", err);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
         detail:
         (err as any)?.data?.msg ||
         (err as any)?.message ||
@@ -5615,7 +5614,7 @@ const handleRenewSubscription = (subscription: Subscription) => {
   if (!packageId) {
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: "معرف الباقة غير موجود",
       life: 3000,
     });
@@ -5635,7 +5634,7 @@ const handleContactUsSubmit = async () => {
   if (!contactForm.messageTitle.trim() || !contactForm.messageText.trim()) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "يرجى ملء جميع الحقول",
       life: 3000,
     });
@@ -5662,7 +5661,7 @@ const handleContactUsSubmit = async () => {
     if (response && response.key === "success") {
       toast.add({
         severity: "success",
-        summary: "نجح",
+        summary: t('profile.toast.success'),
         detail: response.msg || "تم إرسال الرسالة بنجاح",
         life: 3000,
       });
@@ -5675,7 +5674,7 @@ const handleContactUsSubmit = async () => {
     console.error("Error sending contact message:", error);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail:
       (error as any)?.data?.msg ||
       (error as any)?.message ||
@@ -5715,7 +5714,7 @@ const fetchAboutContent = async () => {
       "حدث خطأ أثناء تحميل صفحة من نحن. الرجاء المحاولة مرة أخرى.";
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: aboutError.value,
       life: 3000,
     });
@@ -5752,7 +5751,7 @@ const fetchTermsContent = async () => {
       "حدث خطأ أثناء تحميل الشروط والأحكام. الرجاء المحاولة مرة أخرى.";
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: termsError.value,
       life: 3000,
     });
@@ -5789,7 +5788,7 @@ const fetchPrivacyContent = async () => {
       "حدث خطأ أثناء تحميل سياسة الخصوصية. الرجاء المحاولة مرة أخرى.";
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: privacyError.value,
       life: 3000,
     });
@@ -5841,7 +5840,7 @@ const handleJoinConsultantSubmit = async () => {
   ) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "يرجى ملء جميع الحقول المطلوبة",
       life: 3000,
     });
@@ -5916,7 +5915,7 @@ const handleJoinConsultantSubmit = async () => {
       // Show success message
       toast.add({
         severity: "success",
-        summary: "نجح",
+        summary: t('profile.toast.success'),
         detail: response.msg || "تم إرسال الطلب بنجاح",
         life: 3000,
       });
@@ -5933,7 +5932,7 @@ const handleJoinConsultantSubmit = async () => {
 
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: errorMessage,
       life: 3000,
     });
@@ -5971,7 +5970,7 @@ const confirmDeleteAccount = async () => {
     if (!token) {
       toast.add({
         severity: "error",
-        summary: "خطأ",
+        summary: t('profile.toast.error'),
         detail: "يرجى تسجيل الدخول أولاً",
         life: 3000,
       });
@@ -5995,7 +5994,7 @@ const confirmDeleteAccount = async () => {
     if (response && response.key === "success") {
       toast.add({
         severity: "success",
-        summary: "نجح",
+        summary: t('profile.toast.success'),
         detail: response.msg || "تم حذف الحساب بنجاح",
         life: 3000,
       });
@@ -6011,18 +6010,18 @@ const confirmDeleteAccount = async () => {
       // Navigate to login page
       navigateTo("/login");
     } else {
-      throw new Error(response?.msg || "فشل في حذف الحساب");
+      throw new Error(response?.msg || t('profile.errors.delete_account_failed'));
     }
   } catch (error: any) {
     console.error("Error deleting account:", error);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail:
         (error as any)?.data?.msg ||
         (error as any)?.data?.message ||
         (error as any)?.message ||
-        "حدث خطأ أثناء حذف الحساب. الرجاء المحاولة مرة أخرى.",
+        t('profile.errors.delete_account_error'),
       life: 3000,
     });
   } finally {
@@ -6079,7 +6078,7 @@ const confirmLogout = async () => {
     if (response && response.key === "success") {
       toast.add({
         severity: "success",
-        summary: "نجح",
+        summary: t('profile.toast.success'),
         detail: response.msg || "تم تسجيل الخروج بنجاح",
         life: 3000,
       });
@@ -6087,17 +6086,17 @@ const confirmLogout = async () => {
       isLogoutModalOpen.value = false;
       navigateTo("/login");
     } else {
-      throw new Error(response?.msg || "فشل في تسجيل الخروج");
+      throw new Error(response?.msg || t('profile.errors.logout_failed'));
     }
   } catch (error) {
     console.error("Error during logout:", error);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail:
       (error as any)?.data?.msg ||
       (error as any)?.message ||
-        "حدث خطأ أثناء تسجيل الخروج. الرجاء المحاولة مرة أخرى.",
+        t('profile.errors.logout_error'),
       life: 3000,
     });
   } finally {
@@ -6128,8 +6127,8 @@ const loadWalletBalance = async () => {
     } else {
       toast.add({
         severity: "error",
-        summary: "خطأ",
-        detail: err?.data?.msg || err?.message || "حدث خطأ أثناء تحميل رصيد المحفظة",
+        summary: t('profile.toast.error'),
+        detail: err?.data?.msg || err?.message || t('profile.errors.wallet_load_error'),
         life: 3000,
       });
     }
@@ -6146,7 +6145,7 @@ const handleCharge = async (amount: string) => {
   if (!amount || parseFloat(amount) <= 0) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "يرجى إدخال مبلغ صحيح",
       life: 3000,
     });
@@ -6172,8 +6171,8 @@ const handleCharge = async (amount: string) => {
     
     toast.add({
       severity: "success",
-      summary: "نجح",
-      detail: response?.msg || "تم شحن المحفظة بنجاح",
+      summary: t('profile.toast.success'),
+      detail: response?.msg || t('profile.success.wallet_charged'),
       life: 3000,
     });
     
@@ -6187,10 +6186,10 @@ const handleCharge = async (amount: string) => {
     
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
       detail: isUnauthenticated
-        ? "يرجى تسجيل الدخول لشحن المحفظة"
-        : err?.data?.msg || err?.message || "حدث خطأ أثناء شحن المحفظة",
+        ? t('profile.errors.login_required_charge')
+        : err?.data?.msg || err?.message || t('profile.errors.charge_wallet_error'),
       life: 3000,
     });
     
@@ -6279,7 +6278,7 @@ const calculateFee = async (amount: string) => {
       calculatedFee.value =
         response.data?.total_amount || response.data?.fee || amount;
     } else {
-      throw new Error(response?.msg || "فشل في حساب الرسوم");
+      throw new Error(response?.msg || t('profile.errors.calculate_fee_failed'));
     }
   } catch (err: any) {
     console.error("Error calculating fee:", err);
@@ -6287,7 +6286,7 @@ const calculateFee = async (amount: string) => {
       err?.data?.msg ||
       err?.message ||
       err?.data?.message ||
-      "حدث خطأ أثناء حساب الرسوم. الرجاء المحاولة مرة أخرى.";
+      t('profile.errors.calculate_fee_error');
   } finally {
     isCalculatingFee.value = false;
   }
@@ -6298,7 +6297,7 @@ const openCommissionPaymentModal = async () => {
   if (!amount || parseFloat(amount) <= 0) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "يرجى إدخال مبلغ صحيح",
       life: 3000,
     });
@@ -6320,7 +6319,7 @@ const handleCommissionPaymentConfirm = async (paymentMethod: PaymentMethod) => {
   if (!amount || parseFloat(amount) <= 0) {
     toast.add({
       severity: "warn",
-      summary: "تحذير",
+      summary: t('profile.toast.warning'),
       detail: "يرجى إدخال مبلغ صحيح",
       life: 3000,
     });
@@ -6382,8 +6381,8 @@ const handleCommissionPaymentConfirm = async (paymentMethod: PaymentMethod) => {
     if (response && response.key === "success") {
       toast.add({
         severity: "success",
-        summary: "نجح",
-        detail: response.msg || "تم الدفع بنجاح",
+        summary: t('profile.toast.success'),
+        detail: response.msg || t('profile.success.fee_paid'),
         life: 3000,
       });
 
@@ -6401,18 +6400,18 @@ const handleCommissionPaymentConfirm = async (paymentMethod: PaymentMethod) => {
         isSuccessModalOpen.value = true;
       }, 200);
     } else {
-      throw new Error(response?.msg || "فشل في عملية الدفع");
+      throw new Error(response?.msg || t('profile.errors.payment_failed'));
     }
   } catch (err) {
     console.error("Error paying fee:", err);
     toast.add({
       severity: "error",
-      summary: "خطأ",
+      summary: t('profile.toast.error'),
         detail:
         (err as any)?.data?.msg ||
         (err as any)?.message ||
         (err as any)?.data?.message ||
-        "حدث خطأ أثناء عملية الدفع. الرجاء المحاولة مرة أخرى.",
+        t('profile.errors.payment_error'),
       life: 3000,
     });
   } finally {
