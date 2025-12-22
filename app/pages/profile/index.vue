@@ -168,17 +168,151 @@
                       رقم الجوال
                     </label>
                     <div
-                      class="flex flex-col sm:flex-row rounded-lg sm:rounded-xl border border-gray-200 bg-white shadow-sm focus-within:border-[#15c472] focus-within:ring-2 focus-within:ring-[#15c472]/20 overflow-hidden"
+                      class="flex flex-col sm:flex-row rounded-lg sm:rounded-xl border border-gray-200 bg-white shadow-sm focus-within:border-[#15c472] focus-within:ring-2 focus-within:ring-[#15c472]/20 overflow-visible sm:overflow-hidden"
                     >
-                      <div
-                        class="flex items-center justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-3 py-2.5 sm:px-4 sm:py-3 bg-gray-50 text-xs sm:text-sm text-gray-700 min-w-[90px] sm:min-w-[100px]"
-                      >
-                        <span>+966</span>
-                        <img
-                          src="/images/Country Flags.png"
-                          alt="Saudi Arabia Flag"
-                          class="w-7 h-7 sm:w-6 sm:h-6"
-                        />
+                      <div class="relative z-50" data-country-selector>
+                        <button
+                          type="button"
+                          @click="
+                            isCountryDropdownOpen = !isCountryDropdownOpen;
+                            if (isCountryDropdownOpen) countrySearchQuery = '';
+                          "
+                          :class="[
+                            'flex items-center justify-center gap-2 border-b border-gray-100 sm:border-b-0 sm:border-l px-3 py-2.5 sm:px-4 sm:py-3 bg-gray-50 text-xs sm:text-sm text-gray-700 min-w-[90px] sm:min-w-[120px] hover:bg-gray-100 transition-colors',
+                            isCountryDropdownOpen ? 'bg-gray-100' : ''
+                          ]"
+                        >
+                          <span>{{ settingsForm.countryCode || '+966' }}</span>
+                          <img
+                            v-if="selectedCountry"
+                            :src="selectedCountry.image"
+                            :alt="selectedCountry.name"
+                            class="w-7 h-7 sm:w-6 sm:h-6 object-cover rounded"
+                            @error="(e) => { const img = e.target as HTMLImageElement; if (img) img.src = '/images/Country Flags.png'; }"
+                          />
+                          <img
+                            v-else
+                            src="/images/Country Flags.png"
+                            alt="Country Flag"
+                            class="w-7 h-7 sm:w-6 sm:h-6"
+                          />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 transition-transform"
+                            :class="{ 'rotate-180': isCountryDropdownOpen }"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </button>
+                        <!-- Country Dropdown -->
+                        <Transition
+                          enter-active-class="transition ease-out duration-100"
+                          enter-from-class="transform opacity-0 scale-95"
+                          enter-to-class="transform opacity-100 scale-100"
+                          leave-active-class="transition ease-in duration-75"
+                          leave-from-class="transform opacity-100 scale-100"
+                          leave-to-class="transform opacity-0 scale-95"
+                        >
+                          <div
+                            v-if="isCountryDropdownOpen"
+                            class="absolute bottom-full mb-2 sm:bottom-auto sm:top-full left-0 right-0 sm:right-auto sm:left-0 z-[100] sm:mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-80 w-full sm:w-80 overflow-hidden flex flex-col"
+                            @click.stop
+                          >
+                            <!-- Search Input -->
+                            <div class="p-2 border-b border-gray-200 sticky top-0 bg-white z-10">
+                              <div class="relative">
+                                <input
+                                  v-model="countrySearchQuery"
+                                  type="text"
+                                  placeholder="ابحث عن دولة..."
+                                  class="w-full px-3 py-2 pr-8 text-sm text-right border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#15c472]/20 focus:border-[#15c472]"
+                                  @click.stop
+                                />
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  class="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                  />
+                                </svg>
+                              </div>
+                            </div>
+                            <!-- Countries List -->
+                            <div class="overflow-y-auto max-h-64">
+                              <div
+                                v-for="country in filteredCountries"
+                                :key="country.id"
+                                @click="
+                                  settingsForm.countryId = country.id;
+                                  settingsForm.countryCode = '+' + country.country_code;
+                                  isCountryDropdownOpen = false;
+                                  countrySearchQuery = '';
+                                "
+                                :class="[
+                                  'flex items-center gap-2 px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors',
+                                  settingsForm.countryId === country.id ? 'bg-[#15c472]/10 hover:bg-[#15c472]/15' : ''
+                                ]"
+                              >
+                                <img
+                                  :src="country.image"
+                                  :alt="country.name"
+                                  class="w-6 h-6 object-cover rounded flex-shrink-0"
+                                  @error="(e) => { const img = e.target as HTMLImageElement; if (img) img.src = '/images/Country Flags.png'; }"
+                                />
+                                <span class="text-xs sm:text-sm text-gray-700 flex-1 text-right">{{ country.name }}</span>
+                                <span class="text-xs text-gray-500 flex-shrink-0">+{{ country.country_code }}</span>
+                                <svg
+                                  v-if="settingsForm.countryId === country.id"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  class="w-4 h-4 text-[#15c472] flex-shrink-0"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              </div>
+                              <div
+                                v-if="isLoadingCountries"
+                                class="px-3 py-4 text-xs text-gray-500 text-center"
+                              >
+                                جاري التحميل...
+                              </div>
+                              <div
+                                v-if="!isLoadingCountries && countries.length === 0"
+                                class="px-3 py-4 text-xs text-gray-500 text-center"
+                              >
+                                لا توجد دول متاحة
+                              </div>
+                              <div
+                                v-if="!isLoadingCountries && countries.length > 0 && filteredCountries.length === 0"
+                                class="px-3 py-4 text-xs text-gray-500 text-center"
+                              >
+                                لم يتم العثور على نتائج
+                              </div>
+                            </div>
+                          </div>
+                        </Transition>
                       </div>
                       <input
                         id="settingsMobileNumber"
@@ -1896,7 +2030,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, watch, nextTick, onMounted } from "vue";
+import { reactive, ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
 import Paginator from "primevue/paginator";
 import { useToast } from "primevue/usetoast";
 import Accordion from "primevue/accordion";
@@ -3432,6 +3566,9 @@ watch(activeTab, (newTab) => {
     fetchComplaints();
   } else if (newTab === "wallet") {
     loadWalletBalance();
+  } else if (newTab === "settings") {
+    // Fetch countries when settings tab is opened
+    fetchCountries();
   } else if (newTab === "my-ads") {
     // Fetch user's adverts from API
     fetchMyAdverts();
@@ -4236,6 +4373,54 @@ const fetchUserProfile = async () => {
   }
 };
 
+// Fetch countries from API
+const fetchCountries = async () => {
+  if (countries.value.length > 0) {
+    return; // Already fetched
+  }
+  
+  try {
+    isLoadingCountries.value = true;
+    const response = await $fetch<ApiResponse<any>>(
+      "https://backend.wattani-sa.com/api/v1/countries",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      }
+    );
+
+    if (response && response.key === "success" && response.data) {
+      countries.value = response.data;
+      // Set default country if not set
+      if (!settingsForm.countryId && countries.value.length > 0) {
+        const saudiArabia = countries.value.find(c => c.iso === "SA") || countries.value[0];
+        if (saudiArabia) {
+          settingsForm.countryId = saudiArabia.id;
+          settingsForm.countryCode = `+${saudiArabia.country_code}`;
+        }
+      }
+    }
+  } catch (error: any) {
+    console.error("Error fetching countries:", error);
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: "فشل في جلب قائمة الدول",
+      life: 3000,
+    });
+  } finally {
+    isLoadingCountries.value = false;
+  }
+};
+
+// Get selected country data
+const selectedCountry = computed(() => {
+  return countries.value.find(c => c.id === settingsForm.countryId) || countries.value.find(c => c.iso === "SA") || countries.value[0];
+});
+
 // Load user data from auth on mount
 onMounted(() => {
   // Fetch user's adverts from API if on my-ads tab
@@ -4266,6 +4451,13 @@ onMounted(() => {
   });
 });
 
+// Cleanup event listener on unmount
+onUnmounted(() => {
+  if (import.meta.client) {
+    document.removeEventListener('click', handleClickOutside);
+  }
+});
+
 // Watch for changes in authStore.authUser and user.value to update form when data changes
 watch(() => {
   const authStore = useAuthStore();
@@ -4286,10 +4478,57 @@ const settingsForm = reactive({
   city: "",
   location: "",
   avatar: "",
+  countryCode: "+966",
+  countryId: 1,
 });
 
 const settingsAvatarInput = ref<HTMLInputElement | null>(null);
 const settingsAvatarPreview = ref<string>("");
+
+// Countries state
+const countries = ref<Array<{ id: number; name: string; country_code: string; iso: string; image: string }>>([]);
+const isLoadingCountries = ref(false);
+const isCountryDropdownOpen = ref(false);
+const countrySearchQuery = ref("");
+
+// Filtered countries based on search
+const filteredCountries = computed(() => {
+  if (!countrySearchQuery.value.trim()) {
+    return countries.value;
+  }
+  const query = countrySearchQuery.value.toLowerCase().trim();
+  return countries.value.filter(
+    (country) =>
+      country.name.toLowerCase().includes(query) ||
+      country.country_code.includes(query) ||
+      country.iso.toLowerCase().includes(query)
+  );
+});
+
+// Handle click outside to close country dropdown
+const handleClickOutside = (event: MouseEvent) => {
+  if (isCountryDropdownOpen.value) {
+    const target = event.target as HTMLElement;
+    const countrySelector = target.closest('[data-country-selector]');
+    if (!countrySelector) {
+      isCountryDropdownOpen.value = false;
+      countrySearchQuery.value = '';
+    }
+  }
+};
+
+// Watch for dropdown state changes to add/remove event listener
+watch(isCountryDropdownOpen, (isOpen) => {
+  if (import.meta.client) {
+    if (isOpen) {
+      nextTick(() => {
+        document.addEventListener('click', handleClickOutside);
+      });
+    } else {
+      document.removeEventListener('click', handleClickOutside);
+    }
+  }
+});
 
 const changeMobileForm = reactive({
   currentMobile: "",

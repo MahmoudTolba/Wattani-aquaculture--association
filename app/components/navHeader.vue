@@ -200,8 +200,9 @@
               {{ resolveLabel(item.labels) }}
             </NuxtLink>
 
-            <!-- Action Buttons (Favorites, Chat, Notifications) -->
+            <!-- Action Buttons (Favorites, Chat, Notifications) - shown only when authenticated -->
             <div
+              v-if="showAuth"
               class="flex items-center justify-between gap-2 border-y border-gray-100 py-3"
             >
               <NuxtLink
@@ -297,28 +298,31 @@
           </NuxtLink>
         </nav>
         <div class="hidden md:flex items-center gap-4">
-          <NuxtLink
-            v-for="action in actionButtons"
-            :key="'desktop-action-' + action.id"
-            :to="action.to"
-            :class="[
-              'relative flex h-10 w-10 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:border-[#15c472]/40',
-              action.id === 'notifications' && hasNotifications
-                ? 'text-[#15c472]'
-                : '',
-            ]"
-            :aria-label="resolveLabel(action.aria)"
-          >
-            <img
-              :src="action.icon"
-              :alt="resolveLabel(action.aria)"
-              class="h-5 w-5"
-            />
-            <span
-              v-if="action.id === 'notifications' && hasNotifications"
-              class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#D92D20]"
-            />
-          </NuxtLink>
+          <!-- Action Buttons (Favorites, Chat, Notifications) - shown only when authenticated -->
+          <template v-if="showAuth">
+            <NuxtLink
+              v-for="action in actionButtons"
+              :key="'desktop-action-' + action.id"
+              :to="action.to"
+              :class="[
+                'relative flex h-10 w-10 items-center justify-center rounded-full text-gray-500 transition hover:text-[#15c472] hover:border-[#15c472]/40',
+                action.id === 'notifications' && hasNotifications
+                  ? 'text-[#15c472]'
+                  : '',
+              ]"
+              :aria-label="resolveLabel(action.aria)"
+            >
+              <img
+                :src="action.icon"
+                :alt="resolveLabel(action.aria)"
+                class="h-5 w-5"
+              />
+              <span
+                v-if="action.id === 'notifications' && hasNotifications"
+                class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#D92D20]"
+              />
+            </NuxtLink>
+          </template>
           <button
             type="button"
             class="inline-flex items-center gap-2 rounded-full border border-[#15c472] px-5 py-2 text-sm font-semibold text-[#15c472] transition hover:bg-[#15c472]/5"
